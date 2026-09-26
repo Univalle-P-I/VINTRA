@@ -1,32 +1,26 @@
+<!-- markdownlint-disable MD033 MD041 -->
+
 <div align="center">
-# VINTRA
 
-**Sistema de coordinación y seguimiento de rutas de recolección de residuos sólidos**
+<h1> VINTRA </h1>
 
-![Estado](https://img.shields.io/badge/Estado-En%20definición-lightgrey?style=for-the-badge)
-![Universidad](https://img.shields.io/badge/Universidad%20del%20Valle-Sede%20Buenaventura-blue?style=for-the-badge)
-![Licencia](https://img.shields.io/badge/Licencia-Pendiente-inactive?style=for-the-badge)
+<p><strong>Sistema de coordinación y seguimiento de rutas de recolección de residuos sólidos.</strong></p>
 
-[Arquitectura](docs/ARCHITECTURE.md) · [Equipo](#equipo) · [Estructura del repositorio](#estructura-del-repositorio) · [Cómo contribuir](#cómo-contribuir)
+<p>
+  <a href="#estado-del-proyecto"><img src="https://img.shields.io/badge/Estado-Desarrollo-yellow?style=for-the-badge" alt="Estado: desarrollo"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Universidad%20del%20Valle%20Buenaventura-blue?style=for-the-badge" alt="Universidad del Valle, Sede Buenaventura">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-Apache%202.0-green?style=for-the-badge" alt="Licencia Apache 2.0"></a>
+</p>
+
+<p>
+  <a href="docs/ARCHITECTURE.md">Arquitectura</a> ·
+  <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
+  <a href="CONTRIBUTING.md">Contribuir</a>
+</p>
 
 </div>
----
 
-## Tabla de contenido
-
-- [¿Qué es VINTRA?](#qué-es-vintra)
-- [Génesis del proyecto](#génesis-del-proyecto)
-- [Problema que resuelve](#problema-que-resuelve)
-- [Propuesta de valor](#propuesta-de-valor)
-- [Objetivos](#objetivos)
-- [Arquitectura resumida](#arquitectura-resumida)
-- [Tecnologías](#tecnologías)
-- [Equipo](#equipo)
-- [Estructura del repositorio](#estructura-del-repositorio)
-- [Flujo de trabajo](#flujo-de-trabajo)
-- [Estado del proyecto](#estado-del-proyecto)
-- [Cómo contribuir](#cómo-contribuir)
-- [Licencia](#licencia)
+<!-- markdownlint-enable MD033 MD041 -->
 
 ---
 
@@ -95,7 +89,7 @@ flowchart TD
     I -.integración y despliegue.-> DEVOPS
 ```
 
-El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(pendiente de creación)*.
+El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(en actualizacion)*.
 
 ## Tecnologías
 
@@ -137,7 +131,7 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 
 - **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
 - **Workflows de CI/CD:** `ci.yml`, `backend.yml`, `frontend.yml` *(pendientes de implementación)*
-- **Plantillas de Issues y Pull Requests:** *(pendientes)*
+- **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
 Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.
 
@@ -154,15 +148,17 @@ Este README se irá actualizando a medida que cada célula entregue su informaci
 
 ## Cómo contribuir
 
-*(Sección pendiente — se completará con el flujo de trabajo definitivo del equipo, una vez esté disponible `CONTRIBUTING.md`.)*
+*(Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
 
 ## Licencia
 
-*Por definir.*
+*Apache 2.0 — Universidad del Valle, Sede Buenaventura.*
 
+ <!-- markdownlint-disable MD033 -->
 ---
 
 <div align="center">
 **VINTRA** — Coordinación de rutas, información para la ciudadanía.
 
 </div>
+<!-- markdownlint-enable MD033 -->
