@@ -132,35 +132,39 @@ Atención inmediata a puntos críticos reporttados directamente por el ciudadano
 
 Canal bidireccional directo para el envío ágil de reportes, reclamos y consultas.
 
+
+## Modulos según tipo de usuario
+
 ```mermaid
-Modulos según tipo de usuario
-  ADMIN[ADMIN]
+flowchart TD
+    ADMIN[ADMIN]
 
-  ADMIN --> CU[Crear usuarios]
-  ADMIN --> CR[Crear rutas]
-  ADMIN --> AC[Asignar conductor]
-  ADMIN --> AP[Asignar pasajeros]
+    ADMIN --> CU[Crear usuarios]
+    ADMIN --> CR[Crear rutas]
+    ADMIN --> AC[Asignar conductor]
+    ADMIN --> AP[Asignar pasajeros]
 
-  AC --> RUTA[RUTA]
-  AP --> RUTA
+    AC --> RUTA[RUTA]
+    AP --> RUTA
 
-  RUTA --> DRIVER[DRIVER]
-  DRIVER --> IR[Iniciar recorrido]
-  IR --> GPS[Enviar ubicación GPS]
-  GPS --> TRACK[Guardar en Tracking]
+    RUTA --> DRIVER[DRIVER]
+    DRIVER --> IR[Iniciar recorrido]
+    IR --> GPS[Enviar ubicación GPS]
+    GPS --> TRACK[Guardar en Tracking]
 
-  TRACK --> ESTADO[Actualizar estado<br/>recogido / no recogido]
-  TRACK --> FINALIZADA[Ruta finalizada]
+    TRACK --> ESTADO[Actualizar estado<br/>recogido / no recogido]
+    TRACK --> FINALIZADA[Ruta finalizada]
 
-  ESTADO --> NOTIF[Enviar notificaciones]
-  NOTIF --> PASSENGER[PASSENGER / USER]
-  PASSENGER --> AVISO[Recibir aviso]
-  AVISO --> CONFIRMAR[Confirmar recogida]
-  CONFIRMAR --> CONSULTAR[Consultar estado]
+    ESTADO --> NOTIF[Enviar notificaciones]
+    NOTIF --> PASSENGER[PASSENGER / USER]
+    PASSENGER --> AVISO[Recibir aviso]
+    AVISO --> CONFIRMAR[Confirmar recogida]
+    CONFIRMAR --> CONSULTAR[Consultar estado]
 
-  FINALIZADA --> RATING[RouteRating]
-  RATING --> CALIFICAR[Calificar conductor]
+    FINALIZADA --> RATING[RouteRating]
+    RATING --> CALIFICAR[Calificar conductor]
 ```
+ 
 
 
 El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(en actualizacion)*.
