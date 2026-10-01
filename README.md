@@ -13,7 +13,8 @@
 </p>
 
 <p>
-  <a href="docs/ARCHITECTURE.md">Arquitectura</a> ·
+  <a href="docs/README.md">Documentación</a> ·
+  <a href="docs/arquitectura/README.md">Arquitectura</a> ·
   <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
   <a href="CONTRIBUTING.md">Contribuir</a>
 </p>
@@ -167,7 +168,7 @@ flowchart TD
  
 
 
-El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(en actualizacion)*.
+La documentación técnica está separada por área en [`docs/README.md`](docs/README.md). La arquitectura general, los contratos, el modelo de datos y las decisiones compartidas tienen una ubicación propia para evitar duplicar información.
 
 ## Tecnologías
 
@@ -197,7 +198,15 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 ```
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
-├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
+├── docs/              # Índice y documentación segmentada por área
+│   ├── arquitectura/  # Componentes y decisiones compartidas
+│   ├── frontend/      # Aplicación, pantallas e integración
+│   ├── backend/       # API y reglas de negocio
+│   ├── base-de-datos/ # Persistencia, migraciones y diccionario
+│   ├── modelado/      # Requisitos, historias y modelo de dominio
+│   ├── ui-ux/         # Flujos, prototipos y accesibilidad
+│   ├── infraestructura/ # CI/CD, VPS y operación
+│   └── scrum/         # Planificación y acuerdos funcionales
 ├── backend/           # API REST
 ├── frontend/          # Dashboard y aplicación de cara a la ciudadanía
 ├── database/          # Modelo de datos, migraciones y scripts
