@@ -76,7 +76,7 @@ git push
 | --- | --- |
 | `feat:` | Nueva funcionalidad |
 | `fix:` | Corrección de un error |
-| `docs:` | Cambios de documentación (README, ARCHITECTURE, etc.) |
+| `docs:` | Cambios de documentación (README, documentación por área, arquitectura, etc.) |
 | `style:` | Cambios de formato que no afectan la lógica |
 | `refactor:` | Cambios internos sin alterar el comportamiento |
 | `test:` | Pruebas |
