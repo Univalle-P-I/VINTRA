@@ -48,6 +48,7 @@ VINTRA convierte un servicio operado de forma dispersa y poco visible en un sist
 | --- | --- |
 | Planificación y asignación de rutas | Consulta de horarios y recorridos |
 | Seguimiento en tiempo real de vehículos | Aviso de proximidad del vehículo |
+| Optimización de recorridos minuciosos | mayor facilidad para dejar la basura |
 | Registro de novedades e incumplimientos | Reporte de acumulación de residuos |
 | Indicadores de cumplimiento del servicio | Visibilidad del estado de sus reportes |
 
@@ -88,6 +89,83 @@ flowchart TD
     E -.integración y despliegue.-> DEVOPS
     I -.integración y despliegue.-> DEVOPS
 ```
+
+## Roles y Accesibilidad
+
+La plataforma se adapta a cada perfil de forma segura para garantizar flujos de trabajo claros e interactivos.
+
+### Administrador
+
+- Crear rutas estratégicas
+- Asignar conductores a flotas
+- Gestioner y auditar vehículos
+- Consultar y resolver incidencias
+
+### Conductor
+- Iniciar recorrido asignado
+- Registrar ubicación GPS activa
+- Visualizar estado vial de rutas
+- Finalizar recorrido y reportar novedades
+
+### Ciudadano
+
+- Consultar horario de recolección
+- Consultar trayecto de ruta local
+- Reportar residuos no recogidos
+- Consultar el estado del reporte
+
+## Beneficios de VINTRA
+
+### Mayor eficiencia operativa
+
+Optimización de recursos financieros, camiones y tiempos de recolección inteligente.
+
+### Información en tiempo real
+
+Datos actualizados al minuto tanto los coordinadores como para el vecindario.
+
+### Menos acumulación de basura
+
+Atención inmediata a puntos críticos reporttados directamente por el ciudadano.
+
+### Participación ciudadana
+
+Canal bidireccional directo para el envío ágil de reportes, reclamos y consultas.
+
+
+## Modulos según tipo de usuario
+
+```mermaid
+flowchart TD
+    ADMIN[ADMIN]
+
+    ADMIN --> CU[Crear usuarios]
+    ADMIN --> CR[Crear rutas]
+    ADMIN --> AC[Asignar conductor]
+    ADMIN --> AP[Asignar pasajeros]
+
+    AC --> RUTA[RUTA]
+    AP --> RUTA
+
+    RUTA --> DRIVER[DRIVER]
+    DRIVER --> IR[Iniciar recorrido]
+    IR --> GPS[Enviar ubicación GPS]
+    GPS --> TRACK[Guardar en Tracking]
+
+    TRACK --> ESTADO[Actualizar estado<br/>recogido / no recogido]
+    TRACK --> FINALIZADA[Ruta finalizada]
+
+    ESTADO --> NOTIF[Enviar notificaciones]
+    NOTIF --> PASSENGER[PASSENGER / USER]
+    PASSENGER --> AVISO[Recibir aviso]
+    AVISO --> CONFIRMAR[Confirmar recogida]
+    CONFIRMAR --> CONSULTAR[Consultar estado]
+
+    FINALIZADA --> RATING[RouteRating]
+    RATING --> CALIFICAR[Calificar conductor]
+```
+ 
+
 
 El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(en actualizacion)*.
 
