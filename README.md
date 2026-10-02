@@ -116,7 +116,7 @@ Pendiente de definición por el grupo responsable de Backend/Frontend/Base de Da
 
 Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 
-```
+```text
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
 ├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
