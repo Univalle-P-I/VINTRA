@@ -123,7 +123,7 @@ Puntos a resolver junto con el stack de backend:
 Responsabilidad de la célula GitHub / CI-CD / VPS:
 
 - Estructura del repositorio (`.github/`, `docs/`, `backend/`, `frontend/`, `database/`, `infrastructure/`).
-- Workflows de CI/CD: `ci.yml`, `backend.yml`, `frontend.yml` — pendientes de implementación.
+- Workflows de CI/CD: `ci.yml` valida cambios en PR hacia `develop` y pushes a `develop`/`main`; `backend.yml` y `frontend.yml` están pendientes de implementación.
 - Estrategia de ramas: `main` → `develop` → `feature/` · `fix/` · `task/`.
 - Configuración y despliegue en el VPS — pendiente.
 
