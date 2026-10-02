@@ -116,16 +116,7 @@ Ejemplo para la descripción del PR: `Trello: [TRELLO-123 - Ajustar inicio de se
 
 ### Checks automáticos del PR
 
-Al abrir o actualizar un PR hacia `develop`, GitHub Actions ejecuta el workflow **Backend Docker** cuando el cambio incluye archivos en `backend/` o `.github/workflows/backend.yml`. Sus pasos son:
-
-- **Build backend Docker image** — comprueba que la imagen del backend pueda construirse y que sus dependencias se instalen.
-- **Run Django checks** — ejecuta `python manage.py check` para detectar problemas de configuración de Django.
-- **Run backend tests** — ejecuta `python manage.py test users`; valida las pruebas de la aplicación `users`, no necesariamente todas las aplicaciones del backend.
-- **Smoke test container startup** — intenta iniciar el contenedor y muestra su estado como comprobación básica de arranque.
-
-En la pestaña **Checks** del PR, un estado `success` indica que terminaron correctamente los pasos aplicables. `failure` indica que al menos uno falló: abre los detalles del workflow, localiza el primer paso fallido y revisa su salida antes de corregir y volver a subir los cambios. Si el PR no modifica esas rutas, este workflow puede no ejecutarse.
-
-Actualmente no hay un workflow de GitHub Actions que valide el frontend en cada PR. Los workflows que ejecutan su build son de despliegue; por eso, valida los cambios de frontend localmente antes de abrir el PR.
+El workflow **CI** se ejecuta al abrir o actualizar un PR hacia `develop` y en cada push a `develop` o `main`. Comprueba con `git diff --check` que los cambios no introduzcan errores de espacios en blanco. El repositorio aún no contiene el código de backend o frontend ni workflows que ejecuten sus pruebas automatizadas; realiza las validaciones locales descritas abajo antes de abrir un PR.
 
 ### Validación local
 
@@ -146,7 +137,7 @@ python manage.py check
 python manage.py test users
 ```
 
-El check pasa si Django reporta que no encontró problemas; las pruebas pasan si terminan con `OK`. Un error o una prueba fallida significa que la validación no pasó y debe revisarse el mensaje concreto. Estos comandos locales corresponden a los checks del workflow de backend, aunque CI los ejecuta dentro de la imagen Docker.
+El check pasa si Django reporta que no encontró problemas; las pruebas pasan si terminan con `OK`. Un error o una prueba fallida significa que la validación no pasó y debe revisarse el mensaje concreto. Estos comandos son validaciones locales; CI aún no ejecuta las pruebas del backend.
 
 ## Revisión y aprobación
 

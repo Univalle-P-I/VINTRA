@@ -130,7 +130,7 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 ## Flujo de trabajo
 
 - **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
-- **Workflows de CI/CD:** `ci.yml`, `backend.yml`, `frontend.yml` *(pendientes de implementación)*
+- **Workflows de CI/CD:** `ci.yml` valida cambios en PR hacia `develop` y pushes a `develop`/`main`; `backend.yml` y `frontend.yml` están pendientes de implementación.
 - **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
 Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.
