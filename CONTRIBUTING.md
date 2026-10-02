@@ -162,7 +162,7 @@ flowchart TD
     H --> C
 ```
 
-- Los Pull Requests son revisados por **Daniel Enrique** o **Estefani Cometa**.
+- Los Pull Requests son revisados por la persona asignada.
 - Se requiere al menos **1 aprobación** para fusionar hacia `develop`.
 - Si se agregan nuevos commits después de una aprobación, esa aprobación deja de ser válida y se necesita una nueva revisión.
 - Solo si el resultado es **Approved** la tarea puede pasar a **Done**. o se hace **mergue** a `develop`.
