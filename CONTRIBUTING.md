@@ -169,3 +169,19 @@ flowchart TD
 - Si no es aprobado, la persona sigue trabajando en la misma rama hasta corregir lo señalado y lograr el Approved.
 - Mientras el Pull Request está abierto, se bloquean la **eliminación de la rama** y los **force-push**.
 **Nota:** los comentarios que señalen errores, problemas de integración o cambios en contratos compartidos deben atenderse antes del merge. Las sugerencias menores pueden quedar como mejoras posteriores si el equipo lo acuerda.
+
+
+### Trazabilidad entre Trello y GitHub
+
+Todo trabajo debe mantener una referencia clara entre la tarjeta de Trello y los cambios realizados en GitHub.
+
+Para mantener esta trazabilidad:
+
+- El número de la tarjeta de Trello debe incluirse en el nombre de la rama.
+- El Pull Request debe incluir el número, nombre o enlace de la tarjeta de Trello correspondiente.
+- La referencia a la tarjeta debe mantenerse durante todo el desarrollo de la tarea.
+
+Ejemplo de nombre de rama:
+
+```bash
+task/12-estructura-repositorio
