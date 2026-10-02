@@ -9,6 +9,7 @@ Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu�
 - [Flujo de trabajo](#flujo-de-trabajo)
 - [Convención de mensajes de commit](#convención-de-mensajes-de-commit)
 - [Pull Requests](#pull-requests)
+- [Checks y cómo interpretarlos](#checks-y-cómo-interpretarlos)
 - [Revisión y aprobación](#revisión-y-aprobación)
 
 ## Antes de empezar
@@ -48,8 +49,10 @@ Toda rama de trabajo se crea a partir de `develop`, nunca a partir de `main`.
 ```
 git checkout develop
 git pull origin develop
-git checkout -b feature/nombre-de-tu-tarea
+git checkout -b feature/TRELLO-123-nombre-de-tu-tarea
 ```
+
+Incluye en el nombre de la rama el identificador de la tarjeta de Trello asociada (por ejemplo, `TRELLO-123`). Sustituye el prefijo `feature/` por `fix/` o `task/` según corresponda.
 
 Trabaja normalmente y guarda avances con commits pequeños y descriptivos:
 
@@ -61,7 +64,7 @@ git commit -m "Tipo: descripción breve del cambio"
 Sube la rama la primera vez con:
 
 ```
-git push -u origin feature/nombre-de-tu-tarea
+git push -u origin feature/TRELLO-123-nombre-de-tu-tarea
 ```
 
 Las siguientes veces basta con:
@@ -95,7 +98,7 @@ Toda rama de trabajo se integra a `develop` mediante Pull Request, nunca con pus
 - **Imágenes de prueba** — evidencia de que el cambio funciona (captura de pantalla, resultado de una prueba, etc.). Es obligatorio, no opcional.
 
 ```
-git push -u origin feature/nombre-de-tu-tarea
+git push -u origin feature/TRELLO-123-nombre-de-tu-tarea
 ```
 
 Luego abre el Pull Request desde GitHub, comparando tu rama contra `develop`.
@@ -103,8 +106,47 @@ Luego abre el Pull Request desde GitHub, comparando tu rama contra `develop`.
 ### Requisitos adicionales del Pull Request
 
 - Debe asignarse a una persona como revisora.
-- Debe mencionar o vincularse a la tarea/issue a la que corresponde.
+- Debe indicar en su descripción el nombre o identificador de la tarjeta de Trello y enlazarla directamente. El identificador de la tarjeta también debe estar en el nombre de la rama para mantener la trazabilidad entre Trello y GitHub.
+- Si la tarea también tiene un issue de GitHub, debe mencionarse o vincularse además de la tarjeta de Trello.
 - Debe incluir imágenes de prueba como evidencia de que el cambio funciona.
+
+Ejemplo para la descripción del PR: `Trello: [TRELLO-123 - Ajustar inicio de sesión](https://trello.com/c/abc123...)`.
+
+## Checks y cómo interpretarlos
+
+### Checks automáticos del PR
+
+Al abrir o actualizar un PR hacia `develop`, GitHub Actions ejecuta el workflow **Backend Docker** cuando el cambio incluye archivos en `backend/` o `.github/workflows/backend.yml`. Sus pasos son:
+
+- **Build backend Docker image** — comprueba que la imagen del backend pueda construirse y que sus dependencias se instalen.
+- **Run Django checks** — ejecuta `python manage.py check` para detectar problemas de configuración de Django.
+- **Run backend tests** — ejecuta `python manage.py test users`; valida las pruebas de la aplicación `users`, no necesariamente todas las aplicaciones del backend.
+- **Smoke test container startup** — intenta iniciar el contenedor y muestra su estado como comprobación básica de arranque.
+
+En la pestaña **Checks** del PR, un estado `success` indica que terminaron correctamente los pasos aplicables. `failure` indica que al menos uno falló: abre los detalles del workflow, localiza el primer paso fallido y revisa su salida antes de corregir y volver a subir los cambios. Si el PR no modifica esas rutas, este workflow puede no ejecutarse.
+
+Actualmente no hay un workflow de GitHub Actions que valide el frontend en cada PR. Los workflows que ejecutan su build son de despliegue; por eso, valida los cambios de frontend localmente antes de abrir el PR.
+
+### Validación local
+
+Para el frontend, desde `frontend/`:
+
+```bash
+npm ci
+npm test -- --watchAll=false
+npm run build
+```
+
+La prueba pasa cuando Jest termina con las suites y pruebas en estado `passed`. El build pasa cuando Create React App finaliza sin errores y genera `frontend/build/`; un error de compilación o de dependencias requiere corrección. Los tests pueden informar fallos aunque el build compile correctamente: son comprobaciones distintas.
+
+Para el backend, desde `backend/` y con las dependencias de `requirements.txt` instaladas:
+
+```bash
+python manage.py check
+python manage.py test users
+```
+
+El check pasa si Django reporta que no encontró problemas; las pruebas pasan si terminan con `OK`. Un error o una prueba fallida significa que la validación no pasó y debe revisarse el mensaje concreto. Estos comandos locales corresponden a los checks del workflow de backend, aunque CI los ejecuta dentro de la imagen Docker.
 
 ## Revisión y aprobación
 
@@ -120,7 +162,7 @@ flowchart TD
     H --> C
 ```
 
-- Los Pull Requests son revisados por **Daniel Enrique** o **Estefani Cometa**.
+- Los Pull Requests son revisados por la persona asignada.
 - Se requiere al menos **1 aprobación** para fusionar hacia `develop`.
 - Si se agregan nuevos commits después de una aprobación, esa aprobación deja de ser válida y se necesita una nueva revisión.
 - Solo si el resultado es **Approved** la tarea puede pasar a **Done**. o se hace **mergue** a `develop`.
