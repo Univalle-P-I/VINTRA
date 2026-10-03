@@ -116,7 +116,7 @@ Pendiente de definición por el grupo responsable de Backend/Frontend/Base de Da
 
 Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 
-```
+```text
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
 ├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
@@ -148,7 +148,7 @@ Este README se irá actualizando a medida que cada célula entregue su informaci
 
 ## Cómo contribuir
 
-*(Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
+*(Guía de flujo de trabajo para el equipo del proyecto. Aplica para todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
 
 ## Licencia
 
