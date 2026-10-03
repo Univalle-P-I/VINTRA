@@ -86,147 +86,89 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 ## 3.1 Gestión de flota
 
-
-
 ### 3.1.1 Listado principal / Dashboard de flota
-
-
 
 ### Elementos principales
 
-
-
 ### Acciones
-
 
 ---
 
 ### 3.1.2 Registro / edición de vehículo
 
-
-
 ### Información
 
-
 ### Acciones
-
-
 
 ---
 
 ### 3.1.3 Hoja de vida / detalle del vehículo
 
-
-
 ### Información
-
 
 ---
 
 ### 3.1.4 Registro de mantenimiento / novedad
 
-
-
 ### Información
-
-
 
 ---
 
 # 3.2 Gestión del personal
 
-
-
 ### 3.2.1 Listado de conductores
-
-
 
 ### Elementos
 
-
-
 ### Acciones
-
-
 
 ---
 
 ### 3.2.2 Detalle / perfil del conductor
 
-
-
 ### Información
 
-
-
 ### Acción
-
-
 
 ---
 
 ### 3.2.3 Crear / editar conductor
 
-
 ### Datos personales
-
-
 
 ### Datos de licencia
 
-
-
 ### Acceso
-
-
 
 ### Acciones
 
-
-
 ### Validaciones
-
 
 ---
 
 ### 3.2.4 Activar / desactivar conductor
 
-
-
 ### Elementos
-
 
 ---
 
 ### 3.2.5 Disponibilidad y turnos
 
-
-
 ### Elementos
-
 
 ### Estados
 
-
-
 ### Acciones
-
-
 
 ---
 
 ### 3.2.6 Gestión de usuarios y roles
 
-
-
 ### Información
-
 
 ### Roles
 
-
 ### Acciones
-
 
 ---
 
@@ -234,75 +176,46 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 ## 3.3.1 Listado de rutas
 
-
-
 ### Información
 
-
-
 ### Acciones
-
-
 
 ---
 
 ## 3.3.2 Crear macroruta
 
-
-
 ### Información
 
-
 ### Acción
-
-
 
 ---
 
 ## 3.3.3 Crear microruta
 
-
 ### Información
 
-
-
 ### Acción
-
-
 
 ---
 
 ## 3.3.4 Detalle de ruta
 
-
-
 ### Información
-
-
 
 ---
 
 ## 3.3.5 Editar / modificar ruta
 
-
-
 ### Información modificable
-
-
 
 ---
 
 ## 3.3.6 Asignación de vehículo y conductor
 
-
-
 ### Elementos
-
-
 
 ### Acciones
 
 ---
 
 ## 3.3.7 Estado de la ruta
-
