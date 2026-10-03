@@ -1,0 +1,22 @@
+name: Frontend CI
+
+on:
+  workflow_call:
+
+jobs:
+  frontend-checks:
+    name: Frontend CI Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Frontend)
+        run: |
+          echo "Paso base: Instalación de dependencias del frontend"
+          # TODO: Agregar instalación de dependencias según el stack definitivo
+
+      - name: Run tests (Frontend)
+        run: |
+          echo "Paso base: Ejecución de pruebas del frontend"
+          # TODO: Agregar ejecución de pruebas según el stack definitivo

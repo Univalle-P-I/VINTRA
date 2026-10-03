@@ -62,3 +62,11 @@ jobs:
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           file-path: './README.md'
+
+  backend:
+    name: Backend CI (Modular)
+    uses: ./.github/workflows/backend.yml
+
+  frontend:
+    name: Frontend CI (Modular)
+    uses: ./.github/workflows/frontend.yml
