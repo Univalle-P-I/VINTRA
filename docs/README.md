@@ -37,7 +37,7 @@ El diseño contempla los diferentes perfiles de usuario y sus responsabilidades 
 
 Responsable de gestionar y supervisar la operación de la plataforma.
 
-**Permisos**
+#### Permisos del administrador
 
 - Gestionar vehículos.
 - Gestionar conductores.
@@ -56,7 +56,7 @@ Responsable de gestionar y supervisar la operación de la plataforma.
 
 Responsable de ejecutar el recorrido que le fue asignado.
 
-**Permisos**
+#### Permisos del conductor
 
 - Consultar recorrido asignado.
 - Iniciar recorrido.
@@ -72,7 +72,7 @@ Responsable de ejecutar el recorrido que le fue asignado.
 
 Responsable de consultar información relacionada con el servicio y reportar problemas.
 
-**Permisos**
+#### Permisos del ciudadano
 
 - Consultar horarios.
 - Consultar rutas.
@@ -88,29 +88,29 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 #### 3.1.1 Listado principal / Dashboard de flota
 
-**Elementos principales**
+##### Elementos principales del dashboard de flota
 
-**Acciones**
+##### Acciones del dashboard de flota
 
 ---
 
 #### 3.1.2 Registro / edición de vehículo
 
-**Información**
+##### Información del registro o edición de vehículo
 
-**Acciones**
+##### Acciones del registro o edición de vehículo
 
 ---
 
 #### 3.1.3 Hoja de vida / detalle del vehículo
 
-**Información**
+##### Información del detalle del vehículo
 
 ---
 
 #### 3.1.4 Registro de mantenimiento / novedad
 
-**Información**
+##### Información del mantenimiento del vehículo
 
 ---
 
@@ -118,57 +118,57 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 #### 3.2.1 Listado de conductores
 
-**Elementos**
+##### Elementos del listado de conductores
 
-**Acciones**
+##### Acciones del listado de conductores
 
 ---
 
 #### 3.2.2 Detalle / perfil del conductor
 
-**Información**
+##### Información del perfil del conductor
 
-**Acción**
+##### Acción del perfil del conductor
 
 ---
 
 #### 3.2.3 Crear / editar conductor
 
-**Datos personales**
+##### Datos personales del conductor
 
-**Datos de licencia**
+##### Datos de licencia del conductor
 
-**Acceso**
+##### Acceso del conductor
 
-**Acciones**
+##### Acciones de gestión del conductor
 
-**Validaciones**
+##### Validaciones del conductor
 
 ---
 
 #### 3.2.4 Activar / desactivar conductor
 
-**Elementos**
+##### Elementos de activación del conductor
 
 ---
 
 #### 3.2.5 Disponibilidad y turnos
 
-**Elementos**
+##### Elementos de disponibilidad y turnos
 
-**Estados**
+##### Estados de disponibilidad y turnos
 
-**Acciones**
+##### Acciones de disponibilidad y turnos
 
 ---
 
 #### 3.2.6 Gestión de usuarios y roles
 
-**Información**
+##### Información de usuarios y roles
 
-**Roles**
+##### Roles de usuario
 
-**Acciones**
+##### Acciones de usuarios y roles
 
 ---
 
@@ -176,45 +176,45 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 #### 3.3.1 Listado de rutas
 
-**Información**
+##### Información del listado de rutas
 
-**Acciones**
+##### Acciones del listado de rutas
 
 ---
 
 #### 3.3.2 Crear macroruta
 
-**Información**
+##### Información de creación de macroruta
 
-**Acción**
+##### Acción de creación de macroruta
 
 ---
 
 #### 3.3.3 Crear microruta
 
-**Información**
+##### Información de creación de microruta
 
-**Acción**
+##### Acción de creación de microruta
 
 ---
 
 #### 3.3.4 Detalle de ruta
 
-**Información**
+##### Información del detalle de ruta
 
 ---
 
 #### 3.3.5 Editar / modificar ruta
 
-**Información modificable**
+##### Información modificable de ruta
 
 ---
 
 #### 3.3.6 Asignación de vehículo y conductor
 
-**Elementos**
+##### Elementos de asignación de vehículo y conductor
 
-**Acciones**
+##### Acciones de asignación de vehículo y conductor
 
 ---
 
