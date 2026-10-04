@@ -86,31 +86,51 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 ### 3.1 Gestión de flota
 
+---
+
 #### 3.1.1 Listado principal / Dashboard de flota
 
-##### Elementos principales del dashboard de flota
-
-##### Acciones del dashboard de flota
+- Listado de vehículos registrados.
+- Placa.
+- Marca y modelo.
+- Capacidad de carga.
+- Tipo de combustible.
+- Conductor asignado.
+- Estado del vehículo.
+- Búsqueda y filtros por estado.
 
 ---
 
 #### 3.1.2 Registro / edición de vehículo
 
-##### Información del registro o edición de vehículo
-
-##### Acciones del registro o edición de vehículo
+- Placa.
+- Marca y modelo.
+- Año.
+- Capacidad de carga.
+- Tipo de combustible.
+- Fecha de última revisión técnica.
 
 ---
 
 #### 3.1.3 Hoja de vida / detalle del vehículo
 
-##### Información del detalle del vehículo
+- Información técnica del vehículo.
+- Estado actual.
+- Conductor asignado.
+- Historial de rutas recorridas.
+- Historial de mantenimientos.
+- Historial de fallas.
 
 ---
 
 #### 3.1.4 Registro de mantenimiento / novedad
 
-##### Información del mantenimiento del vehículo
+- Tipo de novedad.
+- Avería mecánica.
+- Mantenimiento programado.
+- Accidente.
+- Fecha estimada de retorno.
+- Observaciones.
 
 ---
 
