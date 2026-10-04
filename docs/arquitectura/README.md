@@ -1,6 +1,6 @@
 # Arquitectura de VINTRA
 
-Este documento es la referencia técnica para los componentes del sistema, sus relaciones y las decisiones que afectan a más de un área. Complementa la guía de documentación disponible en [`docs/README.md`](../README.md) y la visión general del [`README` raíz](../../README.md).
+Este documento es la referencia técnica para los componentes del sistema, sus relaciones y las decisiones que afectan a más de un área. Complementa la visión general del [`README` raíz](../../README.md).
 
 ## Estado
 
