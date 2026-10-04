@@ -1,8 +1,12 @@
-## Qué cambió
-<!-- Resumen del cambio en 1-3 líneas -->
-
 ## Descripción breve
 <!-- Contexto o motivo del cambio -->
+
+## Tarjeta de Trello
+
+- **Enlace:** [Inserta el enlace aquí](https://trello.com...)
+
+## Qué cambió
+<!-- Resumen del cambio en 1-3 líneas -->
 
 ## Cómo se validó
 <!-- Qué revisaste o probaste -->
