@@ -167,7 +167,6 @@ flowchart TD
 - Mientras el Pull Request está abierto, se bloquean la **eliminación de la rama** y los **force-push**.
 **Nota:** los comentarios que señalen errores, problemas de integración o cambios en contratos compartidos deben atenderse antes del merge. Las sugerencias menores pueden quedar como mejoras posteriores si el equipo lo acuerda.
 
-
 ### Trazabilidad entre Trello y GitHub
 
 Todo trabajo debe mantener una referencia clara entre la tarjeta de Trello y los cambios realizados en GitHub.

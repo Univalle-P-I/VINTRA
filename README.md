@@ -103,6 +103,7 @@ La plataforma se adapta a cada perfil de forma segura para garantizar flujos de 
 - Consultar y resolver incidencias
 
 ### Conductor
+
 - Iniciar recorrido asignado
 - Registrar ubicación GPS activa
 - Visualizar estado vial de rutas
@@ -132,7 +133,6 @@ Atención inmediata a puntos críticos reporttados directamente por el ciudadano
 ### Participación ciudadana
 
 Canal bidireccional directo para el envío ágil de reportes, reclamos y consultas.
-
 
 ## Modulos según tipo de usuario
 
