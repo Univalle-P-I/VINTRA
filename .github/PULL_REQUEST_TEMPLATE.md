@@ -3,7 +3,7 @@
 
 ## Tarjeta de Trello
 
-- **Enlace:** [Inserta el enlace aquí](https://trello.com...)
+- **Enlace:** [Buenaventura Limpia UV](https://trello.com/b/KuIPJAME/buenaventuralimpiauv)
 
 ## Qué cambió
 <!-- Resumen del cambio en 1-3 líneas -->
