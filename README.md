@@ -13,7 +13,8 @@
 </p>
 
 <p>
-  <a href="docs/ARCHITECTURE.md">Arquitectura</a> ·
+  <a href="docs/README.md">Documentación</a> ·
+  <a href="docs/arquitectura/README.md">Arquitectura</a> ·
   <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
   <a href="CONTRIBUTING.md">Contribuir</a>
 </p>
@@ -48,6 +49,7 @@ VINTRA convierte un servicio operado de forma dispersa y poco visible en un sist
 | --- | --- |
 | Planificación y asignación de rutas | Consulta de horarios y recorridos |
 | Seguimiento en tiempo real de vehículos | Aviso de proximidad del vehículo |
+| Optimización de recorridos minuciosos | mayor facilidad para dejar la basura |
 | Registro de novedades e incumplimientos | Reporte de acumulación de residuos |
 | Indicadores de cumplimiento del servicio | Visibilidad del estado de sus reportes |
 
@@ -89,7 +91,84 @@ flowchart TD
     I -.integración y despliegue.-> DEVOPS
 ```
 
-El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(en actualizacion)*.
+## Roles y Accesibilidad
+
+La plataforma se adapta a cada perfil de forma segura para garantizar flujos de trabajo claros e interactivos.
+
+### Administrador
+
+- Crear rutas estratégicas
+- Asignar conductores a flotas
+- Gestioner y auditar vehículos
+- Consultar y resolver incidencias
+
+### Conductor
+- Iniciar recorrido asignado
+- Registrar ubicación GPS activa
+- Visualizar estado vial de rutas
+- Finalizar recorrido y reportar novedades
+
+### Ciudadano
+
+- Consultar horario de recolección
+- Consultar trayecto de ruta local
+- Reportar residuos no recogidos
+- Consultar el estado del reporte
+
+## Beneficios de VINTRA
+
+### Mayor eficiencia operativa
+
+Optimización de recursos financieros, camiones y tiempos de recolección inteligente.
+
+### Información en tiempo real
+
+Datos actualizados al minuto tanto los coordinadores como para el vecindario.
+
+### Menos acumulación de basura
+
+Atención inmediata a puntos críticos reporttados directamente por el ciudadano.
+
+### Participación ciudadana
+
+Canal bidireccional directo para el envío ágil de reportes, reclamos y consultas.
+
+
+## Modulos según tipo de usuario
+
+```mermaid
+flowchart TD
+    ADMIN[ADMIN]
+
+    ADMIN --> CU[Crear usuarios]
+    ADMIN --> CR[Crear rutas]
+    ADMIN --> AC[Asignar conductor]
+    ADMIN --> AP[Asignar pasajeros]
+
+    AC --> RUTA[RUTA]
+    AP --> RUTA
+
+    RUTA --> DRIVER[DRIVER]
+    DRIVER --> IR[Iniciar recorrido]
+    IR --> GPS[Enviar ubicación GPS]
+    GPS --> TRACK[Guardar en Tracking]
+
+    TRACK --> ESTADO[Actualizar estado<br/>recogido / no recogido]
+    TRACK --> FINALIZADA[Ruta finalizada]
+
+    ESTADO --> NOTIF[Enviar notificaciones]
+    NOTIF --> PASSENGER[PASSENGER / USER]
+    PASSENGER --> AVISO[Recibir aviso]
+    AVISO --> CONFIRMAR[Confirmar recogida]
+    CONFIRMAR --> CONSULTAR[Consultar estado]
+
+    FINALIZADA --> RATING[RouteRating]
+    RATING --> CALIFICAR[Calificar conductor]
+```
+ 
+
+
+La documentación técnica está separada por área en [`docs/README.md`](docs/README.md). La arquitectura general, los contratos, el modelo de datos y las decisiones compartidas tienen una ubicación propia para evitar duplicar información.
 
 ## Tecnologías
 
@@ -119,7 +198,15 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 ```text
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
-├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
+├── docs/              # Índice y documentación segmentada por área
+│   ├── arquitectura/  # Componentes y decisiones compartidas
+│   ├── frontend/      # Aplicación, pantallas e integración
+│   ├── backend/       # API y reglas de negocio
+│   ├── base-de-datos/ # Persistencia, migraciones y diccionario
+│   ├── modelado/      # Requisitos, historias y modelo de dominio
+│   ├── ui-ux/         # Flujos, prototipos y accesibilidad
+│   ├── infraestructura/ # CI/CD, VPS y operación
+│   └── scrum/         # Planificación y acuerdos funcionales
 ├── backend/           # API REST
 ├── frontend/          # Dashboard y aplicación de cara a la ciudadanía
 ├── database/          # Modelo de datos, migraciones y scripts
