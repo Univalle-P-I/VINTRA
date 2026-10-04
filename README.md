@@ -165,8 +165,6 @@ flowchart TD
     FINALIZADA --> RATING[RouteRating]
     RATING --> CALIFICAR[Calificar conductor]
 ```
- 
-
 
 La documentación técnica está separada por área en [`docs/README.md`](docs/README.md). La arquitectura general, los contratos, el modelo de datos y las decisiones compartidas tienen una ubicación propia para evitar duplicar información.
 
