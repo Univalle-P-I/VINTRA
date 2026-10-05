@@ -225,190 +225,67 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 ---
 
+---
+
 ### 3.3 Gestión de rutas
 
 #### 3.3.1 Listado de rutas
 
-##### Información del listado de rutas
-
-##### Acciones del listado de rutas
+- Visualizar macrorutas y microrutas.
+- Consultar el estado de cada ruta.
+- Consultar vehículo y conductor asignados.
 
 ---
 
 #### 3.3.2 Crear macroruta
 
-##### Información de creación de macroruta
-
-##### Acción de creación de macroruta
+- Definir zona o sector de cobertura.
+- Establecer recorrido general.
+- Registrar información de la macroruta.
 
 ---
 
 #### 3.3.3 Crear microruta
 
-##### Información de creación de microruta
-
-##### Acción de creación de microruta
+- Asociar la microruta a una macroruta.
+- Definir sectores o puntos de recorrido.
+- Establecer recorrido específico.
 
 ---
 
 #### 3.3.4 Detalle de ruta
 
-##### Información del detalle de ruta
+- Visualizar información de la ruta.
+- Consultar recorrido.
+- Consultar horario.
+- Consultar estado.
+- Visualizar vehículo y conductor asignados.
 
 ---
 
 #### 3.3.5 Editar / modificar ruta
 
-##### Información modificable de ruta
+- Modificar información de la ruta.
+- Actualizar recorrido.
+- Modificar sectores o puntos de cobertura.
+- Actualizar horario.
 
 ---
 
 #### 3.3.6 Asignación de vehículo y conductor
 
-##### Elementos de asignación de vehículo y conductor
-
-##### Acciones de asignación de vehículo y conductor
+- Seleccionar vehículo disponible.
+- Seleccionar conductor disponible.
+- Asociarlos a una ruta.
+- Confirmar o modificar la asignación.
 
 ---
 
 #### 3.3.7 Estado de la ruta
 
----
-
----
-
-### 3.4 Gestión de operación
-
-#### 3.4.1 Dashboard de operación
-
-- Vehículos en ruta.
-- Vehículos disponibles.
-- Vehículos en taller.
-- Conductores activos.
-- Recorridos programados.
-- Recorridos en curso.
-- Recorridos finalizados.
-- Alertas de novedades.
-- Acceso a asignaciones.
-- Acceso al monitoreo.
-
----
-
-#### 3.4.2 Asignación de vehículo y conductor
-
-- Ruta.
-- Fecha.
-- Horario.
-- Vehículos disponibles.
-- Conductores disponibles.
-- Validación de licencia vencida.
-- Validación de asignaciones existentes.
-- Confirmación de asignación.
-
----
-
-#### 3.4.3 Monitoreo en vivo
-
-- Mapa con ubicación de vehículos.
-- Recorridos activos.
-- Estado de los recorridos.
-- Conductor asignado.
-- Ruta asignada.
-- Hora estimada de llegada.
-
----
-
-#### 3.4.4 Historial de recorridos y novedades
-
-- Filtro por fecha.
-- Filtro por ruta.
-- Filtro por vehículo.
-- Filtro por conductor.
-- Hora de inicio.
-- Hora de finalización.
-- Estado del recorrido.
-- Novedades registradas.
-- Detalle del recorrido.
-- Exportación del historial.
-
----
-
-#### 3.4.5 Asignación del día
-
-- Ruta asignada.
-- Vehículo asignado.
-- Horario.
-- Paradas del recorrido.
-- Información del vehículo.
-- Inicio del recorrido.
-
----
-
-#### 3.4.6 Recorrido en curso
-
-- Mapa de la ruta.
-- Siguiente parada.
-- Hora estimada de llegada.
-- Registro de novedades.
-- Texto de la novedad.
-- Foto de la novedad.
-- Finalización del recorrido.
-
----
-
-#### 3.4.7 Historial de recorridos del conductor
-
-- Recorridos anteriores.
-- Fecha del recorrido.
-- Ruta.
-- Estado del recorrido.
-- Novedades registradas.
-- Detalle del recorrido.
-
----
-
-#### 3.4.8 Mapa de vehículos en vivo
-
-- Vehículos en movimiento.
-- Filtro por ruta.
-- Ruta del vehículo.
-- Hora estimada de llegada.
-- Paradas cercanas.
-
----
-
-#### 3.4.9 Consulta de rutas y horarios
-
-- Listado de rutas.
-- Buscador de rutas.
-- Recorrido.
-- Paradas.
-- Horarios.
-- Rutas favoritas.
-
----
-
-#### 3.4.10 Notificaciones
-
-- Lista de notificaciones.
-- Retrasos.
-- Cambios de ruta.
-- Novedades del servicio.
-- Estado de lectura.
-- Configuración de notificaciones.
-
----
-
-#### 3.4.11 Reportes de incidencia o problemas
-
-- Tipo de problema.
-- Ruta o parada.
-- Descripción.
-- Foto.
-- Número de seguimiento.
-- Estado del reporte.
-- Recibido.
-- En revisión.
-- Resuelto.
+- Pendiente.
+- Asignada.
+- En recorrido.
+- Finalizada.
 
 ---
