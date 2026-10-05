@@ -138,57 +138,90 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 #### 3.2.1 Listado de conductores
 
-##### Elementos del listado de conductores
-
-##### Acciones del listado de conductores
+- Buscador y filtros por estado y disponibilidad.
+- Nombre.
+- Documento.
+- Teléfono.
+- Estado (activo/inactivo).
+- Vencimiento de licencia.
+- Nuevo conductor.
+- Ver conductor.
+- Editar conductor.
+- Desactivar conductor.
 
 ---
 
 #### 3.2.2 Detalle / perfil del conductor
 
-##### Información del perfil del conductor
-
-##### Acción del perfil del conductor
+- Foto.
+- Datos personales.
+- Datos de contacto.
+- Licencia.
+- Categoría de licencia.
+- Fecha de vencimiento de licencia.
+- Estado actual.
+- Vehículo asignado.
+- Ruta asignada.
+- Historial de recorridos.
+- Editar conductor.
 
 ---
 
 #### 3.2.3 Crear / editar conductor
 
-##### Datos personales del conductor
-
-##### Datos de licencia del conductor
-
-##### Acceso del conductor
-
-##### Acciones de gestión del conductor
-
-##### Validaciones del conductor
+- Nombre.
+- Documento.
+- Teléfono.
+- Correo.
+- Foto.
+- Número de licencia.
+- Categoría de licencia.
+- Fecha de vencimiento.
+- Usuario.
+- Contraseña.
+- Rol Conductor.
+- Guardar.
+- Cancelar.
+- Validación de campos obligatorios.
 
 ---
 
 #### 3.2.4 Activar / desactivar conductor
 
-##### Elementos de activación del conductor
+- Nombre del conductor.
+- Confirmación de activación o desactivación.
+- Motivo de la desactivación.
+- Aviso de asignación activa o pendiente.
 
 ---
 
 #### 3.2.5 Disponibilidad y turnos
 
-##### Elementos de disponibilidad y turnos
-
-##### Estados de disponibilidad y turnos
-
-##### Acciones de disponibilidad y turnos
+- Calendario o tabla semanal.
+- Turnos asignados.
+- Disponible.
+- En ruta.
+- Descanso.
+- Incapacidad.
+- Asignar turno.
+- Editar turno.
+- Conflictos de horarios.
 
 ---
 
 #### 3.2.6 Gestión de usuarios y roles
 
-##### Información de usuarios y roles
-
-##### Roles de usuario
-
-##### Acciones de usuarios y roles
+- Lista de usuarios.
+- Administrador.
+- Conductor.
+- Ciudadano.
+- Estado del usuario.
+- Crear usuario.
+- Editar usuario.
+- Bloquear usuario.
+- Restablecer contraseña.
+- Asignación de roles.
+- Permisos asociados a cada rol.
 
 ---
 
@@ -239,3 +272,143 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 ---
 
 #### 3.3.7 Estado de la ruta
+
+---
+
+---
+
+### 3.4 Gestión de operación
+
+#### 3.4.1 Dashboard de operación
+
+- Vehículos en ruta.
+- Vehículos disponibles.
+- Vehículos en taller.
+- Conductores activos.
+- Recorridos programados.
+- Recorridos en curso.
+- Recorridos finalizados.
+- Alertas de novedades.
+- Acceso a asignaciones.
+- Acceso al monitoreo.
+
+---
+
+#### 3.4.2 Asignación de vehículo y conductor
+
+- Ruta.
+- Fecha.
+- Horario.
+- Vehículos disponibles.
+- Conductores disponibles.
+- Validación de licencia vencida.
+- Validación de asignaciones existentes.
+- Confirmación de asignación.
+
+---
+
+#### 3.4.3 Monitoreo en vivo
+
+- Mapa con ubicación de vehículos.
+- Recorridos activos.
+- Estado de los recorridos.
+- Conductor asignado.
+- Ruta asignada.
+- Hora estimada de llegada.
+
+---
+
+#### 3.4.4 Historial de recorridos y novedades
+
+- Filtro por fecha.
+- Filtro por ruta.
+- Filtro por vehículo.
+- Filtro por conductor.
+- Hora de inicio.
+- Hora de finalización.
+- Estado del recorrido.
+- Novedades registradas.
+- Detalle del recorrido.
+- Exportación del historial.
+
+---
+
+#### 3.4.5 Asignación del día
+
+- Ruta asignada.
+- Vehículo asignado.
+- Horario.
+- Paradas del recorrido.
+- Información del vehículo.
+- Inicio del recorrido.
+
+---
+
+#### 3.4.6 Recorrido en curso
+
+- Mapa de la ruta.
+- Siguiente parada.
+- Hora estimada de llegada.
+- Registro de novedades.
+- Texto de la novedad.
+- Foto de la novedad.
+- Finalización del recorrido.
+
+---
+
+#### 3.4.7 Historial de recorridos del conductor
+
+- Recorridos anteriores.
+- Fecha del recorrido.
+- Ruta.
+- Estado del recorrido.
+- Novedades registradas.
+- Detalle del recorrido.
+
+---
+
+#### 3.4.8 Mapa de vehículos en vivo
+
+- Vehículos en movimiento.
+- Filtro por ruta.
+- Ruta del vehículo.
+- Hora estimada de llegada.
+- Paradas cercanas.
+
+---
+
+#### 3.4.9 Consulta de rutas y horarios
+
+- Listado de rutas.
+- Buscador de rutas.
+- Recorrido.
+- Paradas.
+- Horarios.
+- Rutas favoritas.
+
+---
+
+#### 3.4.10 Notificaciones
+
+- Lista de notificaciones.
+- Retrasos.
+- Cambios de ruta.
+- Novedades del servicio.
+- Estado de lectura.
+- Configuración de notificaciones.
+
+---
+
+#### 3.4.11 Reportes de incidencia o problemas
+
+- Tipo de problema.
+- Ruta o parada.
+- Descripción.
+- Foto.
+- Número de seguimiento.
+- Estado del reporte.
+- Recibido.
+- En revisión.
+- Resuelto.
+
+---
