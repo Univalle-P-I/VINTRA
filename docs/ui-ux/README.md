@@ -254,4 +254,3 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 - Asignada.
 - En recorrido.
 - Finalizada.
-
