@@ -138,57 +138,90 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 #### 3.2.1 Listado de conductores
 
-##### Elementos del listado de conductores
-
-##### Acciones del listado de conductores
+- Buscador y filtros por estado y disponibilidad.
+- Nombre.
+- Documento.
+- Teléfono.
+- Estado (activo/inactivo).
+- Vencimiento de licencia.
+- Nuevo conductor.
+- Ver conductor.
+- Editar conductor.
+- Desactivar conductor.
 
 ---
 
 #### 3.2.2 Detalle / perfil del conductor
 
-##### Información del perfil del conductor
-
-##### Acción del perfil del conductor
+- Foto.
+- Datos personales.
+- Datos de contacto.
+- Licencia.
+- Categoría de licencia.
+- Fecha de vencimiento de licencia.
+- Estado actual.
+- Vehículo asignado.
+- Ruta asignada.
+- Historial de recorridos.
+- Editar conductor.
 
 ---
 
 #### 3.2.3 Crear / editar conductor
 
-##### Datos personales del conductor
-
-##### Datos de licencia del conductor
-
-##### Acceso del conductor
-
-##### Acciones de gestión del conductor
-
-##### Validaciones del conductor
+- Nombre.
+- Documento.
+- Teléfono.
+- Correo.
+- Foto.
+- Número de licencia.
+- Categoría de licencia.
+- Fecha de vencimiento.
+- Usuario.
+- Contraseña.
+- Rol Conductor.
+- Guardar.
+- Cancelar.
+- Validación de campos obligatorios.
 
 ---
 
 #### 3.2.4 Activar / desactivar conductor
 
-##### Elementos de activación del conductor
+- Nombre del conductor.
+- Confirmación de activación o desactivación.
+- Motivo de la desactivación.
+- Aviso de asignación activa o pendiente.
 
 ---
 
 #### 3.2.5 Disponibilidad y turnos
 
-##### Elementos de disponibilidad y turnos
-
-##### Estados de disponibilidad y turnos
-
-##### Acciones de disponibilidad y turnos
+- Calendario o tabla semanal.
+- Turnos asignados.
+- Disponible.
+- En ruta.
+- Descanso.
+- Incapacidad.
+- Asignar turno.
+- Editar turno.
+- Conflictos de horarios.
 
 ---
 
 #### 3.2.6 Gestión de usuarios y roles
 
-##### Información de usuarios y roles
-
-##### Roles de usuario
-
-##### Acciones de usuarios y roles
+- Lista de usuarios.
+- Administrador.
+- Conductor.
+- Ciudadano.
+- Estado del usuario.
+- Crear usuario.
+- Editar usuario.
+- Bloquear usuario.
+- Restablecer contraseña.
+- Asignación de roles.
+- Permisos asociados a cada rol.
 
 ---
 
