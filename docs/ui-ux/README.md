@@ -223,7 +223,6 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 - Asignación de roles.
 - Permisos asociados a cada rol.
 
-
 ---
 
 ### 3.3 Gestión de rutas
