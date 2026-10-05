@@ -192,50 +192,65 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 
 ---
 
+---
+
 ### 3.3 Gestión de rutas
 
 #### 3.3.1 Listado de rutas
 
-##### Información del listado de rutas
-
-##### Acciones del listado de rutas
+- Visualizar macrorutas y microrutas.
+- Consultar el estado de cada ruta.
+- Consultar vehículo y conductor asignados.
 
 ---
 
 #### 3.3.2 Crear macroruta
 
-##### Información de creación de macroruta
-
-##### Acción de creación de macroruta
+- Definir zona o sector de cobertura.
+- Establecer recorrido general.
+- Registrar información de la macroruta.
 
 ---
 
 #### 3.3.3 Crear microruta
 
-##### Información de creación de microruta
-
-##### Acción de creación de microruta
+- Asociar la microruta a una macroruta.
+- Definir sectores o puntos de recorrido.
+- Establecer recorrido específico.
 
 ---
 
 #### 3.3.4 Detalle de ruta
 
-##### Información del detalle de ruta
+- Visualizar información de la ruta.
+- Consultar recorrido.
+- Consultar horario.
+- Consultar estado.
+- Visualizar vehículo y conductor asignados.
 
 ---
 
 #### 3.3.5 Editar / modificar ruta
 
-##### Información modificable de ruta
+- Modificar información de la ruta.
+- Actualizar recorrido.
+- Modificar sectores o puntos de cobertura.
+- Actualizar horario.
 
 ---
 
 #### 3.3.6 Asignación de vehículo y conductor
 
-##### Elementos de asignación de vehículo y conductor
-
-##### Acciones de asignación de vehículo y conductor
+- Seleccionar vehículo disponible.
+- Seleccionar conductor disponible.
+- Asociarlos a una ruta.
+- Confirmar o modificar la asignación.
 
 ---
 
 #### 3.3.7 Estado de la ruta
+
+- Pendiente.
+- Asignada.
+- En recorrido.
+- Finalizada.
