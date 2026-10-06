@@ -289,3 +289,123 @@ Responsable de consultar información relacionada con el servicio y reportar pro
 - Finalizada.
 
 ---
+
+### 3.4 Gestión de operación
+
+#### 3.4.1 Dashboard de operación
+
+- Indicadores: vehículos en ruta, disponibles, en taller y conductores activos.
+- Recorridos del día (programados, en curso, finalizados).
+- Alertas de novedades y accesos rápidos a asignación y monitoreo.
+
+---
+
+#### 3.4.2 Asignación de vehículo y conductor
+
+- Selector de ruta, fecha y horario.
+- Lista de vehículos y conductores disponibles.
+- Validación de conflictos (licencia vencida, ya asignado) y botón Confirmar.
+
+---
+
+#### 3.4.3 Monitoreo en vivo (mapa)
+
+- Mapa con la ubicación de los vehículos en tiempo real.
+- Panel lateral con la lista de recorridos activos y su estado.
+- Al tocar un vehículo: conductor, ruta y hora estimada de llegada.
+
+---
+
+#### 3.4.4 Historial de recorridos y novedades
+
+- Filtros por fecha, ruta, vehículo y conductor.
+- Tabla con hora de inicio y fin, estado y novedades registradas.
+- Detalle de cada recorrido y opción de exportar.
+
+---
+
+#### 3.4.5 Asignación del día
+
+- Ruta, vehículo y horario asignados.
+- Resumen de paradas y datos del vehículo.
+- Botón "Iniciar recorrido".
+
+---
+
+#### 3.4.6 Recorrido en curso
+
+- Mapa con la ruta y la siguiente parada.
+- Cronómetro o hora estimada de llegada.
+- Botones: registrar novedad (texto, foto) y finalizar recorrido.
+
+---
+
+#### 3.4.7 Historial de recorridos del conductor
+
+- Lista de recorridos anteriores con fecha, ruta y estado.
+- Detalle con las novedades que registró.
+
+---
+
+#### 3.4.8 Mapa de vehículos en vivo
+
+- Mapa con los vehículos en movimiento.
+- Filtro por ruta y toque en un vehículo para ver su ruta y hora estimada.
+- Paradas cercanas.
+
+---
+
+#### 3.4.9 Consulta de rutas y horarios
+
+- Listado de rutas con buscador.
+- Detalle: recorrido, paradas y horarios.
+- Opción de marcar rutas favoritas.
+
+---
+
+#### 3.4.10 Notificaciones
+
+- Lista cronológica de avisos (retrasos, cambios de ruta, novedades).
+- Marcar como leído y configurar qué avisos recibir.
+
+---
+
+#### 3.4.11 Reportes de incidencia o problemas
+
+- Formulario con tipo de problema, ruta o parada, descripción y foto opcional.
+- Botón Enviar y confirmación con un número de seguimiento.
+- Lista de reportes enviados y su estado (recibido, en revisión, resuelto).
+
+---
+
+### 3.5 Flujos
+
+#### 3.5.1 Flujo de registro y gestión de vehículos
+
+```mermaid
+flowchart LR
+    classDef admin fill:#E6F0FF,stroke:#2F6FEB,color:#1B1F27,stroke-width:1px;
+    F1A["Menú Flota"] --> F1B["Listado de vehículos"] --> F1C["Nuevo vehículo"] --> F1D["Datos y documentos"] --> F1E["Guardar"] --> F1F["Detalle del vehículo"] --> F1G["Editar / cambiar estado"]
+    class F1A,F1B,F1C,F1D,F1E,F1F,F1G admin;
+```
+
+#### 3.5.2 Flujo de registro y gestión de conductores
+
+```mermaid
+flowchart LR
+    classDef admin fill:#E6F0FF,stroke:#2F6FEB,color:#1B1F27,stroke-width:1px;
+    F2A["Menú Personal"] --> F2B["Listado de conductores"] --> F2C["Nuevo conductor"] --> F2D["Datos y licencia"] --> F2E["Crear usuario rol Conductor"] --> F2F["Guardar"] --> F2G["Detalle / activar-desactivar"]
+    class F2A,F2B,F2C,F2D,F2E,F2F,F2G admin;
+```
+
+#### 3.5.3 Flujo de creación y modificación de rutas
+
+#### 3.5.4 Flujo de asignación de vehículo y conductor
+
+#### 3.5.5 Flujo de inicio de recorrido
+
+#### 3.5.6 Flujo de finalización de recorrido
+
+#### 3.5.7 Flujo de navegación entre las pantallas administrativas
+
+---
