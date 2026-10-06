@@ -404,6 +404,19 @@ flowchart LR
 
 #### 3.5.5 Flujo de inicio de recorrido
 
+```mermaid
+flowchart LR
+    classDef conductor fill:#E6F7ED,stroke:#2CA568,color:#1B1F27,stroke-width:1px;
+
+    F5A["Abrir app"] --> F5B["Asignación del día"]
+    F5B --> F5C["Detalle de ruta y vehículo"]
+    F5C --> F5D["Verificar datos"]
+    F5D --> F5E["Iniciar recorrido"]
+    F5E --> F5F["Estado: en ruta"]
+
+    class F5A,F5B,F5C,F5D,F5E,F5F conductor;
+```
+
 #### 3.5.6 Flujo de finalización de recorrido
 
 #### 3.5.7 Flujo de navegación entre las pantallas administrativas
