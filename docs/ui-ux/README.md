@@ -425,8 +425,6 @@ flowchart LR
 
 ## 4. Listado priorizado de pantallas
 
-
-
 | # | Área | Pantalla | Rol | Prioridad | Flujo relacionado |
 |---|------|----------|-----|-----------|--------------------|
 | 1 | Compartida | Login | Todos | Alta | Acceso |
@@ -463,7 +461,7 @@ flowchart LR
 
 ### Resumen
 
-**Por prioridad**
+### Por prioridad**
 
 | Prioridad | Pantallas |
 |---|---|
@@ -471,7 +469,7 @@ flowchart LR
 | Media | 12 |
 | Baja | 2 |
 
-**Por rol** (una pantalla puede aparecer en más de un rol)
+### Por rol (una pantalla puede aparecer en más de un rol)
 
 | Rol | Pantallas |
 |---|---|
