@@ -400,7 +400,25 @@ flowchart LR
 
 #### 3.5.3 Flujo de creación y modificación de rutas
 
+```mermaid
+flowchart LR
+    classDef admin fill:#E6F0FF,stroke:#2F6FEB,color:#1B1F27,stroke-width:1px;
+    F3A["Menú Rutas"] --> F3B["Listado de rutas"] --> F3C["Nueva ruta"] --> F3D["Origen, paradas, destino y horarios"] --> F3E["Previsualizar en mapa"] --> F3F["Guardar"] --> F3G["Editar / desactivar"]
+    class F3A,F3B,F3C,F3D,F3E,F3F,F3G admin;
+```
+
 #### 3.5.4 Flujo de asignación de vehículo y conductor
+
+```mermaid
+flowchart LR
+    classDef admin fill:#E6F0FF,stroke:#2F6FEB,color:#1B1F27,stroke-width:1px;
+    classDef decision fill:#FFF4D6,stroke:#E0A800,color:#1B1F27,stroke-width:1px;
+    F4A["Menú Operación"] --> F4B["Asignaciones"] --> F4C["Elegir ruta"] --> F4D["Elegir vehículo disponible"] --> F4E["Elegir conductor disponible"] --> F4F{"¿Conflicto?"}
+    F4F -- "Sí: vuelve a elegir" --> F4E
+    F4F -- "No" --> F4G["Confirmar"] --> F4H["Notificar al conductor"]
+    class F4A,F4B,F4C,F4D,F4E,F4G,F4H admin;
+    class F4F decision;
+```
 
 #### 3.5.5 Flujo de inicio de recorrido
 
