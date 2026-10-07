@@ -14,7 +14,7 @@ Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu�
 
 ## Antes de empezar
 
-```bash
+```
 git clone https://github.com/Univalle-P-I/VINTRA.git
 cd VINTRA
 git config user.email "tu-correo@ejemplo.com"
@@ -46,7 +46,7 @@ Toda rama de trabajo se crea a partir de `develop`, nunca a partir de `main`.
 
 ## Flujo de trabajo
 
-```bash
+```
 git checkout develop
 git pull origin develop
 git checkout -b feature/TRELLO-123-nombre-de-tu-tarea
@@ -56,20 +56,20 @@ Incluye en el nombre de la rama el identificador de la tarjeta de Trello asociad
 
 Trabaja normalmente y guarda avances con commits pequeños y descriptivos:
 
-```bash
+```
 git add .
 git commit -m "Tipo: descripción breve del cambio"
 ```
 
 Sube la rama la primera vez con:
 
-```bash
+```
 git push -u origin feature/TRELLO-123-nombre-de-tu-tarea
 ```
 
 Las siguientes veces basta con:
 
-```bash
+```
 git push
 ```
 
@@ -97,7 +97,7 @@ Toda rama de trabajo se integra a `develop` mediante Pull Request, nunca con pus
 - **Comandos utilizados** — si aplica.
 - **Imágenes de prueba** — evidencia de que el cambio funciona (captura de pantalla, resultado de una prueba, etc.). Es obligatorio, no opcional.
 
-```bash
+```
 git push -u origin feature/TRELLO-123-nombre-de-tu-tarea
 ```
 
@@ -116,13 +116,16 @@ Ejemplo para la descripción del PR: `Trello: [TRELLO-123 - Ajustar inicio de se
 
 ### Checks automáticos del PR
 
-El workflow **CI** se ejecuta al abrir o actualizar un PR hacia `develop` y en cada push a `develop` o `main`. Comprueba con `git diff --check` que los cambios no introduzcan errores de espacios en blanco. El repositorio aún no contiene el código de backend o frontend ni workflows que ejecuten sus pruebas automatizadas; realiza las validaciones locales descritas abajo antes de abrir un PR.
+Al abrir o actualizar un PR hacia `develop`, GitHub Actions ejecuta el workflow **Backend Docker** cuando el cambio incluye archivos en `backend/` o `.github/workflows/backend.yml`. Sus pasos son:
 
-El check **lint-markdown** también valida el formato de `README.md`, `CONTRIBUTING.md` y los archivos Markdown de `docs/`. Para ejecutarlo localmente:
+- **Build backend Docker image** — comprueba que la imagen del backend pueda construirse y que sus dependencias se instalen.
+- **Run Django checks** — ejecuta `python manage.py check` para detectar problemas de configuración de Django.
+- **Run backend tests** — ejecuta `python manage.py test users`; valida las pruebas de la aplicación `users`, no necesariamente todas las aplicaciones del backend.
+- **Smoke test container startup** — intenta iniciar el contenedor y muestra su estado como comprobación básica de arranque.
 
-```bash
-npx --yes markdownlint-cli2 "README.md" "CONTRIBUTING.md" "docs/**/*.md"
-```
+En la pestaña **Checks** del PR, un estado `success` indica que terminaron correctamente los pasos aplicables. `failure` indica que al menos uno falló: abre los detalles del workflow, localiza el primer paso fallido y revisa su salida antes de corregir y volver a subir los cambios. Si el PR no modifica esas rutas, este workflow puede no ejecutarse.
+
+Actualmente no hay un workflow de GitHub Actions que valide el frontend en cada PR. Los workflows que ejecutan su build son de despliegue; por eso, valida los cambios de frontend localmente antes de abrir el PR.
 
 ### Validación local
 
@@ -143,7 +146,7 @@ python manage.py check
 python manage.py test users
 ```
 
-El check pasa si Django reporta que no encontró problemas; las pruebas pasan si terminan con `OK`. Un error o una prueba fallida significa que la validación no pasó y debe revisarse el mensaje concreto. Estos comandos son validaciones locales; CI aún no ejecuta las pruebas del backend.
+El check pasa si Django reporta que no encontró problemas; las pruebas pasan si terminan con `OK`. Un error o una prueba fallida significa que la validación no pasó y debe revisarse el mensaje concreto. Estos comandos locales corresponden a los checks del workflow de backend, aunque CI los ejecuta dentro de la imagen Docker.
 
 ## Revisión y aprobación
 

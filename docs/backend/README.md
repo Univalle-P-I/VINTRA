@@ -1,21 +1,33 @@
-# Backend
+# Módulo Backend y API REST - VINTRA
 
-Guía para documentar la API y las reglas de negocio de VINTRA.
+## Descripción General
 
-## Debe publicarse aquí
+El servidor de VINTRA está construido sobre **Node.js** utilizando
+**Express**. Su propósito principal es procesar la lógica de negocio,
+exponer endpoints de la **API REST** y gestionar consultas a la base de
+datos **PostgreSQL** mediante el conector **`pg` (node-postgres)**.
 
-- lenguaje, framework, versión y requisitos de ejecución;
-- módulos y responsabilidades;
-- reglas de negocio para rutas, tracking, reportes e indicadores;
-- contratos de API por recurso, con método, ruta, parámetros, autenticación, respuestas y errores;
-- integración con la base de datos, geolocalización y notificaciones;
-- validación, manejo de errores, seguridad y registro de eventos;
-- comandos para instalar, ejecutar y probar.
+## Imágenes Requeridas
 
-Cada contrato debe incluir un ejemplo mínimo de solicitud y respuesta cuando ayude a integrarlo. El modelo de tablas se documenta en `base-de-datos/`; aquí solo se describe el uso que hace la API.
+Asegúrate de incluir las siguientes imágenes en `docs/backend/`:
 
-## Estado
+1. **`tabla-tecnologias-backend.png`**: Imagen con la tabla del servidor.
+2. **`diagrama-backend-bd.png`**: Diagrama de conexión Express-PostgreSQL.
 
-- Estado: `Borrador`
-- Responsable: Célula Backend / Frontend
-- Pendiente: definir stack, módulos y contratos iniciales.
+## Stack Tecnológico
+
+### Herramientas Principales
+
+- **Entorno de Ejecución**: Node.js
+- **Framework de Servidor**: Express
+- **Conector a Base de Datos**: `pg` (node-postgres)
+- **Base de Datos**: PostgreSQL
+- **Middleware Auxiliar**: `dotenv`, `cors`
+
+### Justificación de Selección
+
+- **Node.js + Express**: Entorno liviano y de alto rendimiento.
+- **`pg` (node-postgres)**: Driver oficial y robusto para PostgreSQL.
+- **PostgreSQL**: Gestor de base de datos relacional íntegro y seguro.
+
+## Esqueleto de Archivos del Backend

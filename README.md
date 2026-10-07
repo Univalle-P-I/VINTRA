@@ -116,7 +116,7 @@ Pendiente de definición por el grupo responsable de Backend/Frontend/Base de Da
 
 Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 
-```text
+```
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
 ├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
@@ -130,7 +130,7 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 ## Flujo de trabajo
 
 - **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
-- **Workflows de CI/CD:** `ci.yml` valida cambios en PR hacia `develop` y pushes a `develop`/`main`; `backend.yml` y `frontend.yml` están pendientes de implementación.
+- **Workflows de CI/CD:** `ci.yml`, `backend.yml`, `frontend.yml` *(pendientes de implementación)*
 - **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
 Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.
@@ -148,7 +148,7 @@ Este README se irá actualizando a medida que cada célula entregue su informaci
 
 ## Cómo contribuir
 
-*(Guía de flujo de trabajo para el equipo del proyecto. Aplica para todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
+*(Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
 
 ## Licencia
 
