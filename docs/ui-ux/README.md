@@ -437,7 +437,27 @@ flowchart LR
 
 #### 3.5.6 Flujo de finalización de recorrido
 
+```mermaid
+flowchart LR
+    classDef conductor fill:#E6F7ED,stroke:#2CA568,color:#1B1F27,stroke-width:1px;
+    F6A["Recorrido en curso"] --> F6B["Llegar al destino"] --> F6C["Registrar novedades"] --> F6D["Finalizar recorrido"] --> F6E["Vehículo y conductor: disponibles"] --> F6F["Guardar en historial"]
+    class F6A,F6B,F6C,F6D,F6E,F6F conductor;
+```
+
 #### 3.5.7 Flujo de navegación entre las pantallas administrativas
+
+```mermaid
+flowchart TD
+    classDef admin fill:#E6F0FF,stroke:#2F6FEB,color:#1B1F27,stroke-width:1px;
+    L["Login"] --> D["Dashboard"]
+    D --> N1["Menú: Dashboard"] --> QA["Accesos rápidos"]
+    D --> N2["Menú lateral: Flota"] --> N2L["Listado"] --> N2D["Detalle / Crear-editar"]
+    D --> N3["Menú lateral: Personal"] --> N3L["Listado"] --> N3D["Detalle / Crear-editar"]
+    D --> N4["Menú lateral: Rutas"] --> N4L["Listado"] --> N4D["Detalle / Crear-editar"]
+    D --> N5["Menú lateral: Operación"] --> N5L["Listado"] --> N5D["Detalle / Crear-editar"]
+    D --> N6["Menú lateral: Usuarios"] --> N6L["Listado"] --> N6D["Detalle / Crear-editar"]
+    class L,D,N1,QA,N2,N2L,N2D,N3,N3L,N3D,N4,N4L,N4D,N5,N5L,N5D,N6,N6L,N6D admin;
+```
 
 ---
 
