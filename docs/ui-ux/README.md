@@ -422,3 +422,60 @@ flowchart LR
 #### 3.5.7 Flujo de navegación entre las pantallas administrativas
 
 ---
+
+## 4. Listado priorizado de pantallas
+
+| # | Área | Pantalla | Rol | Prioridad | Flujo relacionado |
+|---|------|----------|-----|-----------|--------------------|
+| 1 | Compartida | Login | Todos | Alta | Acceso |
+| 2 | Compartida | Registro | Ciudadano | Alta | Acceso |
+| 3 | Compartida | Recuperar contraseña | Todos | Media | Acceso |
+| 4 | Compartida | Mi perfil | Conductor, Ciudadano | Baja | Cuenta |
+| 5 | Flota | Listado de vehículos | Administrador | Alta | 3.6.1 |
+| 6 | Flota | Registro / edición de vehículo | Administrador | Alta | 3.6.1 |
+| 7 | Flota | Hoja de vida / detalle del vehículo | Administrador | Media | 3.6.1 |
+| 8 | Flota | Registro de mantenimiento / novedad | Administrador | Media | 3.6.1 |
+| 9 | Personal | Listado de conductores | Administrador | Alta | 3.6.2 |
+| 10 | Personal | Crear / editar conductor | Administrador | Alta | 3.6.2 |
+| 11 | Personal | Detalle / perfil del conductor | Administrador | Media | 3.6.2 |
+| 12 | Personal | Activar / desactivar conductor | Administrador | Media | 3.6.2 |
+| 13 | Personal | Disponibilidad y turnos | Administrador | Media | 3.6.2 |
+| 14 | Personal | Gestión de usuarios y roles | Administrador | Media | — |
+| 15 | Rutas | Listado de rutas | Administrador | Alta | 3.6.3 |
+| 16 | Rutas | Crear macroruta | Administrador | Alta | 3.6.3 |
+| 17 | Rutas | Crear microruta | Administrador | Alta | 3.6.3 |
+| 18 | Rutas | Detalle de ruta | Administrador | Media | 3.6.3 |
+| 19 | Rutas | Editar / modificar ruta | Administrador | Media | 3.6.3 |
+| 20 | Rutas | Asignación de vehículo y conductor (desde ruta) | Administrador | Alta | 3.6.4 |
+| 21 | Operación | Dashboard de operación | Administrador | Alta | 3.6.7 |
+| 22 | Operación | Asignación de vehículo y conductor | Administrador | Alta | 3.6.4 |
+| 23 | Operación | Monitoreo en vivo (mapa) | Administrador | Alta | 3.6.5 / 3.6.6 |
+| 24 | Operación | Historial de recorridos y novedades | Administrador | Media | 3.6.6 |
+| 25 | Operación | Asignación del día | Conductor | Alta | 3.6.5 |
+| 26 | Operación | Recorrido en curso | Conductor | Alta | 3.6.5 / 3.6.6 |
+| 27 | Operación | Historial de recorridos | Conductor | Media | 3.6.6 |
+| 28 | Operación | Mapa de vehículos en vivo | Ciudadano | Alta | — |
+| 29 | Operación | Consulta de rutas y horarios | Ciudadano | Alta | — |
+| 30 | Operación | Notificaciones | Ciudadano | Media | — |
+| 31 | Operación | Reportes de incidencia o problemas | Ciudadano | Baja | — |
+
+### Resumen
+
+### Por prioridad**
+
+| Prioridad | Pantallas |
+|---|---|
+| Alta | 17 |
+| Media | 12 |
+| Baja | 2 |
+
+### Por rol (una pantalla puede aparecer en más de un rol)
+
+| Rol | Pantallas |
+|---|---|
+| Administrador | 20 |
+| Ciudadano | 6 |
+| Conductor | 4 |
+| Todos los roles | 2 |
+
+---
