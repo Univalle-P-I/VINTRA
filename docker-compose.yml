@@ -17,7 +17,7 @@
       context: ./backend
     container_name: vintra-backend
     environment:
-      PORT: 3000
+      ASPNETCORE_URLS: http://+:3000
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${POSTGRES_DB}
