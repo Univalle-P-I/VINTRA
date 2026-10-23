@@ -44,4 +44,3 @@ jobs:
             find /var/www/vintra.qsuene.com -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
             cp -r /tmp/vintra_build/* /var/www/vintra.qsuene.com/
             rm -rf /tmp/vintra_build
-      
