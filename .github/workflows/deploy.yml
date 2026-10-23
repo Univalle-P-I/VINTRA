@@ -16,12 +16,25 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
       - name: Instalar dependencias y compilar
+        working-directory: ./frontend
         run: |
           npm ci
           npm run build
-      - name: Limpiar carpeta (manteniendo .htaccess)
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Transferir archivos a carpeta temporal
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: "frontend/dist/*"
+          target: "/var/www/vintra.qsuene.com"
+          strip_prefix: "frontend/dist"
+          rm: true
+      - name: Publicar cambios en producción (manteniendo .htaccess)
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -29,14 +42,6 @@ jobs:
           port: 22
           script: |
             find /var/www/vintra.qsuene.com -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
-      - name: Transferir archivos compilados al VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          source: "dist/*"
-          target: "/var/www/vintra.qsuene.com"
-          strip_prefix: "dist"
-          rm: false
+            cp -r /tmp/vintra_build/* /var/www/vintra.qsuene.com/
+            rm -rf /tmp/vintra_build
+      
