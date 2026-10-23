@@ -103,6 +103,7 @@ La plataforma se adapta a cada perfil de forma segura para garantizar flujos de 
 - Consultar y resolver incidencias
 
 ### Conductor
+
 - Iniciar recorrido asignado
 - Registrar ubicación GPS activa
 - Visualizar estado vial de rutas
