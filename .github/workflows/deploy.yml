@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "dist/*" 
+          source: "dist/*"
           target: "/var/www/vintra.qsuene.com"
-          strip_prefix: "dist" 
+          strip_prefix: "dist"
           rm: false
