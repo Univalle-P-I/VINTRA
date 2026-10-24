@@ -12,15 +12,16 @@ variables → Actions** y configura:
 | Nombre | Tipo | Valor |
 | --- | --- | --- |
 | `SONAR_PROJECT_KEY` | Variable | `Univalle-P-I_VINTRA` |
-| `SONAR_ORGANIZATION` | Variable requerida | La clave exacta de la organización en SonarQube Cloud |
-| `SONAR_TOKEN` | Secreto | Un token con permiso para analizar el proyecto en SonarQube Cloud |
+| `SONAR_TOKEN` | Secreto | Un token cuya cuenta emisora tenga permiso para analizar el proyecto en SonarQube Cloud |
 
 Si las variables son de organización, confirma que el repositorio VINTRA esté
-incluido en el acceso. Obtén la clave de organización desde la URL de la página
-de la organización (`https://sonarcloud.io/organizations/<clave>`) o desde la
-sección **Project Information** del proyecto. No asumas que coincide con el
-nombre de la organización de GitHub. SonarScanner for .NET conecta con
-SonarQube Cloud directamente, por lo que no requiere `SONAR_HOST_URL`.
+incluido en el acceso. El workflow usa la clave de organización confirmada
+`univalle-p-i`. SonarScanner for .NET conecta con SonarQube Cloud directamente,
+por lo que no requiere `SONAR_HOST_URL`.
+
+El token no otorga permisos por sí mismo: SonarQube Cloud evalúa los permisos de
+la cuenta que lo generó. Para analizar VINTRA, esa cuenta debe tener
+**Execute Analysis** en el proyecto.
 
 Al subir un cambio a `develop` o `main`, o abrir un pull request hacia esas
 ramas, revisa el job **SonarQube / Analyze backend** en la pestaña **Actions**.
