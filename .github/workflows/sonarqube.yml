@@ -32,6 +32,16 @@ jobs:
       - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
 
+      - name: Validate SonarQube configuration
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+        run: |
+          test -n "$SONAR_TOKEN" || { echo "::error::Missing GitHub secret SONAR_TOKEN"; exit 1; }
+          test -n "$SONAR_PROJECT_KEY" || { echo "::error::Missing GitHub variable SONAR_PROJECT_KEY"; exit 1; }
+          test -n "$SONAR_ORGANIZATION" || { echo "::error::Missing GitHub variable SONAR_ORGANIZATION (use the exact SonarQube Cloud organization key)"; exit 1; }
+
       - name: Begin SonarQube analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -39,8 +49,8 @@ jobs:
           SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
         run: >-
           dotnet sonarscanner begin
-          /k:"${SONAR_PROJECT_KEY:-VINTRA}"
-          /o:"${SONAR_ORGANIZATION:-Univalle-P-I}"
+          /k:"${SONAR_PROJECT_KEY}"
+          /o:"${SONAR_ORGANIZATION}"
           /d:sonar.token="${SONAR_TOKEN}"
 
       - name: Build backend
