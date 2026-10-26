@@ -1,9 +1,29 @@
+# Variables de entorno
 .env
+.env.*
+!.env.example
+
+# Dependencias y archivos generados por Node.js
 node_modules/
 dist/
 .vite/
 coverage/
+*.lcov
+test-results/
+
+# SonarQube / SonarScanner
+.sonarqube/
+.scannerwork/
+*.sonarqubeout
 
 # Archivos generados por .NET
 **/bin/
 **/obj/
+TestResults/
+
+# IDEs y sistema operativo
+.vs/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

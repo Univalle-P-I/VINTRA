@@ -1,0 +1,50 @@
+name: Deploy hacia el VPS
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtención código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+      - name: Instalar dependencias y compilar
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Transferir archivos a carpeta temporal
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: "frontend/dist/*"
+          target: "/var/www/vintra.qsuene.com/html-dev"
+          strip_components: 1
+          overwrite: true
+          rm: false
+
+      - name: Publicar cambios en pruebas (manteniendo .htaccess)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            find /var/www/vintra.qsuene.com/html-dev -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
+            cp -r /tmp/vintra_build/* /var/www/vintra.qsuene.com/html-dev
+            rm -rf /tmp/vintra_build

@@ -3,14 +3,14 @@ import axios from 'axios'
 import './App.css'
 
 function App() {
-  const [mensaje, setMensaje] = useState('Conectando con VINTRA Backend...')
+  const [mensaje, setMensaje] = useState('Conectando con el backend...')
 
   useEffect(() => {
     axios
       .get('http://localhost:3002/')
       .then((response) => {
-  setMensaje(`Backend conectado: ${response.data}`)
-})
+        setMensaje(`Backend conectado: ${response.data}`)
+      })
       .catch(() => {
         setMensaje('No se pudo conectar con el backend')
       })

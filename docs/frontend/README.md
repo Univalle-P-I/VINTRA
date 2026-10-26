@@ -2,20 +2,51 @@
 
 Guía para documentar la aplicación que usan el operador, el administrador, el conductor y la ciudadanía.
 
-## Debe publicarse aquí
+## Framework, versión y requisitos de ejecución
 
-- framework, versión y requisitos de ejecución;
-- estructura de carpetas y criterio para organizar componentes;
-- rutas, pantallas, roles y permisos visibles;
-- manejo de estado, formularios, validaciones y errores;
-- integración con el backend: endpoints consumidos, autenticación y variables de entorno;
-- mapas, geolocalización, actualizaciones en tiempo real y notificaciones;
-- accesibilidad y comandos para instalar, ejecutar y probar.
+- **Framework:** React
+- **Herramienta de construcción (Bundler):** Vite
+- **Versión de Node.js:** Node.js v18.x o superior recomendado.
+- **Gestor de paquetes:** npm o npx.
 
-Las definiciones de los endpoints se mantienen en `backend/` y se enlazan desde aquí. Las decisiones que involucren todo el sistema van en `arquitectura/`.
+## Estructura de carpetas y criterio para organizar componentes
 
-## Estado
+La aplicación se organiza bajo una arquitectura modular orientada a componentes dentro de `src/`:
 
-- Estado: `Borrador`
-- Responsable: Célula Backend / Frontend
-- Pendiente: definir stack, estructura de la aplicación y contratos consumidos.
+```text
+vintra/
+├── frontend/
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── index.html
+│   ├── Dockerfile.frontend
+│   └── src/
+│       ├── components/    # Componentes reutilizables globales (botones, modales, tarjetas)
+│       ├── views/         # Vistas o pantallas principales por rol
+│       ├── context/       # Manejo de estado global (Autenticación, Sesión)
+│       ├── services/      # Configuración de Axios y llamadas a la API REST
+│       ├── main.jsx       # Punto de entrada de la aplicación
+│       └── App.jsx        # Componente principal y enrutador
+```
+
+## Comunicación con el backend
+
+El frontend consume la API REST del backend (Node.js + NestJS) mediante **Axios**. La configuración base (URL de la API, cabeceras comunes e interceptores de autenticación) se centraliza en `src/services/`.
+
+```mermaid
+flowchart LR
+    UI[Vistas React] -->|eventos| SVC[Servicios / Axios]
+    SVC -->|"HTTP + JSON"| API[API REST - Backend NestJS]
+    API --> DB[(PostgreSQL)]
+```
+
+## Comandos para instalar, ejecutar y probar
+
+Desde la carpeta `frontend/`:
+
+```bash
+npm install       # instala dependencias
+npm run dev       # levanta el servidor de desarrollo de Vite
+npm run build     # genera la versión de producción
+npm run preview   # previsualiza el build de producción
+```
