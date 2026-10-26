@@ -37,13 +37,16 @@ La aplicación cuenta con dos entornos independientes para diferenciar la versi�
 ## 🔒 Configuración de Seguridad y Servidor
 
 ### 1. Usuario de Despliegue
+
 Se configuró un usuario exclusivo sin privilegios elevados en el sistema operativo para gestionar la construcción y actualización de las ramas `main` y `develop`:
 * **Usuario:** `vintra_deploy`
 
 ### 2. Firewall (UFW / IPTables)
+
 El cortafuegos se mantiene activo constantemente para limitar las conexiones externas únicamente a las zonas y puertos expresamente permitidos, protegiendo el sistema contra accesos no autorizados.
 
 ### 3. Configuración HTTPS / TLS
+
 * Implementación de certificados **SSL/TLS** para garantizar comunicaciones cifradas mediante HTTPS entre los navegadores y el servidor Apache.
 
 ### 4. Mapeo y Apertura de Puertos
