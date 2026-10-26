@@ -16,7 +16,7 @@ El objetivo es mantener una comunicación clara entre los componentes del sistem
 ## 2. Stack tecnológico y requisitos
 
 | Componente | Tecnología |
-|---|---|
+| --- | --- |
 | Lenguaje | TypeScript |
 | Entorno de ejecución | Node.js |
 | Framework backend | NestJS |
@@ -41,7 +41,7 @@ El backend se organiza por responsabilidades para facilitar el mantenimiento y p
 ### Módulos propuestos
 
 | Módulo | Responsabilidad |
-|---|---|
+| --- | --- |
 | Autenticación y usuarios | Identidad, inicio de sesión, permisos y acceso a recursos. |
 | Vehículos | Consulta y administración de los vehículos disponibles. |
 | Personal y cuadrillas | Gestión del personal, integrantes de cuadrillas y asignaciones. |
@@ -111,7 +111,7 @@ Las fórmulas, los filtros y los criterios de cálculo deben acordarse antes de 
 Los siguientes contratos son una propuesta inicial para orientar la integración. Las rutas definitivas, los parámetros y los formatos deben coincidir con los controladores realmente implementados.
 
 | Recurso | Método | Ruta propuesta | Propósito |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Salud del servicio | GET | `/health` | Comprobar la disponibilidad de la API. |
 | Usuarios | GET | `/users` | Consultar usuarios autorizados. |
 | Vehículos | GET | `/vehicles` | Consultar vehículos. |
@@ -211,7 +211,7 @@ La API debe aplicar validación de datos de entrada, manejo centralizado de erro
 Códigos HTTP previstos:
 
 | Código | Uso |
-|---|---|
+| --- | --- |
 | `200 OK` | Consulta o actualización exitosa. |
 | `201 Created` | Recurso creado correctamente. |
 | `400 Bad Request` | Datos inválidos. |
@@ -272,6 +272,7 @@ docker compose down
 La configuración de la base de datos debe estar definida mediante las variables de entorno requeridas. No se deben subir archivos `.env` con credenciales reales al repositorio.
 
 ## 9. Pendientes para cerrar la documentación
+
 - [ ] Verificar los módulos que existen realmente en el código.
 - [ ] Definir los contratos definitivos por recurso.
 - [ ] Confirmar el mecanismo de autenticación y los permisos.
