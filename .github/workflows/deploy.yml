@@ -66,22 +66,14 @@ jobs:
             source=/tmp/vintra_build
             live=/var/www/vintra.qsuene.com
             test -s "$source/index.html"
+            test -d "$live"
 
-            staging="$(mktemp -d /var/www/.vintra-stage.XXXXXX)"
-            backup="$(mktemp -d /var/www/.vintra-backup.XXXXXX)"
-            cp -a "$source/." "$staging/"
-            if [ -f "$live/.htaccess" ]; then
-              cp -p "$live/.htaccess" "$staging/.htaccess"
-            fi
-            test -s "$staging/index.html"
-
-            if [ -e "$live" ]; then
-              mv "$live" "$backup/current"
-            fi
-            if ! mv "$staging" "$live"; then
-              if [ -e "$backup/current" ]; then
-                mv "$backup/current" "$live"
-              fi
+            backup="$(mktemp -d /tmp/vintra_backup.XXXXXX)"
+            cp -a "$live/." "$backup/"
+            if ! find "$live" -mindepth 1 ! -name '.htaccess' -exec rm -rf -- {} + ||
+               ! cp -a "$source/." "$live/"; then
+              find "$live" -mindepth 1 ! -name '.htaccess' -exec rm -rf -- {} +
+              cp -a "$backup/." "$live/"
               exit 1
             fi
 
