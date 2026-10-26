@@ -124,7 +124,7 @@ Los siguientes contratos son una propuesta inicial para orientar la integración
 
 ### 5.1. Ejemplo de solicitud y respuesta
 
-**Consultar la disponibilidad del servicio**
+### Consultar la disponibilidad del servicio**
 
 ```http
 GET /health HTTP/1.1
@@ -143,7 +143,7 @@ Respuesta propuesta:
 
 Este contrato solo debe darse por implementado cuando exista el endpoint `/health` en el backend.
 
-**Registrar una posición de seguimiento**
+### Registrar una posición de seguimiento**
 
 ```http
 POST /tracking
@@ -272,8 +272,6 @@ docker compose down
 La configuración de la base de datos debe estar definida mediante las variables de entorno requeridas. No se deben subir archivos `.env` con credenciales reales al repositorio.
 
 ## 9. Pendientes para cerrar la documentación
-
-
 - [ ] Verificar los módulos que existen realmente en el código.
 - [ ] Definir los contratos definitivos por recurso.
 - [ ] Confirmar el mecanismo de autenticación y los permisos.
