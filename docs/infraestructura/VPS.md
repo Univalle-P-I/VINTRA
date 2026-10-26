@@ -39,6 +39,7 @@ La aplicación cuenta con dos entornos independientes para diferenciar la versi�
 ### 1. Usuario de Despliegue
 
 Se configuró un usuario exclusivo sin privilegios elevados en el sistema operativo para gestionar la construcción y actualización de las ramas `main` y `develop`:
+
 * **Usuario:** `vintra_deploy`
 
 ### 2. Firewall (UFW / IPTables)
