@@ -11,6 +11,7 @@ jobs:
     steps:
       - name: Obtención código
         uses: actions/checkout@v4
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
@@ -22,6 +23,7 @@ jobs:
         run: |
           npm ci
           npm run build
+
       - name: Transferir archivos a carpeta temporal
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -30,10 +32,12 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           source: "frontend/dist/*"
-          target: "/var/www/vintra.qsuene.com"
-          strip_prefix: "frontend/dist"
-          rm: true
-      - name: Publicar cambios en producción (manteniendo .htaccess)
+          target: "/var/www/vintra.qsuene.com/html-dev"
+          strip_components: 1
+          overwrite: true
+          rm: false
+
+      - name: Publicar cambios en pruebas (manteniendo .htaccess)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -41,6 +45,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            find /var/www/vintra.qsuene.com -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
-            cp -r /tmp/vintra_build/* /var/www/vintra.qsuene.com/
+            find /var/www/vintra.qsuene.com/html-dev -mindepth 1 ! -name '.htaccess' -exec rm -rf {} +
+            cp -r /tmp/vintra_build/* /var/www/vintra.qsuene.com/html-dev
             rm -rf /tmp/vintra_build
