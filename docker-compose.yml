@@ -1,5 +1,5 @@
-﻿services:
-
+﻿
+services:
   postgres:
     image: postgres:16
     container_name: vintra-postgres
@@ -11,22 +11,29 @@
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
-      context: ./backend
+      context: ./vintra-api
+      dockerfile: Dockerfile
     container_name: vintra-backend
     environment:
-      ASPNETCORE_URLS: http://+:3000
+      PORT: 3002
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB}
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "3001:3000"
+      - "3002:3002"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
