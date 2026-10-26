@@ -4,7 +4,7 @@ Este documento detalla la infraestructura, servicios, entornos y seguridad confi
 
 ---
 
-## 📌 Subdominio de Servicios
+## Subdominio de Servicios
 
 El proyecto Vintra se encuentra expuesto en la web mediante la siguiente URL:
 
@@ -12,7 +12,7 @@ El proyecto Vintra se encuentra expuesto en la web mediante la siguiente URL:
 
 ---
 
-## 🛠️ Stack Tecnológico y Requisitos Previos
+## Stack Tecnológico y Requisitos Previos
 
 Las tecnologías e infraestructura instaladas en el servidor para el correcto funcionamiento de la aplicación son:
 
@@ -23,7 +23,7 @@ Las tecnologías e infraestructura instaladas en el servidor para el correcto fu
 
 ---
 
-## 🚀 Entornos de Despliegue
+## Entornos de Despliegue
 
 La aplicación cuenta con dos entornos independientes para diferenciar la versión estable de las fases de desarrollo e integración:
 
@@ -34,7 +34,7 @@ La aplicación cuenta con dos entornos independientes para diferenciar la versi�
 
 ---
 
-## 🔒 Configuración de Seguridad y Servidor
+##  Configuración de Seguridad y Servidor
 
 ### 1. Usuario de Despliegue
 
@@ -72,7 +72,7 @@ El cortafuegos se mantiene activo constantemente para limitar las conexiones ext
 
 ---
 
-## 📂 Arquitectura de Directorios en Servidor
+## Arquitectura de Directorios en Servidor
 
 Estructura organizativa de archivos dentro de `/var/www/` para alojar los entornos de producción y pruebas:
 
