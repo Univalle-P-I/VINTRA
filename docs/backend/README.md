@@ -1,8 +1,8 @@
 # Backend — Documentación de la API y reglas de negocio de VINTRA
 
-**Estado:** `Borrador`  
-**Responsable:** Célula Backend  
-**Proyecto:** VINTRA  
+**Estado:** `Borrador`
+**Responsable:** Célula Backend
+**Proyecto:** VINTRA
 **Stack:** Node.js · NestJS · PostgreSQL · TypeORM
 
 ---
