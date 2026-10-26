@@ -34,7 +34,7 @@ La aplicación cuenta con dos entornos independientes para diferenciar la versi�
 
 ---
 
-##  Configuración de Seguridad y Servidor
+## Configuración de Seguridad y Servidor
 
 ### 1. Usuario de Despliegue
 
