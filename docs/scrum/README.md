@@ -17,8 +17,8 @@
 ## Contenido
 
 - [1. Propósito](#1--propósito)
-- [2. Documentación relacionada](#2--documentación-relacionada)
-- [3. Historias de usuario](#3--historias-de-usuario-y-planificación-inicial)
+- [2. Documentación relacionada](#2-documentación-relacionada)
+- [3. Historias de usuario](#3-historias-de-usuario-y-planificación-inicial)
 - [4. Reglas de priorización](#4--reglas-de-priorización)
 - [5. Planificación por sprints](#5--planificación-inicial-por-sprints)
 - [6. Definition of Done](#6--definition-of-done-dod)
@@ -111,13 +111,13 @@ La prioridad de una historia no determina, por sí sola, el sprint en el que se 
 
 La distribución presentada constituye una propuesta inicial y deberá revisarse según la capacidad del equipo, las dependencias y los acuerdos de planificación.
 
-###  Sprint 1. Acceso, flota y personal
+### Sprint 1. Acceso, flota y personal
 
 **Historias previstas:** HU1, HU2, HU3, HU4, HU5 y HU6.
 
 **Objetivo funcional propuesto:** establecer las capacidades iniciales de acceso al sistema y administración de vehículos y personal, incluyendo la gestión de estados, cuadrillas, turnos y disponibilidad necesarios para la planificación operativa.
 
-###  Sprint 2. Rutas, asignaciones y trazabilidad
+### Sprint 2. Rutas, asignaciones y trazabilidad
 
 **Historias previstas:** HU7, HU8, HU9, HU10, HU11 y HU12.
 
@@ -133,17 +133,17 @@ La *Definition of Done* establece las condiciones comunes que debe cumplir un tr
 
 Una historia o tarea se considerará terminada cuando, según corresponda:
 
--  Cumpla los criterios de aceptación acordados.
+- Cumpla los criterios de aceptación acordados.
 - Respete la estructura y las convenciones del proyecto.
--  Se hayan ejecutado las pruebas y validaciones pertinentes y se conozcan sus resultados.
--  No presente defectos conocidos que impidan cumplir el objetivo de la historia.
--  Se hayan verificado los permisos y las restricciones aplicables.
--  La documentación afectada se encuentre actualizada.
--  Los cambios estén vinculados a la tarea correspondiente.
--  Se hayan adjuntado las evidencias de validación requeridas.
--  El Pull Request haya recibido las revisiones y aprobaciones exigidas.
--  Los comentarios relevantes de revisión se hayan resuelto antes de integrar los cambios.
--  La integración se haya realizado conforme al flujo de trabajo acordado.
+- Se hayan ejecutado las pruebas y validaciones pertinentes y se conozcan sus resultados.
+- No presente defectos conocidos que impidan cumplir el objetivo de la historia.
+- Se hayan verificado los permisos y las restricciones aplicables.
+- La documentación afectada se encuentre actualizada.
+- Los cambios estén vinculados a la tarea correspondiente.
+- Se hayan adjuntado las evidencias de validación requeridas.
+- El Pull Request haya recibido las revisiones y aprobaciones exigidas.
+- Los comentarios relevantes de revisión se hayan resuelto antes de integrar los cambios.
+- La integración se haya realizado conforme al flujo de trabajo acordado.
 
 La DoD no sustituye los criterios de aceptación específicos de cada historia. Para considerar terminado el trabajo deberán cumplirse ambos conjuntos de condiciones.
 
