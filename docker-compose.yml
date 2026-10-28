@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16
-    container_name: vintra-postgres
+    container_name: vintra-task-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -20,7 +20,7 @@ services:
     build:
       context: ./vintra-api
       dockerfile: Dockerfile
-    container_name: vintra-backend
+    container_name: vintra-task-backend
     environment:
       PORT: 3002
       DB_HOST: postgres
@@ -37,7 +37,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: vintra-frontend
+    container_name: vintra-task-frontend
     ports:
       - "5173:80"
     depends_on:
