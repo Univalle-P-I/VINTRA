@@ -63,5 +63,8 @@ jobs:
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
             -Dsonar.organization=univalle-p-i
             -Dsonar.sources=src
-            -Dsonar.tests=test
+            -Dsonar.tests=src
+            -Dsonar.exclusions=src/**/*.spec.ts
+            -Dsonar.test.inclusions=src/**/*.spec.ts
+            -Dsonar.coverage.exclusions=src/**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info

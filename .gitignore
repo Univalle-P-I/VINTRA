@@ -27,3 +27,5 @@ TestResults/
 .vscode/
 .DS_Store
 Thumbs.db
+# Archivos de compilación de TypeScript
+*.tsbuildinfo
