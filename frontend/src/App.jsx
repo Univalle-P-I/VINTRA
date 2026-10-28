@@ -11,11 +11,9 @@ function App() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/health')
+      .get('http://localhost:3002/')
       .then((response) => {
-        setMensaje(
-          `Backend conectado: ${response.data.service} - ${response.data.status}`
-        )
+        setMensaje(`Backend conectado: ${response.data}`)
       })
       .catch(() => {
         setMensaje('No se pudo conectar con el backend')

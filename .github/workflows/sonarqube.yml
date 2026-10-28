@@ -1,3 +1,4 @@
+
 name: SonarQube
 
 on:
@@ -16,8 +17,9 @@ permissions:
 
 jobs:
   analyze:
-    name: Analyze backend
+    name: Analyze NestJS backend
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -27,34 +29,21 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vintra-api/package-lock.json
 
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci --ignore-scripts
+      - name: Install dependencies
+        working-directory: vintra-api
+        run: npm ci
 
-      - name: Run frontend tests with coverage
-        working-directory: frontend
-        run: npm run test:coverage
+      - name: Build backend
+        working-directory: vintra-api
+        run: npm run build
 
-
-      - name: Normalize frontend coverage paths
-        shell: bash
-        run: |
-          sed -i 's#^SF:src\\#SF:frontend/src/#' frontend/coverage/lcov.info
-          echo "Rutas del reporte de cobertura:"
-          grep '^SF:' frontend/coverage/lcov.info
-
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Install SonarScanner for .NET
-        run: dotnet tool install --global dotnet-sonarscanner
+      - name: Run tests with coverage
+        working-directory: vintra-api
+        run: npm run test:cov -- --runInBand
 
       - name: Validate SonarQube configuration
         env:
@@ -64,22 +53,18 @@ jobs:
           test -n "$SONAR_TOKEN" || { echo "::error::Missing GitHub secret SONAR_TOKEN"; exit 1; }
           test -n "$SONAR_PROJECT_KEY" || { echo "::error::Missing GitHub variable SONAR_PROJECT_KEY"; exit 1; }
 
-      - name: Begin SonarQube analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
-        run: >-
-          dotnet sonarscanner begin
-          /k:"${SONAR_PROJECT_KEY}"
-          /o:"univalle-p-i"
-          /d:sonar.token="${SONAR_TOKEN}"
-          /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info"
-
-      - name: Build backend
-        run: dotnet build backend/Vintra.Backend/Vintra.Backend.csproj --no-incremental
-
-
-      - name: End SonarQube analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
+        with:
+          projectBaseDir: vintra-api
+          args: >
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=univalle-p-i
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.exclusions=src/**/*.spec.ts
+            -Dsonar.test.inclusions=src/**/*.spec.ts
+            -Dsonar.coverage.exclusions=src/**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
