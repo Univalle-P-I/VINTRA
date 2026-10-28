@@ -68,3 +68,4 @@ jobs:
             -Dsonar.test.inclusions=src/**/*.spec.ts
             -Dsonar.coverage.exclusions=src/**/*.spec.ts
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
