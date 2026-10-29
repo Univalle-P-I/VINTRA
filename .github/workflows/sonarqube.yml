@@ -24,6 +24,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --ignore-scripts
+
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: npm run test:coverage
+
+
+      - name: Normalize frontend coverage paths
+        shell: bash
+        run: |
+          sed -i 's#^SF:src\\#SF:frontend/src/#' frontend/coverage/lcov.info
+          echo "Rutas del reporte de cobertura:"
+          grep '^SF:' frontend/coverage/lcov.info
+
+
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -49,9 +73,11 @@ jobs:
           /k:"${SONAR_PROJECT_KEY}"
           /o:"univalle-p-i"
           /d:sonar.token="${SONAR_TOKEN}"
+          /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info"
 
       - name: Build backend
         run: dotnet build backend/Vintra.Backend/Vintra.Backend.csproj --no-incremental
+
 
       - name: End SonarQube analysis
         env:
