@@ -145,7 +145,7 @@ Zona
            └── Recorrido operativo (cuando corresponda)
 ```
 
-La jerarquía definitiva, las relaciones entre los niveles y la diferencia entre una ruta planificada y un recorrido ejecutado deberán validarse con el equipo funcional.
+La jerarquía definitiva, las relaciones entre los niveles y la diferencia entre una ruta planificada y un recorrido ejecutado se validan con el equipo.
 
 ### 5.5. Planificación y asignación de recursos
 
@@ -219,15 +219,15 @@ Las siguientes reglas deben orientar el diseño funcional y la implementación.
 | ID | Regla | Aplicación |
 | --- | --- | --- |
 | **RN-01** | Acceso por rol | Las funcionalidades disponibles deben corresponder al rol y los permisos del usuario autenticado. |
-| **RN-02** | Disponibilidad de vehículos | Un vehículo fuera de servicio no debe utilizarse en nuevas asignaciones. |
-| **RN-03** | Disponibilidad del personal | El personal debe cumplir las condiciones de disponibilidad y turno aplicables. |
-| **RN-04** | Prevención de conflictos | No deben confirmarse asignaciones incompatibles con las restricciones acordadas. |
-| **RN-05** | Segundo recorrido | Se contempla para vehículos de 7 yardas cúbicas cuando corresponda; no debe asumirse que todos los vehículos pueden realizarlo. |
-| **RN-06** | Límite operativo conocido | Bajo la regla operativa actual, no se deben asumir más de dos recorridos para un vehículo en una jornada. |
-| **RN-07** | Trazabilidad | Los cambios relevantes de las asignaciones deben poder consultarse según el alcance aprobado. |
-| **RN-08** | Integridad de datos | Las relaciones entre zonas, rutas, recursos y asignaciones deben respetar las restricciones del modelo de datos. |
+| **RN-02** | Disponibilidad de vehículos | Antes de crear o confirmar una asignación, el sistema debe comprobar que el vehículo esté habilitado para operar. Los vehículos fuera de servicio no podrán recibir nuevas asignaciones. Deben definirse los estados que impiden asignar un vehículo y cómo se gestionan las asignaciones existentes cuando cambia su estado. |
+| **RN-03** | Disponibilidad del personal | Antes de confirmar una asignación, el sistema debe verificar que el personal requerido esté disponible y cumpla las condiciones de turno aplicables. Deben precisarse los horarios, las ausencias, las restricciones de disponibilidad y si una persona puede participar en más de una asignación durante el mismo periodo. |
+| **RN-04** | Prevención de conflictos | El sistema debe detectar incompatibilidades antes de confirmar una asignación, como la reutilización de un recurso en actividades que se superponen. Deben definirse las restricciones aplicables a vehículos, personal, rutas, horarios y demás recursos, así como las excepciones autorizadas. |
+| **RN-05** | Segundo recorrido | El sistema debe contemplar la posibilidad de asignar un segundo recorrido a los vehículos cuando las condiciones operativas lo permitan. Esta posibilidad se contempla para vehículos de 7 yardas cúbicas y puede aplicarse ocasionalmente a vehículos de otras capacidades, según las necesidades operativas y las condiciones autorizadas por el equipo funcional. La asignación no debe ser automática ni asumirse como permitida para todos los vehículos en todas las jornadas. |
+| **RN-06** | Límite operativo conocido | La cantidad máxima de recorridos por vehículo en una jornada está pendiente de validación. Deben definirse el origen del límite, el significado de «recorrido», el periodo que constituye una «jornada» y las excepciones aplicables. No debe implementarse un máximo definitivo hasta confirmar estos aspectos. |
+| **RN-07** | Trazabilidad | El sistema debe conservar información consultable sobre los cambios relevantes de las asignaciones, incluyendo qué cambió, cuándo ocurrió y qué usuario realizó la operación, cuando corresponda. Deben definirse los eventos que se registrarán, los datos que se conservarán y quién podrá consultarlos. |
+| **RN-08** | Integridad de datos | El sistema debe impedir que se registren relaciones inválidas entre zonas, rutas, recursos y asignaciones. Las operaciones deben respetar las relaciones, las restricciones y las referencias definidas en el modelo de datos. Deben precisarse las reglas de eliminación, modificación y tratamiento de registros relacionados. |
 
-> **Regla operativa importante:** el segundo recorrido se contempla para vehículos de 7 yardas cúbicas cuando corresponda. Las condiciones exactas para permitirlo y las excepciones deben validarse con el equipo funcional.
+> **Regla operativa importante:** el segundo recorrido se contempla para vehículos de 7 yardas cúbicas y para los otros vehículos cuando corresponda. Las condiciones exactas para permitirlo y las excepciones deben validarse con el equipo funcional.
 
 Los estados permitidos, las excepciones y las condiciones exactas de cada regla deben especificarse en las historias de usuario y sus criterios de aceptación.
 
@@ -280,7 +280,7 @@ La distribución es una referencia y no implica que todas las historias estén a
 
 ## 11. Trazabilidad de requisitos
 
-La documentación debe facilitar la relación entre los elementos que realmente existan en el proyecto.
+La documentación facilita la relación entre los elementos que realmente existan en el proyecto.
 
 ```mermaid
 flowchart LR
@@ -327,7 +327,7 @@ No todos los requisitos necesitan generar un elemento independiente en cada cate
 | Especificar fuentes y fórmulas de los indicadores del MVP | Responsables funcionales y técnicos | Pendiente |
 | Confirmar el alcance de las integraciones geográficas | Responsables técnicos | Pendiente |
 
-Los responsables y las fechas deberán completarse con los acuerdos reales del equipo. Cuando una decisión se resuelva, debe actualizarse con su resultado y la fecha correspondiente.
+Cuando una decisión se resuelva, debe actualizarse con su resultado y la fecha correspondiente.
 
 ## 13. Criterios de validación
 
@@ -347,7 +347,7 @@ El modelado podrá considerarse validado cuando:
 | Campo | Valor |
 | --- | --- |
 | **Estado** | Borrador para revisión del equipo |
-| **Responsables** | Célula Scrum, con revisión de responsables funcionales y técnicos |
+| **Responsables** | Célula Scrum, con revisión de responsables funcionales |
 | **Última actualización** | Por registrar |
 | **Próximo paso** | Validar reglas de negocio, decisiones abiertas y trazabilidad de requisitos |
 
