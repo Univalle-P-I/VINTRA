@@ -1,6 +1,6 @@
 # Base de datos
 
-En esta guía se encuentra documentado la persistencia de VINTRA y su evolución.
+En esta guía se encuentra documentado la persistencia de VINTRA, su arquitectura y evolución.
 
 ## Índice
 
@@ -8,6 +8,9 @@ En esta guía se encuentra documentado la persistencia de VINTRA y su evolución
 - [Diagrama Entidad-Relación](#2-diagramado-er)
 - [Diccionario de Datos](#3-diccionario-de-datos)
 - [Traducción de Relaciones](#4-relaciones-con-el-modelo-de-dominio)
+- [Migraciones, Datos Iniciales y Orden de Ejecución](#5-migraciones-datos-iniciales-y-orden-de-ejecucción)
+- [Politicas para Respaldo, Restauración y Datos Sensibles](#6-políticas-restauración-y-datos-sensibles)
+- [Configuración Local](#7-configuración-local)
 
 
 ## Debe publicarse aquí
@@ -24,12 +27,12 @@ El modelo conceptual y los diagramas de negocio se mantienen en `modelado/`. Las
 
 ## Estado
 
-- Estado: `En curso`
-- Responsable: Farid Cuero
-- Pendiente: migraciones, politicas de respaldos y de restauración
+- Estado: `En desarrollo`
+- Responsable: Ricardo Farid Cuero
+- Pendiente: Versión soportada seleccionada en el stack tecnológico, migraciones, politicas de respaldos y de restauración, documentación de los datos sensibles, ejemplo de configuración local.
 
 ## 1. Motor y Version Soportada
-el motor de la base de datos usado es **PostgresSQL** en conjunto con la herramienta **PostGIS**. la versión soportada aún no esta definida....
+El motor de la base de datos usado es **PostgresSQL** en conjunto con la herramienta **PostGIS**. La versión soportada aún no esta definida....
 
 ## 2. Diagramado ER:
 
@@ -548,3 +551,7 @@ erDiagram
 | order_visit | Orden en que la microruta visita el barrio. No puede repetirse dentro de la misma microruta. | INT | N/A | SI | SI (compuesto) |    | Compuesto único con neighborhood_id y microroute_id |
 
 ## 4. Relaciones con el Modelo de Dominio
+
+## 5. Migraciones, Datos Iniciales y Orden de Ejecucción
+## 6. Políticas, Restauración y Datos Sensibles
+## 7. Configuración Local
