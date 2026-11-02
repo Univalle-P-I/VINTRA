@@ -108,7 +108,7 @@ erDiagram
     }
 
     user_data {
-        UUID id   ,   
+        UUID id
         VARCHAR first_name
         VARCHAR last_name
         VARCHAR email
