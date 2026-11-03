@@ -1,3 +1,4 @@
+
 name: SonarQube
 
 on:
@@ -16,8 +17,9 @@ permissions:
 
 jobs:
   analyze:
-    name: Analyze backend
+    name: Analyze NestJS backend
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -26,6 +28,7 @@ jobs:
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
+<<<<<<< HEAD
         with:
           node-version: "22"
           cache: "npm"
@@ -50,11 +53,24 @@ jobs:
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
+=======
+>>>>>>> fe256838aace1b075037835871210c3b3b6658fb
         with:
-          dotnet-version: 10.0.x
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vintra-api/package-lock.json
 
-      - name: Install SonarScanner for .NET
-        run: dotnet tool install --global dotnet-sonarscanner
+      - name: Install dependencies
+        working-directory: vintra-api
+        run: npm ci
+
+      - name: Build backend
+        working-directory: vintra-api
+        run: npm run build
+
+      - name: Run tests with coverage
+        working-directory: vintra-api
+        run: npm run test:cov -- --runInBand
 
       - name: Validate SonarQube configuration
         env:
@@ -64,9 +80,11 @@ jobs:
           test -n "$SONAR_TOKEN" || { echo "::error::Missing GitHub secret SONAR_TOKEN"; exit 1; }
           test -n "$SONAR_PROJECT_KEY" || { echo "::error::Missing GitHub variable SONAR_PROJECT_KEY"; exit 1; }
 
-      - name: Begin SonarQube analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+<<<<<<< HEAD
           SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
         run: >-
           dotnet sonarscanner begin
@@ -83,3 +101,16 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
+=======
+        with:
+          projectBaseDir: vintra-api
+          args: >
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=univalle-p-i
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.exclusions=src/**/*.spec.ts
+            -Dsonar.test.inclusions=src/**/*.spec.ts
+            -Dsonar.coverage.exclusions=src/**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+>>>>>>> fe256838aace1b075037835871210c3b3b6658fb
