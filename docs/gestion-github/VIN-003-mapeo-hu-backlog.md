@@ -42,5 +42,5 @@ Orden sugerido: validar alcance/reglas (#53/#58), cerrar decisiones y contratos 
 ## Pendientes para cerrar VIN-003
 
 - Product/profesor confirma alcance y prioridades en #53/#58, roles en #70, y las decisiones de HU9/#91, HU11/#83 y HU12/#84.
-- Revisar y normalizar los milestones existentes después de acordar calendario: #71 tiene un milestone que no coincide con su ficha; #83 no tiene milestone; verificar #61 y #70–#84. No asignar hitos por inferencia.
+- Milestones de HU1/HU11 asignados según la ficha: #70 → M2 y #83 → M5. Los demás Issues vinculados conservan los hitos planificados; revisar fechas y capacidad durante el planning.
 - Mantener dependencias como números de Issue; actualizar las fichas si cambian los estados de PR o las decisiones del profesor.
