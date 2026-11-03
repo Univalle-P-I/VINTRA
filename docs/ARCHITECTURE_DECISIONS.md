@@ -22,10 +22,11 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 
 ## ADR-003 — Base relacional PostgreSQL
 
-- **Estado:** Base propuesta consistente en documentos y PR #47; confirmar con issue #54.
+- **Estado:** PostgreSQL aparece en documentos y en el diccionario compartido por BD; confirmar elección de extensión y soporte en issue #54.
 - **Contexto:** Las tarjetas/modelado y Compose contemplan PostgreSQL; el dominio requiere relaciones, restricciones, transacciones e integridad.
-- **Decisión propuesta:** PostgreSQL relacional para datos operativos. No asumir PostGIS.
-- **Consecuencias:** Migraciones versionadas, FKs/constraints para invariantes, backups y manejo de concurrencia. Extensión espacial solo si requisito aprobado demuestra necesidad (#91).
+- **Decisión propuesta:** PostgreSQL relacional para datos operativos. El diccionario de BD propone PostGIS para macrorutas, microrutas, barrios y puntos de ubicación de vehículos.
+- **Pendiente:** confirmar producto/arquitectura si se implementa GIS y seguimiento GPS, SRID, frecuencia, retención, privacidad y ambiente (#54/#58/#91). La propuesta del diccionario no equivale por sí sola a alcance aprobado.
+- **Consecuencias:** Migraciones versionadas, FKs/constraints para invariantes, backups y manejo de concurrencia.
 
 ## ADR-004 — ORM o acceso con `pg`
 
@@ -44,8 +45,8 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 
 ## ADR-006 — Autenticación y permisos
 
-- **Estado:** Pendiente #54/#70/#71.
-- **Contexto:** HU1 y Trello mencionan usuarios/roles. No está confirmada la identidad (local/institucional), mecanismo de sesión ni permisos por operación.
+- **Estado:** Parcialmente informado por el diccionario de BD; protocolo/flujo y permisos pendientes #54/#70/#71.
+- **Contexto:** HU1 y Trello mencionan usuarios/roles. El diccionario propone `user_account`, perfiles/roles, hash Argon2id, sesiones con token hash SHA-256, bloqueo temporal y tokens de restablecimiento de un solo uso. No confirma transporte del token, expiraciones, canales de recuperación, identidad local/institucional ni permisos por operación.
 - **Decisión:** No seleccionar JWT, OAuth, proveedor externo, cookie o flujo de recuperación por inferencia. Resolver mecanismo y amenaza/entorno antes de codificar.
 - **Consecuencias:** Mantener endpoints de negocio protegidos; el frontend no define autoridad. La matriz de roles/acciones es requisito para B-13.
 
@@ -83,6 +84,14 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 - **Contexto:** Workflows existentes publican frontend por SSH/SCP. La guía VPS declara servidores y puertos, pero tiene campos pendientes y requiere comprobar entorno real.
 - **Decisión:** Conservar compatibilidad con el mecanismo SSH/SCP solicitado mientras se valida staging backend; no reemplazar infraestructura por Docker/Kubernetes o cloud sin justificación aprobada.
 - **Consecuencias:** Antes de declarar staging listo, verificar acceso, dominio, TLS, env, PostgreSQL privado, migraciones, backups, health y rollback. No copiar valores sensibles al repo.
+
+## Insumo recibido del equipo de Base de Datos
+
+El diccionario compartido propone tablas concretas para cuentas, perfiles, sesiones, restablecimiento, auditoría, vehículos, cuadrillas, rutas, barrios, horarios, asignaciones y posiciones GPS. Se usa como referencia para diseñar la integración del backend; el equipo de BD conserva la responsabilidad del modelo físico.
+
+Antes de tratarlo como contrato definitivo, coordinar estas diferencias con BD/producto: el catálogo de perfiles incluye conductor frente al alcance administrativo de #70; la restricción microruta-fecha puede impedir el segundo viaje; asignación no enlaza la programación semanal y complica verificar conflictos de horario; el seguimiento GPS requiere decisión de alcance; y la relación obligatoria cuenta-datos personales debe quedar garantizada transaccionalmente o ajustarse en el diseño.
+
+La decisión de ORM (`TypeORM` vs `pg`) sigue abierta en #54: el diccionario especifica tablas y tipos de PostgreSQL, no selecciona la herramienta de persistencia de NestJS.
 
 ## Registro de asuntos abiertos
 
