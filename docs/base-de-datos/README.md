@@ -1,29 +1,16 @@
-# Base de datos
+# Base de datos ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=fff&style=for-the-badge)
 
-En esta guía se encuentra documentado la persistencia de VINTRA, su arquitectura y evolución.
+En esta guía se expone la documentación de la base de datos de VINTRA, su arquitectura y evolución.
 
 ## Índice
 
-- [Motor y Versión Soportadas](#1-motor-y-version-soportada)
-- [Diagrama Entidad-Relación](#2-diagramado-er)
-- [Diccionario de Datos](#3-diccionario-de-datos)
-- [Traducción de Relaciones](#4-relaciones-con-el-modelo-de-dominio)
-- [Migraciones, Datos Iniciales y Orden de Ejecución](#5-migraciones-datos-iniciales-y-orden-de-ejecucción)
-- [Politicas para Respaldo, Restauración y Datos Sensibles](#6-políticas-restauración-y-datos-sensibles)
-- [Configuración Local](#7-configuración-local)
-
-
-## Debe publicarse aquí
-
-- [motor y versión soportada](#1-motor-y-version-soportada)
-- [diagrama entidad-relación y diccionario de datos](#2-diagrama-entidad-relación-y-diccionario-de-datos);
-- tablas, columnas, tipos, claves, restricciones e índices;
-- relaciones con el modelo de dominio;
-- migraciones, datos iniciales y orden de ejecución;
-- políticas para respaldos, restauración y datos sensibles;
-- configuración local sin publicar secretos.
-
-El modelo conceptual y los diagramas de negocio se mantienen en `modelado/`. Las consultas o endpoints que consumen estas estructuras se enlazan desde `backend/`.
+1. [Motor y Versión Soportadas](#1-motor-y-version-soportada)
+2. [Diagrama Entidad-Relación](#2-diagramado-er)
+3. [Diccionario de Datos](#3-diccionario-de-datos)
+4. [Traducción de Relaciones](#4-relaciones-con-el-modelo-de-dominio)
+5. [Migraciones, Datos Iniciales y Orden de Ejecución](#5-migraciones-datos-iniciales-y-orden-de-ejecucción)
+6. [Politicas para Respaldo, Restauración y Datos Sensibles](#6-políticas-restauración-y-datos-sensibles)
+7. [Configuración Local](#7-configuración-local)
 
 ## Estado
 
@@ -31,8 +18,11 @@ El modelo conceptual y los diagramas de negocio se mantienen en `modelado/`. Las
 - Responsable: Ricardo Farid Cuero
 - Pendiente: Versión soportada seleccionada en el stack tecnológico, migraciones, politicas de respaldos y de restauración, documentación de los datos sensibles, ejemplo de configuración local.
 
+---
+
 ## 1. Motor y Version Soportada
-El motor de la base de datos usado es **PostgresSQL** en conjunto con la herramienta **PostGIS**. La versión soportada aún no esta definida....
+
+El motor de la Base de Datos usada es: ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=fff) en conjunto con la extensión: ![PostGIS Badge](https://img.shields.io/badge/PostGIS-3.6-336791?logo=postgresql&logoColor=fff). Usando las versiones 16 para postgreSQL. Y por compatibilidad versionado 3.6.x en adelante.
 
 ## 2. Diagramado ER:
 
