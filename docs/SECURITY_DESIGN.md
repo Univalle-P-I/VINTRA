@@ -66,6 +66,19 @@ SonarQube complementa pruebas, revisiones y dependabot/escaneo de dependencias; 
 - Separar configuración/secretos por entorno. Cambios de esquema y despliegues con copia de respaldo verificada y rollback documentado.
 - Logs estructurados, health separado del estado DB, alertas sin datos sensibles y procedimiento de respuesta.
 
+## Alineación con el diccionario de BD
+
+El diccionario compartido por BD propone estos controles de almacenamiento:
+
+- `user_account.pwd_hash` con Argon2id. La contraseña nunca se guarda en claro. Los parámetros de coste deben definirse mediante una política de seguridad revisada, no con valores improvisados en el código.
+- `session.token_hash` y `password_reset_token.token_hash` como SHA-256 hexadecimal; el token en claro no se persiste. El diseño propone revocación/vencimiento de sesiones y token de restablecimiento de un solo uso. Aún deben definirse generación de entropía, vencimientos, revocación global y canales de entrega.
+- `failed_attempts` y `locked_until` permiten registrar intentos fallidos y bloqueos. Umbrales, duración y respuesta anti enumeración deben aprobarse y configurarse sin valores hardcodeados.
+- `user_account` contiene documento de identidad y se enlaza a `user_data` con nombre, correo y teléfono. Son datos personales: aplicar minimización, permisos por rol, protección en logs, política de conservación y acceso restringido.
+- Los roles y perfiles del diccionario incluyen administración, jefe de operaciones y conductor. Confirmar el alcance con #70 antes de habilitar conductor; el issue vigente limita el MVP a roles administrativos.
+- `audit_log` es append-only según la propuesta. Los campos JSON no deben incluir credenciales, hashes ni información personal innecesaria. Su `entity_id` polimórfico y `actor` textual no tienen FK formal, por lo que se debe revisar integridad y atribución con BD.
+
+La hoja propone almacenamiento y campos, pero no define por sí sola el protocolo HTTP de login, cookies/tokens, CSRF, recuperación, autorización por endpoint ni requisitos de privacidad. Esos contratos siguen sujetos a #54/#70/#71 y revisión de seguridad.
+
 ## Lista de verificación para aceptar el diseño
 
 1. Alcance/actores y datos personales definidos (#53, #55).
