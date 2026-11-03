@@ -88,11 +88,11 @@ Actualiza campos expresamente permitidos. Proteger cambios de estado con reglas 
 
 ### `GET /api/v1/routes` y `POST /api/v1/routes`
 
-CRUD de rutas solo después de definir macro/micro/sector, paradas y geografía (#78/#79). Validar identificador, pertenencia, orden y datos geográficos únicamente si están aprobados. No aceptar latitud/longitud arbitrarias como sustituto de un modelo GIS.
+Rutas de API candidatas. El diccionario de BD propone `macroroute` (nombre y geometría de área), `microroute` (macroruta, nombre y geometría de trayecto), `btura_neighborhood` (comuna, nombre y geometría) y relaciones de microruta con barrios/horarios. Los nombres HTTP, campos públicos, alcance GIS y operaciones CRUD se cierran con BD/producto en #54/#63/#66/#78/#79. Si se aprueba geometría, el contrato debe fijar SRID y formato; no aceptar coordenadas sin referencia espacial.
 
 ### `GET /api/v1/assignments` y `POST /api/v1/assignments`
 
-`POST` es una operación transaccional. El contrato de creación candidato requiere route, vehicle, crew/driver y ventana temporal conforme al modelo aprobado. Respuestas `201`, `400`, `401`, `403`, `404`, `409` cuando un recurso no existe o existe conflicto; `503` si dependencia temporalmente indisponible. Los campos y nombres finales dependen de #63/#66/#93.
+`POST` es una operación transaccional. El diccionario de BD propone `microroute_id`, `crew_id`, `vehicle_id`, `assignment_status_id` y `scheduled_date`, con `started_at`/`ended_at` opcionales. El contrato final debe alinearse con esos campos aprobados y resolver cómo se selecciona el horario, porque `assignment` no incluye una referencia a `microroute_schedule`. La hoja propone una asignación única por microruta y fecha; confirmar que no bloquee el segundo viaje de HU11 antes de crear esa restricción. Respuestas candidatas: `201`, `400`, `401`, `403`, `404`, `409` y `503`.
 
 Validaciones obligatorias una vez fijadas reglas: disponibilidad, compatibilidad, conflicto temporal, estado habilitado, referencias válidas y concurrencia. Una respuesta `409` debe identificar el conflicto con un código seguro y accionable. No permitir que dos solicitudes concurrentes creen la misma asignación incompatible; usar transacción y restricción/estrategia aprobada.
 
@@ -142,6 +142,21 @@ Elegir entre `400` y `422` para validación semántica en #66; no emitir ambos i
 - OpenAPI debe incluir esquemas, ejemplos inocuos, códigos de error y seguridad por operación.
 - Cambios aditivos compatibles dentro de versión; cambios que rompen clientes requieren migración/versionado anunciado.
 - SonarQube revisa calidad del backend propuesto por PR #47; la cobertura debe importarse desde el pipeline y el quality gate bloquear PR según política aprobada. Sonar no valida que un contrato sea correcto ni sustituye pruebas.
+
+## Alineación con el diccionario de BD
+
+El diccionario compartido por el equipo de BD es una propuesta de esquema, no una API publicada. Estos nombres deben guiar el mapeo del backend cuando el modelo quede aprobado:
+
+| Recurso | Campos propuestos en el modelo | Consideración para el contrato |
+| --- | --- | --- |
+| Vehículo | `plate`, `vehicle_type_id`, `vehicle_status_id`, `capacity_kg`, `capacity_yd3`, `is_active` | Validar unicidad de placa, unidades/rangos y catálogos con #64/#72. |
+| Cuenta/perfil | `user_account`, `user_data`, `profile`, `user_role` | No publicar documentos, hashes ni datos personales en responses generales. Los endpoints de autenticación todavía requieren decisión. |
+| Cuadrilla | `crew`, `crew_member`, conductor asociado | Acordar si los integrantes son cuentas o solo nombres y resolver perfiles/permisos de conductor. |
+| Ruta | Macroruta, microruta, barrio, horarios y relaciones de días | Confirmar PostGIS/SRID y qué datos necesita realmente el frontend. |
+| Asignación | Microruta, cuadrilla, vehículo, estado, fecha y tiempos reales | Resolver unicidad por día, segundo viaje y conflictos de horario antes del contrato definitivo. |
+| Seguimiento | `vehicle_position` con punto geográfico y marca de tiempo | No exponer posiciones hasta aprobar necesidad, autorización, frecuencia y retención (#91). |
+
+Las operaciones y esquemas JSON de esta especificación siguen siendo candidatos hasta que BD y producto confirmen el diccionario y las HUs. No codificar límites, estados o valores de catálogo por inferencia.
 
 ## Fuentes y decisiones abiertas
 
