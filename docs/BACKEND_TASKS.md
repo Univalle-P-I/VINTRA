@@ -58,6 +58,18 @@ Las prioridades P0/P1/P2 reflejan el orden de dependencia del MVP y las tarjetas
 | B-23 | Notificaciones, indicadores y reportes futuros (#92) | Evaluar HUs y prioridad; no añadir proveedor, cola ni servicio externo por inferencia. |
 | B-24 | Extensión PostgreSQL/PostGIS | Depende de B-03/B-04 y necesidad de consultas espaciales demostrada. |
 
+## Trabajo coordinado con Base de Datos a partir del diccionario
+
+El equipo de BD compartió un diccionario que propone cuentas/perfiles/sesiones, vehículos, cuadrillas, asignaciones, macrorutas/microrutas/barrios/horarios y posiciones GPS. El modelo de tablas es de su equipo; las tareas de backend consisten en integrar el esquema aprobado en los contratos y reglas de la API.
+
+| ID | Tarea de integración backend | Dependencias | Criterios de aceptación | Responsable |
+| --- | --- | --- | --- | --- |
+| B-25 | Alinear DTOs y respuestas de la API con el diccionario aprobado | B-05–B-07 y confirmación del equipo de BD | Vehículo, cuadrilla, ruta y asignación usan los campos aprobados; datos personales y hashes no se exponen; OpenAPI coincide con implementación. | Backend + BD |
+| B-26 | Resolver diferencias de reglas antes de implementar asignaciones y rutas | B-04, B-05, HU11 y #91 | Producto/BD resuelven unicidad microruta-fecha frente a segundo viaje, horarios de asignación, conductor/perfiles y alcance GPS/PostGIS; cada decisión tiene criterio verificable. | Producto + BD + Backend |
+| B-27 | Implementar autenticación según el esquema aprobado | B-03, B-09, B-13 | Solo después de acordar flujo HTTP, vida de sesiones, restablecimiento, bloqueo, permisos y parámetros criptográficos; sin secretos ni límites operativos hardcodeados. | Backend + Seguridad |
+
+La hoja recibida es fuente de análisis para estas dependencias, pero no reemplaza aprobación de alcance ni el PR de Base de Datos que publique el esquema final. No corresponde al backend redefinir tablas sin coordinar con su equipo.
+
 ## Dependencias y paralelismo
 
 ```mermaid
