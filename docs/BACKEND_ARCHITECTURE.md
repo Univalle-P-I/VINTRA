@@ -91,7 +91,7 @@ Antes de producción: validar configuración por entorno, migraciones revisadas 
 5. CI/quality gate y despliegue de staging (#69, #90).
 6. Funcionalidades por dependencia: usuarios/permisos, vehículos, personal/cuadrillas, rutas, asignaciones, órdenes y auditoría (#71–#85, #93).
 
-Los detalles y criterios de aceptación están en [BACKEND_TASKS.md](BACKEND_TASKS.md). Las decisiones que requieren aprobación se registran en [ARCHITECTURE_DECISIONS.md](ARCHITECTURE_DECISIONS.md).
+Los detalles y criterios de aceptación se documentan en BACKEND_TASKS.md. Las decisiones que requieren aprobación se registran en ARCHITECTURE_DECISIONS.md; ambos documentos se proponen en PR separadas para mantener cambios pequeños.
 
 ## Fuentes y límites
 
