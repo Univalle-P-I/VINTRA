@@ -246,6 +246,17 @@ erDiagram
         UUID microroute_id   
         INT order_visit
     }
+    
+    email_validation_token {
+        UUID id   
+        UUID user_account_id   
+        VARCHAR email
+        CHAR token_hash
+        INET request_ip
+        TIMESTAMPTZ used_at
+        TIMESTAMPTZ expires_at
+        TIMESTAMPTZ created_at
+    }
 
     user_role ||--o{ profile : "tiene"
     user_account ||--o| profile : "tiene"
@@ -257,6 +268,7 @@ erDiagram
     user_account ||--o{ audit_log : "hace"
 
     user_data ||--o{ crew : "pertenece"
+    user_data ||--o{ email_validation_token : "genera"
     crew ||--o{ crew_member : "tiene"
     crew ||--o{ assignment : "realiza"
 
@@ -330,7 +342,7 @@ erDiagram
 | id | Identificador único de los datos personales. Es el mismo id de user_account (relación 1 a 1). | UUID | N/A | SI | SI |   ,    | Referencia user_account(id) |
 | first_name | Nombres de la persona. Dato personal. | VARCHAR | 80 | SI | NO |    |    |
 | last_name | Apellidos de la persona. Dato personal. | VARCHAR | 80 | SI | NO |    |    |
-| email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | NO |    |    |
+| email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | SI |    |    |
 | phone | Número de teléfono de contacto. Dato personal. | VARCHAR | 10 | NO | NO |    | NULL permitido |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO |    |    |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO |    | Por defecto now() |
@@ -535,10 +547,24 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del registro. | UUID | N/A | SI | SI |    |    |
-| neighborhood_id | Barrio atendido por la microruta. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con microroute_id y order_visit; referencia btura_neighborhood(id) |
-| microroute_id | Microruta que atiende el barrio. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con neighborhood_id y order_visit; referencia microroute(id) |
+| id | Identificador único del registro. | UUID | N/A | SI | SI | PK |    |
+| neighborhood_id | Barrio atendido por la microruta. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con microroute_id y order_visit; referencia btura_neighborhood(id) |
+| microroute_id | Microruta que atiende el barrio. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con neighborhood_id y order_visit; referencia microroute(id) |
 | order_visit | Orden en que la microruta visita el barrio. No puede repetirse dentro de la misma microruta. | INT | N/A | SI | SI (compuesto) |    | Compuesto único con neighborhood_id y microroute_id |
+
+### 3.24. email_validation_token
+
+| atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único de la solicitud de restablecimiento. | UUID | N/A | SI | SI | PK |    |
+| user_account_id | Cuenta de usuario que solicitó el restablecimiento. | UUID | N/A | SI | NO | FK  | Referencia user_account(id) |
+| email | Correo Email que se esta verificando | VARCHAR | 254 | SI | NO |    |    |
+| token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI |    |    |
+| request_ip | Dirección IP desde la que se hizo la solicitud. | INET | N/A | NO | NO |    | NULL permitido |
+| used_at | Fecha y hora en que se usó el token. NULL mientras no se haya usado (un solo uso). | TIMESTAMPTZ | N/A | NO | NO |    | NULL permitido |
+| expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO |    |    |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO |    | Por defecto now() |
+
 
 ## 4. Relaciones con el Modelo de Dominio
 
