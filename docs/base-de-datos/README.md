@@ -542,6 +542,50 @@ erDiagram
 
 ## 4. Relaciones con el Modelo de Dominio
 
+Traducción de los conceptos del negocio a tablas de la base de datos. El modelo conceptual se mantiene en `docs/modelado/`.
+
+### 4.1. Entidades de dominio → tablas
+
+| Concepto de dominio | Tabla(s) | Observaciones |
+| --- | --- | --- |
+| Usuario del sistema | `user_account`, `user_data` | Credenciales y datos personales separados (1 a 1, mismo `id`) |
+| Rol (administrador, conductor, ciudadano) | `user_role`, `profile` | Una cuenta puede tener varios roles; no puede repetir el mismo rol |
+| Cuadrilla de recolección | `crew`, `crew_member` | La cuadrilla la encabeza un conductor |
+| Vehículo recolector | `vehicle`, `vehicle_type`, `vehicle_status` | Tipo y estado son catálogos |
+| Macroruta (zona) | `macroroute` | Área geográfica (multipolígono) |
+| Microruta (recorrido) | `microroute` | Trazado (multilínea) dentro de una macroruta |
+| Barrio | `btura_neighborhood` | Límites de los barrios de Buenaventura |
+| Horario de recolección | `schedule`, `microroute_schedule` | Franja horaria por microruta y día de la semana |
+| Recorrido ejecutado | `assignment`, `assignment_status` | Una microruta, un día, una cuadrilla y un vehículo |
+| Seguimiento en tiempo real | `vehicle_position` | Puntos GPS de una asignación en curso |
+| Trazabilidad | `audit_log` | Registro de CREATE, UPDATE y DELETE |
+| Autenticación | `session`, `password_reset_token` | Solo se almacenan hashes de los tokens |
+
+### 4.2. Relaciones y cardinalidades
+
+| Relación | Cardinalidad | Regla |
+| --- | --- | --- |
+| `user_status` → `user_account` | 1 a N | Define si la cuenta puede iniciar sesión |
+| `document_type` → `user_account` | 1 a N | El par (tipo, número) de documento es único |
+| `user_account` → `user_data` | 1 a 1 | `user_data.id` = `user_account.id` |
+| `user_account` ↔ `user_role` (vía `profile`) | N a M | Único (`user_account_id`, `user_role_id`) |
+| `user_account` → `session` | 1 a N | Sesión revocable y con vencimiento |
+| `user_account` → `password_reset_token` | 1 a N | Token de un solo uso |
+| `user_account` → `audit_log` | 1 a N | Referencia lógica: `actor` se guarda como texto |
+| `user_data` → `crew` | 1 a N | El conductor representa la cuadrilla |
+| `crew` → `crew_member` | 1 a N | Una cuadrilla tiene varios integrantes |
+| `macroroute` → `microroute` | 1 a N | Una macroruta contiene varias microrutas |
+| `microroute` ↔ `schedule` (vía `microroute_schedule`) | N a M | Con día de la semana (1 a 7, ISO) |
+| `microroute` ↔ `btura_neighborhood` (vía `microroute_neighborhood`) | N a M | Con orden de visita |
+| `microroute` → `assignment` | 1 a N | Una ejecución por microruta y día |
+| `crew` → `assignment` | 1 a N | Una cuadrilla realiza varias asignaciones |
+| `vehicle` → `assignment` | 1 a N | Un vehículo se usa en varias asignaciones |
+| `assignment_status` → `assignment` | 1 a N | Estado actual de la asignación |
+| `assignment` → `vehicle_position` | 1 a N | Solo asignaciones en curso (regla de la aplicación) |
+| `vehicle_status` → `vehicle` | 1 a N | Estado actual del vehículo |
+| `vehicle_type` → `vehicle` | 1 a N | Tipo de vehículo |
+
+
 ## 5. Migraciones, Datos Iniciales y Orden de Ejecucción
 ## 6. Políticas, Restauración y Datos Sensibles
 ## 7. Configuración Local
