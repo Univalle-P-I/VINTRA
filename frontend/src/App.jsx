@@ -8,17 +8,33 @@ import './App.css'
 function App() {
   const [screen, setScreen] = useState('landing')
   const [mensaje, setMensaje] = useState('Conectando con VINTRA Backend...')
+  const [estadoDB, setEstadoDB] = useState('Comprobando PostgreSQL...')
 
   useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL
+
+    if (!API_URL) {
+      setMensaje('No se ha configurado la URL del backend')
+      setEstadoDB('No se pudo comprobar PostgreSQL')
+      return
+    }
+
     axios
-      .get('http://localhost:3001/health')
+      .get(`${API_URL}/health`)
       .then((response) => {
-        setMensaje(
-          `Backend conectado: ${response.data.service} - ${response.data.status}`
-        )
+        setMensaje(`Backend: ${response.data.status}`)
       })
       .catch(() => {
         setMensaje('No se pudo conectar con el backend')
+      })
+
+    axios
+      .get(`${API_URL}/health/db`)
+      .then((response) => {
+        setEstadoDB(`PostgreSQL: ${response.data.database}`)
+      })
+      .catch(() => {
+        setEstadoDB('PostgreSQL: desconectado')
       })
   }, [])
 
@@ -48,6 +64,10 @@ function App() {
 
       <p className="backend-status" role="status">
         {mensaje}
+      </p>
+
+      <p className="backend-status" role="status">
+        {estadoDB}
       </p>
     </>
   )
