@@ -1,104 +1,99 @@
-# Diseño de base de datos de VINTRA
+# Diseño de datos de VINTRA
 
-## Estado del diseño
+## Propósito y fuente
 
-Es un modelo lógico inicial del MVP, no un DDL listo para producción. Debe revisarse con el ERD y diccionario del equipo (#63–#64) y con alcance/reglas aprobadas (#53, #58). Las PR #47, #49 y #50 se encuentran abiertas en el momento de redactarlo y se toman como baseline futuro condicionado a que se corrijan y fusionen. La tarjeta Trello #7 menciona PostgreSQL/PostGIS, pero la extensión geográfica continúa condicionada a la aprobación de stack y requisitos (#54, #58).
+Este documento resume el diccionario de datos remitido por el equipo de Base de Datos. Describe una propuesta de esquema PostgreSQL para cuentas, flota, cuadrillas, rutas y asignaciones. No reemplaza el archivo del equipo ni convierte automáticamente sus propuestas en decisiones aprobadas.
 
-PostgreSQL es la base objetivo según los documentos y el Compose de la PR #47. TypeORM aparece en el código de esa PR y `pg` directo en la documentación de la PR #49; la herramienta se debe resolver en #54. El modelo conceptual no depende de esa elección.
+El diseño físico, sus migraciones y cambios de tablas corresponden al equipo de BD. Backend debe consumir el esquema que ese equipo apruebe y coordinar con él los contratos y las reglas que la API necesita. El ORM de NestJS sigue pendiente de la decisión técnica #54.
 
-## Entidades iniciales
+El libro describe 23 entidades. Los campos siguientes reflejan lo especificado en las hojas; `N/A` significa que el diccionario no asigna longitud. Los ejemplos de roles, estados y catálogos no son una lista definitiva de valores.
 
-| Entidad | Atributos conceptuales | Notas de integridad |
+## Entidades del diccionario
+
+| Entidad | Campos y tipos descritos | Relaciones y notas |
 | --- | --- | --- |
-| `user` | id, identificador de acceso, hash de credencial si aplica, estado, timestamps | El identificador único y mecanismo de acceso dependen del alcance y decisión de autenticación. Nunca guardar contraseña en texto plano. |
-| `role` | id, nombre, descripción | Catálogo controlado; nombres y alcance salen de la matriz #70. |
-| `user_role` | user_id, role_id | PK compuesta o id más `UNIQUE(user_id, role_id)`; FKs restrictivas. |
-| `permission` / `role_permission` | clave de acción/recurso; role_id, permission_id | Solo si la matriz exige permisos configurables; si es fija, evitar tablas innecesarias y mapear política en el módulo. Decidir en #70. |
-| `vehicle` | id, identificador institucional/placa, tipo, capacidad, estado | Identificador único normalizado; unidad de capacidad debe quedar definida en diccionario; no asumir valores válidos de tipo/estado (#58, #64). |
-| `staff_member` | id, identificador, nombre y datos mínimos requeridos, estado | Minimizar datos personales; definir identificación/retención en alcance. |
-| `crew` | id, nombre/código, estado | Código único si el negocio lo requiere. |
-| `crew_member` | crew_id, staff_member_id, vigencia desde/hasta, función si aplica | Permite cambios de integrantes en el tiempo; no usar una lista duplicada en `crew`. |
-| `shift` | id, fecha/ventana temporal, estado o jornada aprobada | Horas, zona horaria y estados deben ser definidos por producto. |
-| `availability` | recurso (vehículo/persona/cuadrilla), intervalo, motivo/estado | Alternativa relacional con tablas separadas por tipo de recurso para conservar FKs; diseño físico pendiente de #63–#64. |
-| `sector` | id, nombre/código, descripción, geometría opcional | Geometría solo con requisito y extensión aprobados; guardar referencia textual/catálogo mientras tanto. |
-| `route` | id, sector_id, nombre/código, tipo/estado | Definir macro/micro/ruta y cardinalidad en #58/#63. Código único dentro del ámbito que defina dominio. |
-| `route_stop` | id, route_id, orden, sector/dirección/ubicación opcional | Solo si HU y operación requieren paradas ordenadas; no inventar coordenadas. `UNIQUE(route_id, orden)`. |
-| `assignment` | id, route_id, fecha/intervalo, vehicle_id, crew_id/driver_id, estado, created_by, timestamps | FKs; intervalos y recursos no deben entrar en conflicto según reglas aprobadas. Añadir actor explícito si conductor difiere de cuadrilla. |
-| `assignment_audit` | id, assignment_id, actor_user_id, occurred_at, operation, previous_value, new_value | Registro append-only; datos serializados con esquema/versionado o columnas estructuradas revisadas. Proteger datos sensibles. |
-| `work_order` | id, assignment_id, reference, status, created_at | Solo si HU85 se confirma; `UNIQUE(assignment_id)` cuando sea una orden por asignación. |
+| `user_role` | `id UUID`, `code VARCHAR(30)`, `name VARCHAR(100)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | Catálogo de roles. `code` es único. La descripción menciona administración, jefe de operaciones y conductor; confirmar alcance. |
+| `user_status` | `id UUID`, `code VARCHAR(30)`, `name VARCHAR(100)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | Catálogo de estados de cuenta; `code` único. |
+| `document_type` | `id UUID`, `code VARCHAR(30)`, `name VARCHAR(50)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | Catálogo de tipos de documento. El diccionario marca `code` y `name` únicos. |
+| `user_account` | `id UUID`, `user_status_id UUID`, `document_type_id UUID`, `document_id CHAR(20)`, `pwd_hash TEXT`, `failed_attempts SMALLINT`, `locked_until TIMESTAMPTZ`, `last_login_at TIMESTAMPTZ`, `password_changed_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FKs a estado y tipo de documento. Unicidad compuesta indicada para tipo + documento. Contiene datos personales sensibles y hash de contraseña Argon2id. |
+| `user_data` | `id UUID`, `first_name VARCHAR(80)`, `last_name VARCHAR(80)`, `email VARCHAR(254)`, `phone VARCHAR(10)`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | `id` es PK y FK a `user_account(id)`; el documento describe relación 1:1. |
+| `profile` | `id UUID`, `user_role_id UUID`, `user_account_id UUID`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | FKs a rol y cuenta; unicidad compuesta indicada para cuenta + rol. Una cuenta puede tener varios perfiles. |
+| `session` | `id UUID`, `user_account_id UUID`, `token_hash CHAR(64)`, `request_ip INET`, `revoked_at TIMESTAMPTZ`, `last_used_at TIMESTAMPTZ`, `expires_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FK a cuenta. Token guardado como hash SHA-256 hexadecimal; el token en claro no se almacena. |
+| `password_reset_token` | `id UUID`, `user_account_id UUID`, `token_hash CHAR(64)`, `request_ip INET`, `used_at TIMESTAMPTZ`, `expires_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FK a cuenta. Token de un solo uso, almacenado como hash SHA-256 hexadecimal. |
+| `audit_log` | `id UUID`, `actor TEXT`, `action ENUM`, `entity VARCHAR(50)`, `entity_id UUID`, `old_values JSONB`, `new_values JSONB`, `request_ip INET`, `created_at TIMESTAMPTZ` | El diccionario indica solo inserción/consulta. `actor` y `entity_id` son polimórficos/textuales y no tienen FK formal. No guardar credenciales ni hashes. |
+| `crew` | `id UUID`, `user_data_id UUID`, `name VARCHAR(100)`, `is_active BOOLEAN`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FK al conductor que representa la cuadrilla; `user_data_id` único según la hoja. El rol de conductor se valida en la aplicación. |
+| `crew_member` | `id UUID`, `crew_id UUID`, `full_name VARCHAR(120)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | FK a cuadrilla. La hoja guarda el nombre del integrante, no una FK a `user_data`. |
+| `vehicle_status` | `id UUID`, `code VARCHAR(30)`, `name VARCHAR(100)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | Catálogo; `code` único. |
+| `vehicle_type` | `id UUID`, `code VARCHAR(30)`, `name VARCHAR(100)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | Catálogo; `code` único. |
+| `vehicle` | `id UUID`, `vehicle_status_id UUID`, `vehicle_type_id UUID`, `plate CHAR(6)`, `capacity_kg FLOAT`, `capacity_yd3 FLOAT`, `is_active BOOLEAN`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FKs a estado y tipo; placa única. Unidades kg y yd³ especificadas en campos separados. |
+| `assignment_status` | `id UUID`, `code VARCHAR(30)`, `name VARCHAR(100)`, `is_active BOOLEAN`, `created_at TIMESTAMPTZ` | Catálogo; `code` único. Los códigos citados son ejemplos, no estados aprobados por esta revisión. |
+| `assignment` | `id UUID`, `crew_id UUID`, `microroute_id UUID`, `vehicle_id UUID`, `assignment_status_id UUID`, `scheduled_date DATE`, `started_at TIMESTAMPTZ`, `ended_at TIMESTAMPTZ`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FKs a cuadrilla, microruta, vehículo y estado. La hoja propone unicidad de microruta + fecha. |
+| `vehicle_position` | `id UUID`, `assignment_id UUID`, `geom POINT`, `recorded_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FK a asignación; geometría PostGIS. La hoja permite registrar posición solo durante asignaciones en curso mediante regla de aplicación. |
+| `macroroute` | `id UUID`, `name VARCHAR(100)`, `geom MULTIPOLYGON`, `is_active BOOLEAN`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | Área que agrupa microrutas; geometría PostGIS. |
+| `microroute` | `id UUID`, `macroroute_id UUID`, `name VARCHAR(100)`, `geom MULTILINESTRING`, `is_active BOOLEAN`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FK a macroruta; geometría PostGIS. |
+| `schedule` | `id UUID`, `name VARCHAR(100)`, `start_time TIME`, `end_time TIME`, `is_active BOOLEAN`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | Horario reutilizable por microrutas. |
+| `microroute_schedule` | `id UUID`, `microroute_id UUID`, `schedule_id UUID`, `day_of_week SMALLINT`, `is_active BOOLEAN`, `updated_at TIMESTAMPTZ`, `created_at TIMESTAMPTZ` | FKs a microruta y horario; día descrito en escala ISO 1–7. Unicidad compuesta por microruta + horario + día. |
+| `btura_neighborhood` | `id UUID`, `commune VARCHAR(100)`, `name VARCHAR(150)`, `geom MULTIPOLYGON`, `created_at TIMESTAMPTZ` | Barrio con comuna y geometría PostGIS. |
+| `microroute_neighborhood` | `id UUID`, `neighborhood_id UUID`, `microroute_id UUID`, `order_visit INT` | FKs a barrio y microruta; especifica orden de visita y unicidades compuestas, pero debe aclararse qué pares exactos son únicos. |
 
-La lista `availability` es deliberadamente conceptual: se recomienda evitar FKs polimórficas sin integridad. El ERD final puede materializar `vehicle_unavailability` y `staff_unavailability` por separado.
+Los campos con `DEFAULT` en el diccionario incluyen `is_active = TRUE`, `created_at = now()` y `failed_attempts = 0` en las tablas indicadas. Deben implementarse mediante migraciones de BD aprobadas y consistentes por entorno, no como valores repetidos arbitrariamente en lógica de backend.
 
-## Relaciones y cardinalidades
+## Relaciones
 
 ```mermaid
 erDiagram
-  USER ||--o{ USER_ROLE : tiene
-  ROLE ||--o{ USER_ROLE : asigna
+  USER_STATUS ||--o{ USER_ACCOUNT : clasifica
+  DOCUMENT_TYPE ||--o{ USER_ACCOUNT : identifica
+  USER_ACCOUNT ||--o| USER_DATA : describe
+  USER_ACCOUNT ||--o{ PROFILE : tiene
+  USER_ROLE ||--o{ PROFILE : asigna
+  USER_ACCOUNT ||--o{ SESSION : abre
+  USER_ACCOUNT ||--o{ PASSWORD_RESET_TOKEN : solicita
+  USER_DATA ||--o| CREW : lidera
   CREW ||--o{ CREW_MEMBER : integra
-  STAFF_MEMBER ||--o{ CREW_MEMBER : participa
-  SECTOR ||--o{ ROUTE : organiza
-  ROUTE ||--o{ ROUTE_STOP : contiene
-  ROUTE ||--o{ ASSIGNMENT : programa
-  VEHICLE ||--o{ ASSIGNMENT : asigna
+  VEHICLE_STATUS ||--o{ VEHICLE : clasifica
+  VEHICLE_TYPE ||--o{ VEHICLE : categoriza
   CREW ||--o{ ASSIGNMENT : ejecuta
-  ASSIGNMENT ||--o{ ASSIGNMENT_AUDIT : registra
-  USER ||--o{ ASSIGNMENT_AUDIT : actua
-  ASSIGNMENT ||--o| WORK_ORDER : genera
+  MICROROUTE ||--o{ ASSIGNMENT : programa
+  VEHICLE ||--o{ ASSIGNMENT : usa
+  ASSIGNMENT_STATUS ||--o{ ASSIGNMENT : clasifica
+  ASSIGNMENT ||--o{ VEHICLE_POSITION : registra
+  MACROROUTE ||--o{ MICROROUTE : contiene
+  MICROROUTE ||--o{ MICROROUTE_SCHEDULE : programa
+  SCHEDULE ||--o{ MICROROUTE_SCHEDULE : define
+  MICROROUTE ||--o{ MICROROUTE_NEIGHBORHOOD : recorre
+  BTURA_NEIGHBORHOOD ||--o{ MICROROUTE_NEIGHBORHOOD : atiende
 ```
 
-La cardinalidad `sector–route`, uso de conductor independiente, turnos y paradas está por confirmar con el dominio. Una asignación puede requerir más de un recurso o viaje; no se fija el diseño para segundo viaje hasta validar RN-05/RN-06 en PR #50 y las reglas #58/#83.
+`audit_log` no tiene relaciones con FKs formales según el diccionario. La relación 1:1 cuenta-datos personales está implementada con FK desde `user_data` hacia `user_account`; esa FK asegura que los datos personales no tengan cuenta inexistente y que no haya más de una fila por cuenta, pero no obliga por sí sola a que cada cuenta tenga su fila `user_data`.
 
-## Claves, restricciones e índices
+## Restricciones e integridad descritas
 
-- PK sustituta estable para cada entidad, salvo tablas de unión pequeñas donde una PK compuesta simplifica unicidad.
-- FKs explícitas; `ON DELETE RESTRICT` como opción inicial para registros operativos/históricos. Borrado lógico solo si existe requisito de auditoría y política aprobada.
-- `NOT NULL`, `CHECK`, `UNIQUE` solo para reglas confirmadas: por ejemplo capacidad positiva y rango de intervalo coherente, una vez unidad/rangos estén aprobados.
-- Índices en FKs usadas por consultas, identificadores únicos normalizados, fecha/estado de asignación y claves de búsqueda confirmadas por casos de uso. Evitar índices especulativos.
-- Restricciones de no solapamiento de intervalos requieren decidir granularidad y política de concurrencia; considerar exclusion constraints PostgreSQL si el issue #58 lo valida. No se afirma que un `UNIQUE` simple resuelva solapamientos.
-- No almacenar datos calculables o duplicados (p. ej., nombre de sector en cada parada si hay FK a sector), excepto snapshot justificado para trazabilidad.
+- PK UUID en todas las entidades descritas.
+- Unicidad explícita para códigos de catálogos, placa, hashes de token, documento + tipo de documento y las claves compuestas descritas.
+- FKs desde cuentas, perfiles, sesiones, cuadrillas, vehículos, asignaciones, posiciones, rutas y relaciones de agenda/visita.
+- Timestamps guardados como `TIMESTAMPTZ`; las descripciones indican UTC. `scheduled_date` es `DATE`, y `schedule` usa horas `TIME` sin zona.
+- Catálogos incluyen `is_active`; estados y transiciones deben basarse en reglas de negocio aprobadas.
+- `audit_log` se plantea append-only y sus JSON deben excluir contraseñas y hashes.
 
-## Geografía
+## Puntos que BD y producto deben cerrar
 
-El requisito puede variar entre mapa estático de rutas, coordenadas de paradas y rastreo en vivo. Issue #91 solicita separar esos casos y decidir si se requieren; no asumir GPS, ETA, geocodificación ni PostGIS. Si se aprueba geometría, definir SRID, tipo geométrico, precisión, consultas e índice espacial antes de migrar. Las coordenadas no deben ser valores ficticios en producción.
+| Punto | Por qué necesita decisión |
+| --- | --- |
+| Roles y perfiles | El diccionario nombra administrador, jefe de operaciones y conductor; confirmar frente al alcance actual de roles administrativos (#70). |
+| Segundo viaje | `UNIQUE(microroute_id, scheduled_date)` permitiría solo una ejecución por microruta al día; revisar contra HU11/RN-05 y la regla aprobada (#58/#83). |
+| Conflictos de horario | `assignment` no referencia `microroute_schedule` ni un horario concreto. Acordar cómo backend valida disponibilidad y conflictos temporales (#93). |
+| Geografía y GPS | Hay geometrías para macro/microrutas, barrios y posiciones. Aprobar alcance, SRID, formato, permisos, frecuencia y retención antes de activar PostGIS/seguimiento (#54/#58/#91). |
+| Integrantes de cuadrilla | `crew_member` guarda nombre, sin identificador de persona/cuenta; decidir si se requiere vínculo para disponibilidad y auditoría (#76). |
+| Unicidad de barrios/orden | La hoja marca unicidad compuesta en `microroute_neighborhood` pero no especifica claramente la composición. BD debe precisar las restricciones antes del DDL. |
+| Datos personales | Documento, nombre, correo, teléfono e IP requieren finalidad, acceso, conservación y enmascaramiento acordados. |
+| Auditoría | `actor` textual y `entity_id` polimórfico no tienen FK. Definir formato estable, integridad, retención y quién puede consultar. |
+| Precisión numérica | `capacity_kg` y `capacity_yd3` aparecen como `FLOAT`. Confirmar precisión y validaciones con BD, manteniendo unidades explícitas. |
 
-## Migraciones y datos semilla
+## Migraciones y responsabilidad
 
-1. Resolver stack/ORM en #54 y modelo/diccionario en #63–#64.
-2. Crear migración inicial versionada, determinista y revisable; usar transacción si la operación lo soporta.
-3. Agregar índices/constraints junto con la entidad y documentar la intención.
-4. Mantener semillas solo para catálogos y entornos de desarrollo; identificarlas como datos no productivos y evitar usuarios/contraseñas reutilizables.
-5. Validar creación desde una base vacía, aplicación de migraciones, consistencia y reversión en un entorno desechable (#65).
-6. En producción, ejecutar migraciones como paso explícito de despliegue con respaldo/rollback; no permitir que el servidor altere el esquema al arrancar.
-
-## Ejemplo de estructura relacional (conceptual)
-
-```text
-user(id PK, login UNIQUE?, credential_hash?, status, created_at, updated_at)
-role(id PK, name UNIQUE)
-user_role(user_id FK, role_id FK, PRIMARY KEY(user_id, role_id))
-vehicle(id PK, normalized_identifier UNIQUE, type, capacity, status)
-staff_member(id PK, normalized_identifier UNIQUE?, status, ...)
-crew(id PK, code UNIQUE?, status)
-crew_member(crew_id FK, staff_member_id FK, valid_from, valid_to, ...)
-sector(id PK, code UNIQUE?, name, geometry? )
-route(id PK, sector_id FK?, code, status)
-assignment(id PK, route_id FK, vehicle_id FK, crew_id FK?, starts_at, ends_at, status, created_by FK)
-assignment_audit(id PK, assignment_id FK, actor_user_id FK, occurred_at, operation, before, after)
-```
-
-Los signos `?` indican decisiones pendientes, no columnas confirmadas. El ejemplo no establece el DDL final ni contrato de autenticación.
-
-## Decisiones pendientes
-
-| Pregunta | Fuente | Cierre requerido |
-| --- | --- | --- |
-| ORM: TypeORM o `pg` directo | PR #47 vs #49, issue #54 | Comparación y aprobación técnica |
-| Identificador, estado y datos mínimos de usuarios/personal | #53, #63–#64, #70 | Producto/seguridad |
-| Modelo exacto ruta/sector/parada y geografía | #58, #63, #91 | Dominio y stack GIS |
-| Cardinalidad de recursos y segundo viaje | PR #50 RN-05/RN-06, #58, #83, #93 | Producto/operaciones |
-| Retención, soft-delete, auditoría y datos personales | #70, #84 | Seguridad/operaciones |
+Este documento no crea ni reemplaza migraciones. El equipo de BD debe versionar el esquema aprobado, las extensiones necesarias, los índices, constraints, seeds y política de reversión. Backend debe coordinar su mapeo de entidades/repositorios, DTOs, validaciones y transacciones con ese esquema. No usar sincronización automática de ORM en producción.
 
 ## Fuentes
 
-`docs/modelado/README.md`; PR #50 (HUs y RN del MVP, capacidad/segundo viaje pendientes); PR #47 (PostgreSQL, TypeORM en implementación propuesta); PR #49 (mención a `pg`); Trello #3/#6/#7; issues #53, #54, #58, #63–#65, #70, #78, #81, #83, #84, #91 y #93. El contenido es diseño propuesto, no evidencia de tablas ya implementadas.
+Fuente principal: diccionario.xlsx remitido por el equipo de Base de Datos, hojas `user_role`, `user_status`, `document_type`, `user_account`, `user_data`, `profile`, `session`, `password_reset_token`, `audit_log`, `crew`, `crew_member`, `vehicle_status`, `vehicle_type`, `vehicle`, `assignment_status`, `assignment`, `vehicle_position`, `macroroute`, `microroute`, `schedule`, `microroute_schedule`, `btura_neighborhood` y `microroute_neighborhood`. Contrastar decisiones y alcance con issues #54, #58, #63–#66, #70, #76, #78, #81, #83, #84, #91 y #93, y con las HUs aprobadas.
