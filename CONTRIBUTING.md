@@ -1,168 +1,60 @@
 # Contribuir a VINTRA
 
-Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu­las (UI/UX, Base de Datos, Backend/Frontend, Scrum, GitHub/CI-CD/VPS).
+Esta guía describe el flujo vigente del repositorio. Las instrucciones de instalación y validación deben corresponder a las carpetas actuales del proyecto; si cambian los scripts o workflows, actualiza esta guía en el mismo PR.
 
-## Tabla de contenido
+## Preparación
 
-- [Antes de empezar](#antes-de-empezar)
-- [Estrategia de ramas](#estrategia-de-ramas)
-- [Flujo de trabajo](#flujo-de-trabajo)
-- [Convención de mensajes de commit](#convención-de-mensajes-de-commit)
-- [Pull Requests](#pull-requests)
-- [Checks y cómo interpretarlos](#checks-y-cómo-interpretarlos)
-- [Revisión y aprobación](#revisión-y-aprobación)
-
-## Antes de empezar
-
-```bash
+```powershell
 git clone https://github.com/Univalle-P-I/VINTRA.git
 cd VINTRA
-git config user.email "tu-correo@ejemplo.com"
-git config user.name "Tu Nombre"
 ```
 
-Usa el mismo correo con el que tienes tu cuenta de GitHub, para que tus commits queden asociados a tu usuario.
-
-## Estrategia de ramas
-
-```mermaid
-flowchart LR
-    main --> develop
-    develop --> feature1["feature/nombre-funcionalidad"]
-    develop --> fix1["fix/nombre-correccion"]
-    develop --> task1["task/nombre-tarea"]
-    feature1 -->|Pull Request| develop
-    fix1 -->|Pull Request| develop
-    task1 -->|Pull Request| develop
-    develop -->|Pull Request| main
-```
-
-- **`main`** — versión estable del proyecto.
-- **`develop`** — integración de todo el trabajo en curso.
-- **`feature/`** — funcionalidades nuevas.
-- **`fix/`** — corrección de errores.
-- **`task/`** — tareas que no son ni funcionalidad ni corrección (documentación, configuración, dependencias, etc.).
-Toda rama de trabajo se crea a partir de `develop`, nunca a partir de `main`.
+Configura `user.name` y `user.email` una sola vez si Git aún no conoce tu identidad.
 
 ## Flujo de trabajo
 
-```bash
-git checkout develop
+1. Actualiza `develop` y crea una rama de trabajo desde esa base.
+2. Incluye el identificador de la tarjeta Trello enlazada desde el Issue en el nombre de rama, por ejemplo `task/TRELLO-123-nombre-corto`. Si no existe una tarjeta aplicable, acuerda la referencia con Producto/Integración antes de crear la rama; no atribuyas a una tarjeta relacionada un alcance que no tiene.
+3. Mantén el cambio acotado al Issue y no incluyas archivos locales ajenos. Usa commits pequeños con prefijos `feat:`, `fix:`, `docs:`, `test:` o `chore:`.
+4. Abre un Pull Request hacia `develop`, enlaza el Issue (`Closes #56` cuando corresponda) y la tarjeta Trello, asigna una persona revisora y registra validaciones reales.
+5. Atiende los comentarios y checks. Marca el Issue como terminado solo después de integrar el PR y satisfacer sus criterios.
+
+```powershell
+git switch develop
 git pull origin develop
-git checkout -b feature/TRELLO-123-nombre-de-tu-tarea
+git switch -c task/TRELLO-123-nombre-corto
 ```
 
-Incluye en el nombre de la rama el identificador de la tarjeta de Trello asociada (por ejemplo, `TRELLO-123`). Sustituye el prefijo `feature/` por `fix/` o `task/` según corresponda.
+No uses `git add .` en un árbol con otros cambios locales. Selecciona explícitamente los archivos del PR.
 
-Trabaja normalmente y guarda avances con commits pequeños y descriptivos:
+## Validaciones locales
 
-```bash
-git add .
-git commit -m "Tipo: descripción breve del cambio"
-```
+Desde `frontend/`, con Node/npm disponibles:
 
-Sube la rama la primera vez con:
-
-```bash
-git push -u origin feature/TRELLO-123-nombre-de-tu-tarea
-```
-
-Las siguientes veces basta con:
-
-```bash
-git push
-```
-
-## Convención de mensajes de commit
-
-| Prefijo | Uso |
-| --- | --- |
-| `feat:` | Nueva funcionalidad |
-| `fix:` | Corrección de un error |
-| `docs:` | Cambios de documentación (README, documentación por área, arquitectura, etc.) |
-| `style:` | Cambios de formato que no afectan la lógica |
-| `refactor:` | Cambios internos sin alterar el comportamiento |
-| `test:` | Pruebas |
-| `chore:` | Tareas de mantenimiento, configuración, dependencias |
-
-Ejemplo: `git commit -m "docs: actualiza README con estructura del proyecto"`
-
-## Pull Requests
-
-Toda rama de trabajo se integra a `develop` mediante Pull Request, nunca con push directo. El PR debe incluir:
-
-- **Qué cambió** — resumen del cambio.
-- **Descripción breve** — contexto o motivo del cambio.
-- **Cómo se validó** — qué se revisó o probó.
-- **Comandos utilizados** — si aplica.
-- **Imágenes de prueba** — evidencia de que el cambio funciona (captura de pantalla, resultado de una prueba, etc.). Es obligatorio, no opcional.
-
-```bash
-git push -u origin feature/TRELLO-123-nombre-de-tu-tarea
-```
-
-Luego abre el Pull Request desde GitHub, comparando tu rama contra `develop`.
-
-### Requisitos adicionales del Pull Request
-
-- Debe asignarse a una persona como revisora.
-- Debe indicar en su descripción el nombre o identificador de la tarjeta de Trello y enlazarla directamente. El identificador de la tarjeta también debe estar en el nombre de la rama para mantener la trazabilidad entre Trello y GitHub.
-- Si la tarea también tiene un issue de GitHub, debe mencionarse o vincularse además de la tarjeta de Trello.
-- Debe incluir imágenes de prueba como evidencia de que el cambio funciona.
-
-Ejemplo para la descripción del PR: `Trello: [TRELLO-123 - Ajustar inicio de sesión](https://trello.com/c/abc123...)`.
-
-## Checks y cómo interpretarlos
-
-### Checks automáticos del PR
-
-El workflow **CI** se ejecuta al abrir o actualizar un PR hacia `develop` y en cada push a `develop` o `main`. Comprueba con `git diff --check` que los cambios no introduzcan errores de espacios en blanco. El repositorio aún no contiene el código de backend o frontend ni workflows que ejecuten sus pruebas automatizadas; realiza las validaciones locales descritas abajo antes de abrir un PR.
-
-El check **lint-markdown** también valida el formato de `README.md`, `CONTRIBUTING.md` y los archivos Markdown de `docs/`. Para ejecutarlo localmente:
-
-```bash
-npx --yes markdownlint-cli2 "README.md" "CONTRIBUTING.md" "docs/**/*.md"
-```
-
-### Validación local
-
-Para el frontend, desde `frontend/`:
-
-```bash
+```powershell
 npm ci
-npm test -- --watchAll=false
+npm run lint
+npm test
 npm run build
 ```
 
-La prueba pasa cuando Jest termina con las suites y pruebas en estado `passed`. El build pasa cuando Create React App finaliza sin errores y genera `frontend/build/`; un error de compilación o de dependencias requiere corrección. Los tests pueden informar fallos aunque el build compile correctamente: son comprobaciones distintas.
+Desde la raíz, con .NET SDK 10:
 
-Para el backend, desde `backend/` y con las dependencias de `requirements.txt` instaladas:
-
-```bash
-python manage.py check
-python manage.py test users
+```powershell
+dotnet restore backend/Vintra.Backend/Vintra.Backend.csproj
+dotnet build backend/Vintra.Backend/Vintra.Backend.csproj --no-restore
 ```
 
-El check pasa si Django reporta que no encontró problemas; las pruebas pasan si terminan con `OK`. Un error o una prueba fallida significa que la validación no pasó y debe revisarse el mensaje concreto. Estos comandos son validaciones locales; CI aún no ejecuta las pruebas del backend.
+El workflow reutilizable `backend.yml` aún contiene pasos TODO y no ejecuta esas comprobaciones; no reportes el job como evidencia de build o pruebas del backend. Ejecuta únicamente validaciones pertinentes al cambio y copia sus resultados en el PR. Para documentación/configuración, revisa también `git diff --check` y Markdown lint.
 
-## Revisión y aprobación
+## Pull Request y evidencia
 
-```mermaid
-flowchart TD
-    A[Abrir Pull Request] --> B[Asignar revisora]
-    B --> C{Revisión}
-    C -->|Approved| D[Fusionar a develop]
-    D --> E[Tarea pasa a Done]
-    C -->|Cambios solicitados| F[Corregir en la misma rama]
-    F --> G[Nuevo commit]
-    G --> H[Aprobaciones anteriores quedan invalidadas]
-    H --> C
-```
+- Describe objetivo, alcance, decisiones y archivos afectados.
+- Enlaza el Issue de origen y la tarjeta Trello correspondiente (si aplica).
+- Registra comandos y resultados; nunca afirmes que una comprobación pasó si no se ejecutó.
+- Adjunta captura para cambios visuales. Para backend, datos o CI, usa resultados/logs sanitizados; para documentación, el diff revisado es evidencia suficiente.
+- Solicita revisión a alguien distinto del autor. No fusiones con checks fallidos o criterios pendientes.
 
-- Los Pull Requests son revisados por la persona asignada.
-- Se requiere al menos **1 aprobación** para fusionar hacia `develop`.
-- Si se agregan nuevos commits después de una aprobación, esa aprobación deja de ser válida y se necesita una nueva revisión.
-- Solo si el resultado es **Approved** la tarea puede pasar a **Done**. o se hace **mergue** a `develop`.
-- Si no es aprobado, la persona sigue trabajando en la misma rama hasta corregir lo señalado y lograr el Approved.
-- Mientras el Pull Request está abierto, se bloquean la **eliminación de la rama** y los **force-push**.
-**Nota:** los comentarios que señalen errores, problemas de integración o cambios en contratos compartidos deben atenderse antes del merge. Las sugerencias menores pueden quedar como mejoras posteriores si el equipo lo acuerda.
+## Automatizaciones disponibles
+
+El workflow `ci.yml` verifica espacios en blanco, lint de Markdown, enlaces del README y llama a los workflows reutilizables de backend y frontend. Verifica el estado de cada job en el PR: que el workflow exista no demuestra por sí solo que el backend se haya compilado o probado.
