@@ -16,7 +16,7 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 - Estado: `En desarrollo`
 - Responsable: Ricardo Farid Cuero
-- Pendiente: Versión soportada seleccionada en el stack tecnológico, migraciones, politicas de respaldos y de restauración, documentación de los datos sensibles, ejemplo de configuración local.
+- Pendiente: Migraciones, politicas de respaldos y de restauración, documentación de los datos sensibles, ejemplo de configuración local.
 
 ---
 
