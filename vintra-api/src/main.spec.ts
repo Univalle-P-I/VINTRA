@@ -1,5 +1,3 @@
-
-
 import { NestFactory } from '@nestjs/core';
 import { bootstrap } from './main';
 
@@ -35,7 +33,7 @@ describe('bootstrap', () => {
 
     await bootstrap();
 
-    expect(NestFactory.create).toHaveBeenCalled();
+    expect(NestFactory.create.mock.calls).toHaveLength(1);
     expect(mockApp.enableCors).toHaveBeenCalledWith({
       origin: 'http://localhost:5173',
     });
