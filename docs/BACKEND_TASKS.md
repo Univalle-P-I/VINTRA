@@ -89,10 +89,26 @@ flowchart TD
   B11 --> B12[B-12 Staging]
   B07 --> B13[B-13 Auth]
   B09 --> B14[B-14 Vehículos]
+  B05 --> B14
+  B06 --> B14
+  B07 --> B14
+  B11 --> B14
   B13 --> B14
   B14 --> B15[B-15 Estado flota]
   B09 --> B16[B-16 Personal/cuadrillas]
+  B04 --> B16
+  B05 --> B16
+  B06 --> B16
+  B07 --> B16
+  B11 --> B16
+  B13 --> B16
   B09 --> B17[B-17 Rutas]
+  B02 --> B17
+  B04 --> B17
+  B05 --> B17
+  B06 --> B17
+  B07 --> B17
+  B11 --> B17
   B15 --> B18[B-18 Asignaciones]
   B16 --> B18
   B17 --> B18
