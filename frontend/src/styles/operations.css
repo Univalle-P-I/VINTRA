@@ -1,0 +1,171 @@
+/* Gestión de operación: asignación, validaciones, propuestas de viaje */
+
+.assignment-form,
+.second-trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.assignment-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.assignment-grid .field {
+  min-width: 0;
+}
+
+.validation-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.validation-card {
+  border: 1px solid #dce8e1;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px;
+}
+
+.validation-card strong {
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.validation-card span {
+  color: #64766c;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.validation-error {
+  background: #fff0ee;
+  border-color: #f0d0ca;
+}
+
+.validation-error strong {
+  color: #a44236;
+}
+
+.validation-warning {
+  background: #fff8e8;
+  border-color: #efdfb8;
+}
+
+.validation-warning strong {
+  color: #775b22;
+}
+
+.validation-success {
+  background: #edf7ef;
+  border-color: #cee4d3;
+}
+
+.validation-success strong {
+  color: #276744;
+}
+
+.assignment-summary {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.assignment-summary > div,
+.trip-proposal {
+  background: #f8fbf9;
+  border: 1px solid #e1ebe5;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 11px;
+}
+
+.assignment-summary strong,
+.trip-proposal strong {
+  color: #426354;
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 10px;
+}
+
+.assignment-summary span,
+.trip-proposal span {
+  color: #53675c;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.trip-proposals {
+  gap: 10px;
+}
+
+.trip-proposal-pending {
+  background: #fff8e8;
+  border-color: #efdfb8;
+}
+
+.trip-proposal-pending strong {
+  color: #775b22;
+}
+
+.second-trip-form {
+  background: #fff5e8;
+  border: 1px solid #f0dec1;
+  border-radius: 7px;
+  padding: 14px;
+}
+
+.second-trip-form > strong {
+  color: #98651d;
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 12px;
+}
+
+.second-trip-form .form-message.error {
+  color: #a44236;
+}
+
+.second-trip-form .assignment-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.second-trip-form .notice {
+  margin: 0;
+}
+
+.button:disabled {
+  color: #87958d;
+  opacity: 0.7;
+}
+
+@media (max-width: 1100px) {
+  .assignment-grid,
+  .second-trip-form .assignment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .validation-grid,
+  .assignment-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .assignment-grid,
+  .second-trip-form .assignment-grid,
+  .validation-grid,
+  .assignment-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .trip-proposals {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
