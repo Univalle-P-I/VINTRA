@@ -38,14 +38,17 @@ npm test
 npm run build
 ```
 
-Desde la raíz, con .NET SDK 10:
+Desde `vintra-api/`, con Node.js y npm disponibles:
 
 ```powershell
-dotnet restore backend/Vintra.Backend/Vintra.Backend.csproj
-dotnet build backend/Vintra.Backend/Vintra.Backend.csproj --no-restore
+npm ci
+npm run lint
+npm test -- --runInBand
+npm run test:e2e -- --runInBand
+npm run build
 ```
 
-El workflow reutilizable `backend.yml` aún contiene pasos TODO y no ejecuta esas comprobaciones; no reportes el job como evidencia de build o pruebas del backend. Ejecuta únicamente validaciones pertinentes al cambio y copia sus resultados en el PR. Para documentación/configuración, revisa también `git diff --check` y Markdown lint.
+El backend usa NestJS y estos scripts están definidos en `vintra-api/package.json`. El workflow reutilizable `backend.yml` aún contiene pasos TODO y no ejecuta estas comprobaciones; no reportes el job como evidencia de build o pruebas del backend. Ejecuta únicamente validaciones pertinentes al cambio y copia sus resultados en el PR. Para documentación/configuración, revisa también `git diff --check` y Markdown lint.
 
 ## Pull Request y evidencia
 
