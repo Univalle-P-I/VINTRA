@@ -445,8 +445,8 @@ erDiagram
 | vehicle_status_id | Estado actual del vehículo. | UUID | N/A | SI | NO | FK | Referencia vehicle_status(id) |
 | vehicle_type_id | Tipo de vehículo. | UUID | N/A | SI | NO | FK | Referencia vehicle_type(id) |
 | plate | Placa del vehículo. No puede repetirse. | CHAR | 6 | SI | SI |    |    |
-| capacity_kg | Capacidad de carga en kilogramos. | FLOAT | N/A | SI | NO |    |    |
-| capacity_yd3 | Capacidad volumétrica en yardas cúbicas. | FLOAT | N/A | SI | NO |    |    |
+| capacity_kg | Capacidad de carga en kilogramos. | NUMERIC | N/A | SI | NO |    |    |
+| capacity_yd3 | Capacidad volumétrica en yardas cúbicas. | NUMERIC | N/A | SI | NO |    |    |
 | is_active | Indica si el vehículo está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO |    |    |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO |    | Por defecto now() |
