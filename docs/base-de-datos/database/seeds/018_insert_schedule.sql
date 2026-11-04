@@ -1,0 +1,8 @@
+BEGIN;
+
+INSERT INTO schedule (id, name, start_time, end_time) VALUES
+    ('00000000-0000-4000-8000-000000000a01', 'Turno mañana', TIME '06:00', TIME '12:00'),
+    ('00000000-0000-4000-8000-000000000a02', 'Turno tarde', TIME '14:00', TIME '20:00')
+ON CONFLICT DO NOTHING;
+
+COMMIT;
