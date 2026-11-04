@@ -293,7 +293,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del rol. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del rol. | UUID | N/A | SI | SI | PK |    |
 | code | Identificador lógico estable del rol. | VARCHAR | 30 | SI | SI |    |    |
 | name | Nombre legible para mostrar en pantalla. | VARCHAR | 100 | SI | NO |    |    |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -303,7 +303,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del estado. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del estado. | UUID | N/A | SI | SI | PK |    |
 | code | Identificador lógico estable del estado. | VARCHAR | 30 | SI | SI |    |    |
 | name | Nombre legible para mostrar en pantalla. | VARCHAR | 100 | SI | NO |    |    |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -313,7 +313,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del tipo de documento. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del tipo de documento. | UUID | N/A | SI | SI | PK |    |
 | code | Identificador único estable para lógica del sistema. | VARCHAR | 30 | SI | SI |    |    |
 | name | Nombre del tipo de documento (ej.: cédula de ciudadanía, cédula de extranjería, pasaporte). | VARCHAR | 50 | SI | SI |    |    |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -323,10 +323,10 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la cuenta de usuario. | UUID | N/A | SI | SI |    |    |
-| user_status_id | Estado administrativo de la cuenta. Determina si puede iniciar sesión. | UUID | N/A | SI | NO |    | Referencia user_status(id) |
-| document_type_id | Tipo de documento de identidad del titular de la cuenta. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con document_id; referencia document_type(id) |
-| document_id | Número de documento de identidad del titular. Dato personal sensible. No puede repetirse junto con document_type_id. | CHAR | 20 | SI | SI (compuesto) |    | Compuesto único con document_type_id |
+| id | Identificador único de la cuenta de usuario. | UUID | N/A | SI | SI | PK |    |
+| user_status_id | Estado administrativo de la cuenta. Determina si puede iniciar sesión. | UUID | N/A | SI | NO | FK | Referencia user_status(id) |
+| document_type_id | Tipo de documento de identidad del titular de la cuenta. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con document_id; referencia document_type(id) |
+| document_id | Número de documento de identidad del titular. Dato personal sensible. No puede repetirse junto con document_type_id. | CHAR | 20 | SI | SI (compuesto) | FK | Compuesto único con document_type_id |
 | pwd_hash | Hash de la contraseña (Argon2id; incluye sal y parámetros). | TEXT | N/A | SI | NO |    |    |
 | failed_attempts | Intentos fallidos consecutivos de inicio de sesión. Se reinicia al autenticarse con éxito. Por defecto 0. | SMALLINT | N/A | SI | NO |    | Por defecto 0 |
 | locked_until | Fecha hasta la cual la cuenta está bloqueada temporalmente por intentos fallidos. NULL si no está bloqueada. | TIMESTAMPTZ | N/A | NO | NO |    | NULL permitido |
@@ -339,7 +339,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de los datos personales. Es el mismo id de user_account (relación 1 a 1). | UUID | N/A | SI | SI |   ,    | Referencia user_account(id) |
+| id | Identificador único de los datos personales. Es el mismo id de user_account (relación 1 a 1). | UUID | N/A | SI | SI | PK | Referencia user_account(id) |
 | first_name | Nombres de la persona. Dato personal. | VARCHAR | 80 | SI | NO |    |    |
 | last_name | Apellidos de la persona. Dato personal. | VARCHAR | 80 | SI | NO |    |    |
 | email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | SI |    |    |
@@ -351,9 +351,9 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del perfil. | UUID | N/A | SI | SI |    |    |
-| user_role_id | Rol que se ejerce con este perfil (ej.: conductor). Una cuenta no puede repetir el mismo rol. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con user_account_id; referencia user_role(id) |
-| user_account_id | Cuenta de usuario a la que pertenece el perfil. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con user_role_id; referencia user_account(id) |
+| id | Identificador único del perfil. | UUID | N/A | SI | SI | PK |    |
+| user_role_id | Rol que se ejerce con este perfil (ej.: conductor). Una cuenta no puede repetir el mismo rol. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con user_account_id; referencia user_role(id) |
+| user_account_id | Cuenta de usuario a la que pertenece el perfil. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con user_role_id; referencia user_account(id) |
 | is_active | Indica si el perfil está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO |    | Por defecto now() |
 
@@ -361,8 +361,8 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la sesión. | UUID | N/A | SI | SI |    |    |
-| user_account_id | Cuenta de usuario dueña de la sesión. | UUID | N/A | SI | NO |    | Referencia user_account(id) |
+| id | Identificador único de la sesión. | UUID | N/A | SI | SI | PK |    |
+| user_account_id | Cuenta de usuario dueña de la sesión. | UUID | N/A | SI | NO | FK | Referencia user_account(id) |
 | token_hash | Hash SHA-256 (hexadecimal) del token de sesión. El token en claro nunca se almacena. | CHAR | 64 | SI | SI |    |    |
 | request_ip | Dirección IP desde la que se abrió la sesión. | INET | N/A | NO | NO |    | NULL permitido |
 | revoked_at | Fecha y hora en que la sesión fue revocada (cierre de sesión, cambio de contraseña, bloqueo). NULL si sigue vigente. | TIMESTAMPTZ | N/A | NO | NO |    | NULL permitido |
@@ -374,8 +374,8 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la solicitud de restablecimiento. | UUID | N/A | SI | SI |    |    |
-| user_account_id | Cuenta de usuario que solicitó el restablecimiento. | UUID | N/A | SI | NO |    | Referencia user_account(id) |
+| id | Identificador único de la solicitud de restablecimiento. | UUID | N/A | SI | SI | PK |    |
+| user_account_id | Cuenta de usuario que solicitó el restablecimiento. | UUID | N/A | SI | NO | FK | Referencia user_account(id) |
 | token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI |    |    |
 | request_ip | Dirección IP desde la que se hizo la solicitud. | INET | N/A | NO | NO |    | NULL permitido |
 | used_at | Fecha y hora en que se usó el token. NULL mientras no se haya usado (un solo uso). | TIMESTAMPTZ | N/A | NO | NO |    | NULL permitido |
@@ -386,7 +386,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del evento de auditoría. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del evento de auditoría. | UUID | N/A | SI | SI | PK |    |
 | actor | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático del sistema. Se guarda como texto. | TEXT | N/A | SI | NO |    | Referencia polimórfica no formal |
 | action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO |    | Valores permitidos: CREATE, UPDATE, DELETE |
 | entity | Nombre de la tabla afectada (ej.: vehicle, assignment, microroute). | VARCHAR | 50 | SI | NO |    |    |
@@ -400,8 +400,8 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la cuadrilla. | UUID | N/A | SI | SI |    |    |
-| user_data_id | Conductor que representa y encabeza la cuadrilla. Que la persona tenga el rol de conductor se valida en la aplicación. | UUID | N/A | SI | SI |    | Referencia user_data(id) |
+| id | Identificador único de la cuadrilla. | UUID | N/A | SI | SI | PK |    |
+| user_data_id | Conductor que representa y encabeza la cuadrilla. Que la persona tenga el rol de conductor se valida en la aplicación. | UUID | N/A | SI | SI | FK | Referencia user_data(id) |
 | name | Nombre de la cuadrilla. | VARCHAR | 100 | SI | NO |    |    |
 | is_active | Indica si la cuadrilla está vigente (TRUE) o inactiva (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO |    |    |
@@ -411,8 +411,8 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del integrante. | UUID | N/A | SI | SI |    |    |
-| crew_id | Cuadrilla a la que pertenece el integrante. | UUID | N/A | SI | NO |    | Referencia crew(id) |
+| id | Identificador único del integrante. | UUID | N/A | SI | SI | PK |    |
+| crew_id | Cuadrilla a la que pertenece el integrante. | UUID | N/A | SI | NO | FK | Referencia crew(id) |
 | full_name | Nombre completo del integrante. Dato personal. | VARCHAR | 120 | SI | NO |    |    |
 | is_active | Indica si el integrante está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO |    | Por defecto now() |
@@ -421,7 +421,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del estado. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del estado. | UUID | N/A | SI | SI | PK |    |
 | code | Código estable del estado (ej.: AVAILABLE, MAINTENANCE) que la aplicación usa en su lógica. | VARCHAR | 30 | SI | SI |    |    |
 | name | Nombre legible para mostrar en pantalla. | VARCHAR | 100 | SI | NO |    |    |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -431,7 +431,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del tipo de vehículo. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del tipo de vehículo. | UUID | N/A | SI | SI | PK |    |
 | code | Código estable del tipo de vehículo que la aplicación usa en su lógica. | VARCHAR | 30 | SI | SI |    |    |
 | name | Nombre legible para mostrar en pantalla. | VARCHAR | 100 | SI | NO |    |    |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -441,9 +441,9 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del vehículo. | UUID | N/A | SI | SI |    |    |
-| vehicle_status_id | Estado actual del vehículo. | UUID | N/A | SI | NO |    | Referencia vehicle_status(id) |
-| vehicle_type_id | Tipo de vehículo. | UUID | N/A | SI | NO |    | Referencia vehicle_type(id) |
+| id | Identificador único del vehículo. | UUID | N/A | SI | SI | PK |    |
+| vehicle_status_id | Estado actual del vehículo. | UUID | N/A | SI | NO | FK | Referencia vehicle_status(id) |
+| vehicle_type_id | Tipo de vehículo. | UUID | N/A | SI | NO | FK | Referencia vehicle_type(id) |
 | plate | Placa del vehículo. No puede repetirse. | CHAR | 6 | SI | SI |    |    |
 | capacity_kg | Capacidad de carga en kilogramos. | FLOAT | N/A | SI | NO |    |    |
 | capacity_yd3 | Capacidad volumétrica en yardas cúbicas. | FLOAT | N/A | SI | NO |    |    |
@@ -455,7 +455,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del estado. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del estado. | UUID | N/A | SI | SI | PK |    |
 | code | Código estable del estado (ej.: SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED) que la aplicación y el proceso automático usan en su lógica. | VARCHAR | 30 | SI | SI |    |    |
 | name | Nombre legible para mostrar en pantalla. | VARCHAR | 100 | SI | NO |    |    |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -465,11 +465,11 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la asignación. | UUID | N/A | SI | SI |    |    |
-| crew_id | Cuadrilla que ejecuta la microruta. | UUID | N/A | SI | NO |    | Referencia crew(id) |
-| microroute_id | Microruta que se ejecuta. Junto con scheduled_date no puede repetirse (una ejecución por día). | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con scheduled_date; referencia microroute(id) |
-| vehicle_id | Vehículo utilizado en la ejecución. | UUID | N/A | SI | NO |    | Referencia vehicle(id) |
-| assignment_status_id | Estado actual de la asignación. | UUID | N/A | SI | NO |    | Referencia assignment_status(id) |
+| id | Identificador único de la asignación. | UUID | N/A | SI | SI | PK |    |
+| crew_id | Cuadrilla que ejecuta la microruta. | UUID | N/A | SI | NO | FK | Referencia crew(id) |
+| microroute_id | Microruta que se ejecuta. Junto con scheduled_date no puede repetirse (una ejecución por día). | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con scheduled_date; referencia microroute(id) |
+| vehicle_id | Vehículo utilizado en la ejecución. | UUID | N/A | SI | NO | FK | Referencia vehicle(id) |
+| assignment_status_id | Estado actual de la asignación. | UUID | N/A | SI | NO | FK | Referencia assignment_status(id) |
 | scheduled_date | Fecha programada de ejecución de la microruta. Junto con microroute_id no puede repetirse. | DATE | N/A | SI | SI (compuesto) |    | Compuesto único con microroute_id |
 | started_at | Fecha y hora reales de inicio del recorrido. NULL mientras no haya iniciado. | TIMESTAMPTZ | N/A | NO | NO |    | NULL permitido |
 | ended_at | Fecha y hora reales de fin del recorrido. NULL mientras no haya terminado. | TIMESTAMPTZ | N/A | NO | NO |    | NULL permitido |
@@ -480,8 +480,8 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del reporte de posición. | UUID | N/A | SI | SI |    |    |
-| assignment_id | Asignación en curso a la que pertenece la posición. Solo se aceptan posiciones de asignaciones en curso (regla de la aplicación). | UUID | N/A | SI | NO |    | Referencia assignment(id) |
+| id | Identificador único del reporte de posición. | UUID | N/A | SI | SI | PK |    |
+| assignment_id | Asignación en curso a la que pertenece la posición. Solo se aceptan posiciones de asignaciones en curso (regla de la aplicación). | UUID | N/A | SI | NO | FK | Referencia assignment(id) |
 | geom | Ubicación geográfica del vehículo (PostGIS, geometría de tipo punto). | POINT | N/A | SI | NO |    |    |
 | recorded_at | Fecha y hora en que el dispositivo registró la posición (distinta de created_at, que es la del servidor). | TIMESTAMPTZ | N/A | SI | NO |    |    |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO |    | Por defecto now() |
@@ -490,7 +490,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la macroruta. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único de la macroruta. | UUID | N/A | SI | SI | PK |    |
 | name | Nombre de la macroruta. | VARCHAR | 100 | SI | NO |    |    |
 | geom | Área geográfica que cubre la macroruta (PostGIS, multipolígono). | MULTIPOLYGON | N/A | SI | NO |    |    |
 | is_active | Indica si la macroruta está vigente (TRUE) o inactiva (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -501,8 +501,8 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la microruta. | UUID | N/A | SI | SI |    |    |
-| macroroute_id | Macroruta a la que pertenece la microruta. | UUID | N/A | SI | NO |    | Referencia macroroute(id) |
+| id | Identificador único de la microruta. | UUID | N/A | SI | SI | PK |    |
+| macroroute_id | Macroruta a la que pertenece la microruta. | UUID | N/A | SI | NO | FK | Referencia macroroute(id) |
 | name | Nombre de la microruta. | VARCHAR | 100 | SI | NO |    |    |
 | geom | Trazado geográfico de la microruta (PostGIS, multilínea). | MULTILINESTRING | N/A | SI | NO |    |    |
 | is_active | Indica si la microruta está vigente (TRUE) o inactiva (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
@@ -513,7 +513,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del horario. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del horario. | UUID | N/A | SI | SI | PK |    |
 | name | Nombre del horario (ej.: turno de la mañana). | VARCHAR | 100 | SI | NO |    |    |
 | start_time | Hora de inicio del horario. | TIME | N/A | SI | NO |    |    |
 | end_time | Hora de fin del horario. | TIME | N/A | SI | NO |    |    |
@@ -525,9 +525,9 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del registro. | UUID | N/A | SI | SI |    |    |
-| microroute_id | Microruta a la que se asigna el horario. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con schedule_id y day_of_week; referencia microroute(id) |
-| schedule_id | Horario aplicado a la microruta. | UUID | N/A | SI | SI (compuesto) |    | Compuesto único con microroute_id y day_of_week; referencia schedule(id) |
+| id | Identificador único del registro. | UUID | N/A | SI | SI | PK |    |
+| microroute_id | Microruta a la que se asigna el horario. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con schedule_id y day_of_week; referencia microroute(id) |
+| schedule_id | Horario aplicado a la microruta. | UUID | N/A | SI | SI (compuesto) | FK | Compuesto único con microroute_id y day_of_week; referencia schedule(id) |
 | day_of_week | Día de la semana de 1 a 7 (ISO: 1 = lunes, 7 = domingo). La combinación con microroute_id y schedule_id no puede repetirse. | SMALLINT | N/A | SI | SI (compuesto) |    | Compuesto único con microroute_id y schedule_id; rango 1–7 |
 | is_active | Indica si el horario de la microruta está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO |    | Por defecto TRUE |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO |    |    |
@@ -537,7 +537,7 @@ erDiagram
 
 | atributo | descripción | tipo | longitud | mandatorio | unico | clave | restricciones |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del barrio. | UUID | N/A | SI | SI |    |    |
+| id | Identificador único del barrio. | UUID | N/A | SI | SI | PK |    |
 | commune | Comuna a la que pertenece el barrio. | VARCHAR | 100 | SI | NO |    |    |
 | name | Nombre del barrio. | VARCHAR | 150 | SI | NO |    |    |
 | geom | Límite geográfico del barrio (PostGIS, multipolígono). | MULTIPOLYGON | N/A | SI | NO |    |    |
