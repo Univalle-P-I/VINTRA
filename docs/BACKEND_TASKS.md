@@ -119,22 +119,6 @@ flowchart TD
 
 B-01 puede avanzar junto con auditoría de código/documentos. B-02, B-03 y B-04 pueden trabajarse en paralelo después de identificar responsables; B-05 requiere sus resultados. Luego datos, API y entorno pueden desarrollarse parcialmente en paralelo sobre contratos revisados; las funciones de rutas, flota y personal se pueden implementar en ramas paralelas tras B-05–B-11. La asignación depende de que los tres dominios publiquen contratos estables.
 
-## Forma de entrega por PR
-
-Cada tarea completada se entrega en su propia PR hacia `develop`, con una unidad revisable; tareas que comparten migración/API pueden agruparse solo si el equipo conserva criterios verificables y revisión manejable. Antes de abrirla, enlazar issue/tarjeta e incluir, en el formato solicitado:
-
-```markdown
-## Descripción breve
-
-## Qué cambió
-
-## Cómo se validó
-
-## Comandos utilizados
-```
-
-Las PR de documentación preparadas para este plan también deben ir separadas, no presentarse como implementación backend. Respetar el flujo de revisión de `CONTRIBUTING.md` y no fusionar sin revisión.
-
 ## Fuentes y mantenimiento
 
 Issues #53–#93 (en particular #54–#55, #58, #63–#72, #75–#85, #90–#93), tarjetas Trello #3/#6/#7/#8/#9/#14 y HUs 1–12. Actualizar estados cuando producto cierre decisiones y cuando una PR se fusione; el backlog de GitHub es referencia operativa más actual que algunos README antiguos.
