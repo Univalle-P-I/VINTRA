@@ -113,7 +113,7 @@ flowchart TB
             F2["Operador / Administrador"]
             F3["Ciudadanía"]
             F4["Axios - Cliente HTTP"]
-            
+
             F1 --> F4
             F2 --> F1
             F3 --> F1
@@ -200,3 +200,9 @@ La arquitectura propuesta establece una separación de responsabilidades entre l
 La utilización de NestJS con TypeORM permite centralizar el acceso a PostgreSQL desde el backend, mientras que React, Vite y Axios facilitan la construcción y comunicación de la interfaz web con la API REST.
 
 La implementación definitiva de cada componente, sus integraciones y los servicios externos deberá verificarse con el código fuente y la configuración real del proyecto VINTRA.
+
+## Prueba de conexión frontend–API–PostgreSQL
+
+El frontend consulta `GET /health` y `GET /health/db` con un timeout de cinco segundos. La primera respuesta confirma que NestJS está disponible; la segunda ejecuta `SELECT NOW()` mediante TypeORM y confirma la conexión a PostgreSQL. La pantalla de estado muestra cada resultado y permite repetir la comprobación.
+
+Para arrancar el conjunto con Docker Compose y verificar ambos estados, sigue [las instrucciones del README raíz](../../README.md#ejecutar-la-prueba-de-conexión). El puerto HTTP del backend debe configurarse como número TCP; el proceso convierte `PORT` a número y rechaza valores fuera del rango permitido.

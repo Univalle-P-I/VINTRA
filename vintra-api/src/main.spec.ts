@@ -47,6 +47,16 @@ describe('bootstrap', () => {
 
     await bootstrap();
 
-    expect(mockApp.listen).toHaveBeenCalledWith('4000');
+    expect(mockApp.listen).toHaveBeenCalledWith(4000);
+  });
+
+  it('rejects an invalid port before listening', async () => {
+    process.env.PORT = 'not-a-port';
+
+    await expect(bootstrap()).rejects.toThrow(
+      'PORT debe ser un número entero entre 1 y 65535',
+    );
+
+    expect(mockApp.listen).not.toHaveBeenCalled();
   });
 });
