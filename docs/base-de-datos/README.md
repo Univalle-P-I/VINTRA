@@ -398,4 +398,95 @@ CREATE TRIGGER trg_vehicle_updated_at
 ```
 
 ## 6. Políticas, Restauración y Datos Sensibles
+
+Esta sección define cómo se respalda y restaura la base de datos y cómo se tratan los datos sensibles identificados en el [diccionario de datos](#3-diccionario-de-datos). Las frecuencias y retenciones son una propuesta inicial.
+
+### 6.1. Política de Respaldo
+
+| Tipo | Herramienta | Contenido | Frecuencia | Retención |
+| --- | --- | --- | --- | --- |
+| Lógico completo | `pg_dump -Fc` | Esquema y datos (incluye geometrías PostGIS) | Diario | 14 días |
+| Lógico completo | `pg_dump -Fc` | Esquema y datos | Semanal | 8 semanas |
+| Esquema | Migraciones y seeds del repositorio (sección 5) | Estructura y catálogos | En cada cambio | Control de versiones |
+
+Reglas:
+
+- Los respaldos se almacenan cifrados y fuera del servidor de la base de datos.
+- Los respaldos contienen datos personales (sección 6.3), por lo que tienen el mismo nivel de protección que la base de producción.
+- Cada respaldo se verifica al terminar con `pg_restore --list`.
+- Los respaldos vencidos se eliminan de forma segura.
+
+```bash
+pg_dump -h <host> -U <usuario> -d <base_de_datos> -Fc -f backup_$(date +%Y%m%d_%H%M).dump
+```
+
+### 6.2. Política de Restauración
+
+Principios:
+
+1. No se restaura sobre producción sin antes probar el respaldo en un ambiente aparte.
+2. Antes de restaurar en producción se respalda el estado actual.
+3. Cada restauración queda registrada (fecha, motivo, respaldo usado y resultado).
+
+Procedimiento:
+
+1. Usar un servidor con PostgreSQL 16 y los paquetes de PostGIS 3.6.x o superior instalados.
+2. Crear la base de datos vacía.
+3. Restaurar el respaldo con `pg_restore`.
+4. Validar el resultado.
+
+```bash
+createdb -h <host> -U <usuario> <base_de_datos>
+pg_restore -h <host> -U <usuario> -d <base_de_datos> --no-owner --exit-on-error backup_YYYYMMDD_HHMM.dump
+```
+
+El respaldo ya incluye la creación de las extensiones `postgis` y `pgcrypto`, por lo que no se ejecuta `000_create_extensions.sql` en este caso.
+
+Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql`, las migraciones `001` a `024` y los seeds `001` a `024`, en orden ascendente (sección 5.4).
+
+Validación posterior:
+
+- Existen las 24 tablas, con sus `PK`, `FK`, `UNIQUE` y `CHECK`.
+- Existen los índices GIST sobre las columnas `geom` (`vehicle_position`, `macroroute`, `microroute`, `btura_neighborhood`).
+- Los catálogos (`user_role`, `user_status`, `document_type`, `vehicle_status`, `vehicle_type`, `assignment_status`) tienen sus `code` estables.
+- Las geometrías son válidas (`ST_IsValid`).
+
+Después de restaurar en producción:
+
+- Revocar las sesiones existentes (`session.revoked_at`).
+- Invalidar los tokens pendientes de `password_reset_token` y `email_validation_token` (`used_at`).
+
+Se recomienda una restauración de prueba mensual en un ambiente aislado.
+
+### 6.3. Datos Sensibles
+
+#### 6.3.1. Clasificación
+
+| Clasificación | Datos |
+| --- | --- |
+| Secreto (nunca se expone ni se registra) | `user_account.pwd_hash`, `session.token_hash`, `password_reset_token.token_hash`, `email_validation_token.token_hash` |
+| Personal | `user_account.document_id`, `user_data.first_name`, `user_data.last_name`, `user_data.email`, `user_data.phone`, `crew_member.full_name`, `email_validation_token.email` |
+| Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_validation_token`, `audit_log`), `audit_log.actor`, `vehicle_position` (`geom`, `recorded_at`) |
+
+#### 6.3.2. Reglas de tratamiento
+
+| Dato | Regla |
+| --- | --- |
+| Contraseña | Solo se almacena el hash Argon2id (incluye sal y parámetros) |
+| Tokens (sesión, restablecimiento, validación de correo) | Solo se almacena el hash SHA-256; el token en claro nunca se guarda |
+| `audit_log.old_values` y `new_values` | Nunca contienen contraseñas ni hashes; la aplicación los filtra antes de insertar |
+| `document_id` | Se muestra enmascarado y no se escribe en logs |
+| Datos personales | No se usan datos reales en desarrollo ni pruebas; los seeds contienen datos ficticios |
+| Posiciones GPS | Solo de asignaciones en curso (regla de la aplicación) |
+| Credenciales de conexión | En variables de entorno o gestor de secretos; nunca en el repositorio |
+
+#### 6.3.3. Depuración
+
+| Tabla | Política propuesta |
+| --- | --- |
+| `session` | Eliminar las vencidas o revocadas con más de 30 días |
+| `password_reset_token`, `email_validation_token` | Eliminar las usadas o vencidas con más de 30 días |
+| `vehicle_position` | Definir un periodo de conservación (es la tabla de mayor crecimiento) |
+| Cuentas dadas de baja | Deshabilitar con `user_status`; anonimizar `user_data` si se requiere |
+
 ## 7. Configuración Local
