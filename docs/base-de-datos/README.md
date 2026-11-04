@@ -597,5 +597,91 @@ Traducción de los conceptos del negocio a tablas de la base de datos. El modelo
 
 
 ## 5. Migraciones, Datos Iniciales y Orden de Ejecucción
+
+> Herramienta de migraciones: **por definir** (depende del stack de Backend).
+> Mientras tanto, los scripts son SQL plano en `database/migrations/`.
+
+### 5.1. Convención de nombres
+
+`V<número de 3 dígitos>__<descripción_en_snake_case>.sql`. Ejemplo: `V003__create_users.sql`.
+
+- Una migración nunca se edita después de aplicarse en `develop` o `main`; los cambios se hacen con una migración nueva.
+- Cada migración debe poder ejecutarse sobre una base que ya tiene aplicadas las anteriores, en orden numérico.
+- Todas las claves primarias son `UUID` con `DEFAULT gen_random_uuid()`.
+- Las columnas `created_at` usan `DEFAULT now()`.
+
+### 5.2. Orden de ejecución
+
+El orden respeta las dependencias entre claves foráneas: una tabla se crea después de las tablas que referencia.
+
+| Orden | Migración | Contenido | Depende de |
+| --- | --- | --- | --- |
+| 1 | `V001__extensions` | `postgis` (y `pgcrypto` si aplica) | N/A |
+| 2 | `V002__create_catalogs` | `user_role`, `user_status`, `document_type`, `vehicle_status`, `vehicle_type`, `assignment_status`, `schedule` | N/A |
+| 3 | `V003__create_users` | `user_account`, `user_data`, `profile` | V002 |
+| 4 | `V004__create_auth` | `session`, `password_reset_token` | V003 |
+| 5 | `V005__create_audit` | tipo `ENUM` de acción, `audit_log` | N/A |
+| 6 | `V006__create_fleet` | `vehicle`, `crew`, `crew_member` | V002, V003 |
+| 7 | `V007__create_geography` | `macroroute`, `microroute`, `btura_neighborhood`, `microroute_neighborhood`, `microroute_schedule` | V001, V002 |
+| 8 | `V008__create_operation` | `assignment`, `vehicle_position` | V002, V006, V007 |
+| 9 | `V009__indexes` | Índices GIST sobre `geom` y demás índices | V007, V008 |
+| 10 | `V010__triggers` | Función y triggers de `updated_at` | Todas las anteriores |
+| 11 | `seeds/` | Datos iniciales (ver 5.3) | V002 en adelante |
+
+### 5.3. Datos iniciales (semillas)
+
+| Tabla | Códigos (`code`) |
+| --- | --- |
+| `user_role` | `ADMIN`, `DRIVER`, `CITIZEN` |
+| `user_status` | `ACTIVE`, `INACTIVE`, `BLOCKED` |
+| `document_type` | `CC`, `CE`, `PAS` |
+| `vehicle_status` | `AVAILABLE`, `IN_SERVICE`, `MAINTENANCE`, `OUT_OF_SERVICE` |
+| `vehicle_type` | Por definir con el operador del servicio de aseo |
+| `assignment_status` | `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED` |
+
+Las semillas deben ser **idempotentes** para poder ejecutarse varias veces sin duplicar datos. Ejemplo:
+
+```sql
+INSERT INTO user_role (code, name) VALUES
+  ('ADMIN',   'Administrador'),
+  ('DRIVER',  'Conductor'),
+  ('CITIZEN', 'Ciudadano')
+ON CONFLICT (code) DO NOTHING;
+```
+
+Los datos geográficos (barrios, macrorutas, microrutas) se cargan aparte desde archivos GeoJSON o shapefile, no desde las semillas.
+
+### 5.4. Índices mínimos
+
+- `GIST (geom)` en `macroroute`, `microroute`, `btura_neighborhood` y `vehicle_position`.
+- `(assignment_id, recorded_at)` en `vehicle_position`.
+- `(scheduled_date)` en `assignment`.
+- Los únicos ya definidos en el diccionario (placa, `token_hash`, documento, etc.).
+
+### 5.5. Triggers
+
+`updated_at` se actualiza automáticamente en cada `UPDATE` de las tablas que lo tienen, con una función común:
+
+```sql
+CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Un trigger por tabla (ejemplo)
+CREATE TRIGGER trg_vehicle_updated_at
+  BEFORE UPDATE ON vehicle
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+```
+
+### 5.6. Decisiones pendientes que afectan las migraciones
+
+- Nombre final de la FK del estado en `user_account` (`status_id` en el diagrama, `user_status_id` en el diccionario).
+- Tipo de `capacity_kg` y `capacity_yd3` (`NUMERIC` en el diagrama, `FLOAT` en el diccionario).
+- Valores de `vehicle_type`, que depende del operador del servicio de aseo.
+- Herramienta de migraciones (Flyway, Alembic, etc.), que decide Backend.
+
 ## 6. Políticas, Restauración y Datos Sensibles
 ## 7. Configuración Local
