@@ -340,67 +340,46 @@ Traducción de los conceptos del negocio a tablas de la base de datos. El modelo
 
 ## 5. Migraciones, Datos Iniciales y Orden de Ejecucción
 
-> Herramienta de migraciones: **por definir** (depende del stack de Backend).
-> Mientras tanto, los scripts son SQL plano en `database/migrations/`.
+Las [migraciones](/docs/base-de-datos/database/migrations/) crean las tablas de la base de datos y los [datos iniciales](/docs/base-de-datos/database/seeds/) insertan datos y registros de ejemplo. Ambos conjuntos están separados por tabla y comparten una numeración secuencial que determina el orden de ejecución.
 
-### 5.1. Convención de nombres
+### 5.1. Estructura de archivos
 
-`V<número de 3 dígitos>__<descripción_en_snake_case>.sql`. Ejemplo: `V003__create_users.sql`.
-
-- Una migración nunca se edita después de aplicarse en `develop` o `main`; los cambios se hacen con una migración nueva.
-- Cada migración debe poder ejecutarse sobre una base que ya tiene aplicadas las anteriores, en orden numérico.
-- Todas las claves primarias son `UUID` con `DEFAULT gen_random_uuid()`.
-- Las columnas `created_at` usan `DEFAULT now()`.
-
-### 5.2. Orden de ejecución
-
-El orden respeta las dependencias entre claves foráneas: una tabla se crea después de las tablas que referencia.
-
-| Orden | Migración | Contenido | Depende de |
+| Tipo | Ubicación | Convención | Ejemplo |
 | --- | --- | --- | --- |
-| 1 | `V001__extensions` | `postgis` (y `pgcrypto` si aplica) | N/A |
-| 2 | `V002__create_catalogs` | `user_role`, `user_status`, `document_type`, `vehicle_status`, `vehicle_type`, `assignment_status`, `schedule` | N/A |
-| 3 | `V003__create_users` | `user_account`, `user_data`, `profile` | V002 |
-| 4 | `V004__create_auth` | `session`, `password_reset_token` | V003 |
-| 5 | `V005__create_audit` | tipo `ENUM` de acción, `audit_log` | N/A |
-| 6 | `V006__create_fleet` | `vehicle`, `crew`, `crew_member` | V002, V003 |
-| 7 | `V007__create_geography` | `macroroute`, `microroute`, `btura_neighborhood`, `microroute_neighborhood`, `microroute_schedule` | V001, V002 |
-| 8 | `V008__create_operation` | `assignment`, `vehicle_position` | V002, V006, V007 |
-| 9 | `V009__indexes` | Índices GIST sobre `geom` y demás índices | V007, V008 |
-| 10 | `V010__triggers` | Función y triggers de `updated_at` | Todas las anteriores |
-| 11 | `seeds/` | Datos iniciales (ver 5.3) | V002 en adelante |
+| Migración | `database/migrations/` | `NNN_create_<tabla>.sql` | `001_create_macrorute.sql` |
+| Dato inicial | `database/seeds/` | `NNN_insert_<tabla>.sql` | `001_insert_macrorute.sql` |
 
-### 5.3. Datos iniciales (semillas)
+- `NNN` es un número de tres dígitos que indica el orden de ejecución.
+- `create` identifica un archivo que crea una tabla.
+- `insert` identifica un archivo que inserta datos iniciales.
+- `<tabla>` corresponde al nombre de la tabla afectada.
+- `000_create_extensions.sql` habilita las extensiones `postgis` y `pgcrypto`; no crea una tabla.
 
-| Tabla | Códigos (`code`) |
-| --- | --- |
-| `user_role` | `ADMIN`, `DRIVER`, `CITIZEN` |
-| `user_status` | `ACTIVE`, `INACTIVE`, `BLOCKED` |
-| `document_type` | `CC`, `CE`, `PAS` |
-| `vehicle_status` | `AVAILABLE`, `IN_SERVICE`, `MAINTENANCE`, `OUT_OF_SERVICE` |
-| `vehicle_type` | Por definir con el operador del servicio de aseo |
-| `assignment_status` | `SCHEDULED`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED` |
+### 5.2. Migraciones
 
-Las semillas deben ser **idempotentes** para poder ejecutarse varias veces sin duplicar datos. Ejemplo:
+Cada migración crea una tabla con sus restricciones (`PK`, `FK`, `UNIQUE`, `CHECK`) y los índices documentados en el diccionario de datos. Los archivos están envueltos en `BEGIN`/`COMMIT` para que la ejecución sea atómica.
 
-```sql
-INSERT INTO user_role (code, name) VALUES
-  ('ADMIN',   'Administrador'),
-  ('DRIVER',  'Conductor'),
-  ('CITIZEN', 'Ciudadano')
-ON CONFLICT (code) DO NOTHING;
-```
+AVISO: El orden de las migraciones no es alfabético ni arbitrario: respeta las dependencias entre tablas. Primero se crean los catálogos, después las entidades que los referencian y al final las tablas transaccionales. Por eso una migración con número mayor puede depender de una anterior y no debe ejecutarse de forma aislada.
 
-Los datos geográficos (barrios, macrorutas, microrutas) se cargan aparte desde archivos GeoJSON o shapefile, no desde las semillas.
+### 5.3. Datos iniciales
 
-### 5.4. Índices mínimos
+Los seeds contienen catálogos y algunos datos de demostración. Se ejecutan después de todas las migraciones y en orden numérico ascendente, porque algunos inserts referencian registros creados por seeds anteriores. Los archivos usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
+
+### 5.4. Orden de ejecución
+
+El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](/docs/base-de-datos/database/schema/README.md). La secuencia general es:
+
+1. Ejecutar `000_create_extensions.sql`.
+2. Ejecutar las migraciones `001` a `024` en orden ascendente.
+3. Ejecutar los seeds `001` a `024` en orden ascendente.
+
+### 5.5. Índices mínimos
 
 - `GIST (geom)` en `macroroute`, `microroute`, `btura_neighborhood` y `vehicle_position`.
 - `(assignment_id, recorded_at)` en `vehicle_position`.
 - `(scheduled_date)` en `assignment`.
-- Los únicos ya definidos en el diccionario (placa, `token_hash`, documento, etc.).
 
-### 5.5. Triggers
+### 5.6. Triggers
 
 `updated_at` se actualiza automáticamente en cada `UPDATE` de las tablas que lo tienen, con una función común:
 
@@ -417,13 +396,6 @@ CREATE TRIGGER trg_vehicle_updated_at
   BEFORE UPDATE ON vehicle
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 ```
-
-### 5.6. Decisiones pendientes que afectan las migraciones
-
-- Nombre final de la FK del estado en `user_account` (`status_id` en el diagrama, `user_status_id` en el diccionario).
-- Tipo de `capacity_kg` y `capacity_yd3` (`NUMERIC` en el diagrama, `FLOAT` en el diccionario).
-- Valores de `vehicle_type`, que depende del operador del servicio de aseo.
-- Herramienta de migraciones (Flyway, Alembic, etc.), que decide Backend.
 
 ## 6. Políticas, Restauración y Datos Sensibles
 ## 7. Configuración Local
