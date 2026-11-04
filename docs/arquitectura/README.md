@@ -2,7 +2,6 @@
 
 ![Node.js](https://img.shields.io/badge/Node.js-LTS-339933?logo=nodedotjs&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-Framework-E0234E?logo=nestjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
@@ -56,37 +55,92 @@ VINTRA es una plataforma web compuesta por un backend con API REST, una base de 
 
 **PostgreSQL** — Sistema gestor relacional que permite estructurar la información mediante tablas, restricciones y relaciones. Adecuado cuando se requiere consistencia y consultas SQL. La estructura definitiva del esquema dependerá de los requisitos funcionales del proyecto.
 
-**NestJS** — Framework de Node.js para construir servicios backend y APIs escalables. Organiza la lógica de negocio en módulos, controladores y providers, con **TypeScript** como lenguaje tipado y validación de entradas con `class-validator`.
+**NestJS** — Framework de Node.js para construir servicios backend y APIs escalables. Organiza la lógica de negocio en módulos, controladores y providers, con **TypeScript** como lenguaje tipado y **TypeORM** como herramienta para la gestión de la base de datos. Las credenciales deben provenir de variables de entorno y no quedar escritas directamente en el código.
 
 **React** — Biblioteca para construir interfaces a partir de componentes reutilizables. Permite separar la interfaz en unidades que pueden mantenerse y ampliarse conforme crezca el sistema.
 
 **Vite** — Herramienta de desarrollo y compilación para el frontend. Proporciona un servidor de desarrollo ágil y un proceso de construcción para preparar los archivos de la aplicación.
 
-**pg** — Cliente de PostgreSQL para Node.js. Permite que el backend ejecute consultas SQL y gestione conexiones a la base de datos. Las credenciales deben provenir de variables de entorno y no quedar escritas directamente en el código.
+**TypeORM** — ORM (Object-Relational Mapping) utilizado junto con NestJS para gestionar la conexión y las operaciones con la base de datos PostgreSQL. Permite trabajar con entidades, repositorios y consultas utilizando TypeScript, reduciendo la necesidad de escribir consultas SQL directamente.
+
 
 **Axios** — Cliente HTTP que facilita enviar solicitudes desde React hacia los endpoints de la API REST, gestionar respuestas y tratar errores de comunicación.
 
 **Git** — Sistema de control de versiones recomendado para registrar cambios, revisar contribuciones y reducir conflictos al trabajar entre varios integrantes.
 
-## Diagrama de arquitectura
+**MVP (mínimo viable):**
+- Gestión y visualización de rutas de recolección.
+- Asignación de vehículos y conductores.
+- Seguimiento en tiempo real del estado de los vehículos.
+- Reporte y consulta de acumulación de residuos.
+
+**Más adelante:**
+- Notificaciones push/SMS al ciudadano.
+- Seguimiento geolocalizado interactivo en tiempo real.
+- Indicadores avanzados y visualización geográfica.
+- Modo ciudadano (consulta de rutas y reportes) con interfaz dedicada.
+
+
+## Diagrama de arquitectura VINTRA
 
 ```mermaid
-flowchart TD
-    A[VINTRA<br/>Plataforma de coordinación de rutas] --> B[Gestión de Rutas]
-    A --> C[Tracking y Geolocalización]
-    A --> D[Comunicación Ciudadana]
-    B --> E[Backend / REST API]
-    C --> E
-    D --> E
-    E --> F[(Base de datos)]
-    E --> G[Servicios geográficos]
-    E --> H[Notificaciones / Alertas]
-    E --> I[Frontend<br/>Dashboard y Mapa]
-    I --> J[Operador / Administrador]
-    I --> K[Ciudadanía]
-    subgraph DEVOPS["DevOps · Grupo GitHub-CI-CD-VPS"]
-        L[GitHub Actions - CI/CD]
-        M[VPS / Despliegue]
+flowchart TB
+
+    subgraph SISTEMA["VINTRA - Plataforma de coordinación de rutas"]
+
+        subgraph FRONTEND["Frontend"]
+            F1["Dashboard y Mapa"]
+            F2["Operador / Administrador"]
+            F3["Ciudadanía"]
+        end
+
+        subgraph BACKEND["Backend / REST API - NestJS"]
+            B1["Gestión de Rutas"]
+            B2["Tracking y Geolocalización"]
+            B3["Comunicación Ciudadana"]
+        end
+
+        subgraph INFRA["Infraestructura y servicios"]
+            D1[("Base de datos PostgreSQL")]
+            D2["TypeORM"]
+            D3["Servicios geográficos"]
+            D4["Notificaciones / Alertas"]
+        end
+
     end
-    E -.integración y despliegue.-> DEVOPS
-    I -.integración y despliegue.-> DEVOPS
+
+    subgraph DEVOPS["Integración y despliegue - DevOps"]
+        C1["GitHub"]
+        C2["GitHub Actions - CI/CD"]
+        C3["VPS / Despliegue"]
+    end
+
+    F1 --> B1
+    F2 --> B1
+    F2 --> B2
+    F3 --> B3
+
+    B1 --> B2
+    B1 --> D2
+    B2 --> D3
+    B3 --> D4
+
+    D2 --> D1
+
+    C1 --> C2
+    C2 --> C3
+    C3 -.-> BACKEND
+
+    classDef frontend fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef backend fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef database fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef devops fill:#f3e8ff,stroke:#9333ea,color:#581c87
+
+    class F1,F2,F3 frontend
+    class B1,B2,B3 backend
+    class D1,D2,D3,D4 database
+    class C1,C2,C3 devops
+```
+
+
+    
