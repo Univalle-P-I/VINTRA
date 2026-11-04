@@ -7,6 +7,26 @@ jobs:
   backend-checks:
     name: Backend CI Job
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: vintra_test
+          POSTGRES_USER: vintra_test
+          POSTGRES_PASSWORD: vintra_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vintra_test -d vintra_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      POSTGRES_DB: vintra_test
+      POSTGRES_USER: vintra_test
+      POSTGRES_PASSWORD: vintra_test_password
     defaults:
       run:
         working-directory: vintra-api
@@ -28,8 +48,11 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm run test:cov -- --runInBand
+
+      - name: Run e2e tests against PostgreSQL
+        run: npm run test:e2e -- --runInBand
 
       - name: Build backend
         run: npm run build

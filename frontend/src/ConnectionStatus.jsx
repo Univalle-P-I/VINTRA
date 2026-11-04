@@ -51,7 +51,7 @@ function ConnectionStatus() {
     return () => {
       active = false
     }
-  }, [attempt])
+  }, [attempt, apiUrl])
 
   return (
     <section
