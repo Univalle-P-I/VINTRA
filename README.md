@@ -13,7 +13,7 @@
 </p>
 
 <p>
-  <a href="docs/ARCHITECTURE.md">Arquitectura</a> ·
+  <a href="docs/arquitectura/README.md">Arquitectura</a> ·
   <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
   <a href="CONTRIBUTING.md">Contribuir</a>
 </p>
@@ -89,18 +89,59 @@ flowchart TD
     I -.integración y despliegue.-> DEVOPS
 ```
 
-El detalle técnico completo de la arquitectura (componentes, contratos entre módulos, modelo de datos y decisiones de diseño) se documentará en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) *(en actualizacion)*.
+El detalle técnico de la arquitectura, el stack y los contratos entre componentes se documenta en [`docs/arquitectura/README.md`](docs/arquitectura/README.md).
 
 ## Tecnologías
 
-Pendiente de definición por el grupo responsable de Backend/Frontend/Base de Datos. Esta sección se completará una vez esos equipos definan el stack (lenguaje de backend, framework de frontend y motor de base de datos), para que el grupo de GitHub-CI-CD-VPS pueda ajustar los workflows de CI/CD y la configuración del VPS en consecuencia.
+El stack definido para esta prueba de integración es React + Vite en frontend, Node.js + NestJS en backend, y PostgreSQL con TypeORM y el driver `pg` para persistencia. El frontend usa Axios para consultar los endpoints de salud.
 
 | Componente | Tecnología | Responsable |
 | --- | --- | --- |
-| Frontend | *Por definir* | Célula Backend / Frontend |
-| Backend | *Por definir* | Célula Backend / Frontend |
-| Base de datos | PostgreSQL | Célula Base de Datos |
+| Frontend | React + Vite | Célula Backend / Frontend |
+| Backend | Node.js + NestJS | Célula Backend / Frontend |
+| Base de datos | PostgreSQL + TypeORM (`pg`) | Célula Base de Datos |
 | Infraestructura y despliegue | *Por definir* | Célula GitHub / CI-CD / VPS |
+
+## Ejecutar la prueba de conexión
+
+Requisitos: Docker Compose, Node.js 22 o superior y npm.
+
+### Ejecutar todo con Docker Compose
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+Abre `http://localhost:5174`. La tarjeta **Estado del entorno** debe mostrar
+**API backend: Disponible** y **PostgreSQL: Disponible**. Los endpoints que
+comprueba son `http://localhost:3002/health` y `http://localhost:3002/health/db`.
+
+### Ejecutar frontend y API en modo desarrollo
+
+En la raíz, copia `.env.example` a `.env` y arranca PostgreSQL:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d postgres
+```
+
+En dos terminales, inicia API y frontend:
+
+```powershell
+cd vintra-api
+npm ci
+npm run start:dev
+```
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Abre `http://localhost:5173`. Para detener PostgreSQL ejecuta
+`docker compose down`; la base de datos conserva sus datos en el volumen.
 
 ## Equipo
 
@@ -120,7 +161,7 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
 ├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
-├── backend/           # API REST
+├── vintra-api/        # API REST con NestJS
 ├── frontend/          # Dashboard y aplicación de cara a la ciudadanía
 ├── database/          # Modelo de datos, migraciones y scripts
 ├── infrastructure/    # Configuración de despliegue y VPS
@@ -130,7 +171,7 @@ Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
 ## Flujo de trabajo
 
 - **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
-- **Workflows de CI/CD:** `ci.yml` valida cambios en PR hacia `develop` y pushes a `develop`/`main`; `backend.yml` y `frontend.yml` están pendientes de implementación.
+- **Workflows de CI:** `ci.yml` valida whitespace, Markdown y enlaces, y ejecuta los workflows reutilizables de backend y frontend.
 - **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
 Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.
@@ -141,7 +182,7 @@ VINTRA se encuentra en fase de definición. La propuesta general, el problema, l
 
 - [ ] **UI/UX** — Diseño de la landing page.
 - [ ] **Base de Datos** — Modelo y diseño de la base de datos.
-- [ ] **Backend / Frontend** — Definición del stack tecnológico y configuración del entorno (PostgreSQL).
+- [x] **Backend / Frontend** — Stack tecnológico y prueba base de conexión implementados; los módulos funcionales siguen pendientes.
 - [ ] **Scrum** — Historias de usuario.
 - [ ] **GitHub / CI-CD / VPS** — Plantillas de Issues/PR, workflows de CI/CD, estrategia de ramas ya definida, configuración y despliegue en el VPS.
 Este README se irá actualizando a medida que cada célula entregue su información.
