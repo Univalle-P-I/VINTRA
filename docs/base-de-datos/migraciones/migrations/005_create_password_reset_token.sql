@@ -10,7 +10,7 @@ CREATE TABLE password_reset_token (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_password_reset_token_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id),
     CONSTRAINT uq_password_reset_token_hash UNIQUE (token_hash),
-    CONSTRAINT ck_password_reset_token_hash CHECK (token_hash ~ '^[0-9a-fA-F]{64}$')
+    CONSTRAINT ck_password_reset_token_expires_at CHECK (expires_at > created_at)
 );
 
 CREATE INDEX idx_password_reset_token_user_account_id ON password_reset_token (user_account_id);
