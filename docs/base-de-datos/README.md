@@ -490,3 +490,73 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | Cuentas dadas de baja | Deshabilitar con `user_status`; anonimizar `user_data` si se requiere |
 
 ## 7. Configuración Local
+Requisitos: Docker y Docker Compose. No se publican secretos: cada persona crea su propio `.env`.
+
+### 7.1. Archivo `.env.example`
+
+```env
+POSTGRES_DB=vintra
+POSTGRES_USER=vintra_app
+POSTGRES_PASSWORD=cambia_esta_contraseña
+POSTGRES_PORT=5432
+```
+
+Copiarlo a `.env` (que debe estar en `.gitignore`) y cambiar la contraseña.
+
+### 7.2. `docker-compose.yml` (en `database/`)
+
+```yaml
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: vintra-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - vintra_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  vintra_pgdata:
+```
+
+### 7.3. Puesta en marcha
+
+```bash
+cd database
+cp .env.example .env          # editar la contraseña
+docker compose up -d          # levantar la base
+docker compose ps             # verificar estado "healthy"
+
+# Ejecutar migraciones en orden (mientras no haya herramienta definida)
+for f in migrations/V*.sql; do
+  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+done
+
+# Cargar datos iniciales
+for f in seeds/*.sql; do
+  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+done
+```
+
+### 7.4. Comandos útiles
+
+```bash
+# Entrar a la consola SQL
+docker exec -it vintra-db psql -U vintra_app -d vintra
+
+# Verificar PostGIS (dentro de psql)
+SELECT postgis_full_version();
+
+# Reiniciar desde cero (borra todos los datos locales)
+docker compose down -v && docker compose up -d
+```
+
