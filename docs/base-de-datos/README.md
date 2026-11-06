@@ -413,7 +413,7 @@ Las [migraciones](/docs/base-de-datos/migraciones/migrations/) crean las tablas 
 
 - `NNN` es un número de tres dígitos que indica el orden de ejecución.
 - `create` identifica un archivo que crea una tabla.
-- `insert` identifica un archivo que inserta datos iniciales; los seeders actuales deben regenerarse para el DER v2.
+- `insert` identifica un archivo que inserta datos iniciales de ejemplo.
 - `<tabla>` corresponde al nombre de la tabla afectada.
 - `000_create_extensions.sql` habilita las extensiones `postgis` y `pgcrypto`; no crea una tabla.
 
@@ -425,7 +425,7 @@ AVISO: El orden de las migraciones no es alfabético ni arbitrario: respeta las 
 
 ### 5.3. Datos iniciales
 
-Los seeders actuales pertenecen al modelo anterior y no son compatibles con estas migraciones. Deben regenerarse para el DER v2 antes de ejecutarse. Cuando se actualicen, deberán usar `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
+Los seeders insertan datos mínimos de ejemplo para `user_account`, `user_data`, `profile`, `vehicle_type`, `crew`, `crew_member` y `driver`. Usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
 
 ### 5.4. Orden de ejecución
 
@@ -433,7 +433,7 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 
 1. Ejecutar `000_create_extensions.sql`.
 2. Ejecutar las migraciones `001` a `029` en orden ascendente.
-3. Ejecutar los seeders cuando se regeneren para el nuevo DER.
+3. Ejecutar los seeders `001`, `002`, `003`, `007`, `015`, `016` y `017` en orden ascendente.
 
 ### 5.5. Índices mínimos
 
@@ -505,7 +505,7 @@ pg_restore -h <host> -U <usuario> -d <base_de_datos> --no-owner --exit-on-error 
 
 El respaldo ya incluye la creación de las extensiones `postgis` y `pgcrypto`, por lo que no se ejecuta `000_create_extensions.sql` en este caso.
 
-Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql` y las migraciones `001` a `029`, en orden ascendente (sección 5.4). Los seeders deben regenerarse antes de cargarse.
+Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql`, las migraciones `001` a `029` y los seeders de la sección 5.3, en orden ascendente.
 
 Validación posterior:
 
@@ -539,7 +539,7 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | Tokens (sesión, restablecimiento, validación de correo) | Solo se almacena el hash SHA-256; el token en claro nunca se guarda |
 | `*_log.old_values` | Nunca contiene contraseñas ni hashes; la aplicación los filtra antes de insertar |
 | `document_id` | Se muestra enmascarado y no se escribe en logs |
-| Datos personales | No se usan datos reales en desarrollo ni pruebas; los seeders regenerados deben contener datos ficticios |
+| Datos personales | No se usan datos reales en desarrollo ni pruebas; los seeders contienen datos ficticios |
 | Posiciones GPS | Solo de asignaciones en curso (regla de la aplicación) |
 | Credenciales de conexión | En variables de entorno o gestor de secretos; nunca en el repositorio |
 
@@ -604,7 +604,7 @@ for f in docs/base-de-datos/migraciones/migrations/*.sql; do
   docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
 done
 
-# Los seeders deben regenerarse para el DER v2 antes de cargarlos.
+# Ejecutar los seeders en orden ascendente (ver sección 5.3).
 ```
 
 ### 7.4. Comandos útiles

@@ -39,12 +39,17 @@ Las migraciones se ejecutan en orden numérico ascendente. El orden respeta las 
 
 ## Datos Semillas
 
-Los seeders actuales (`docs/base-de-datos/migraciones/seeders/`) pertenecen al modelo anterior: referencian catálogos eliminados y algunas fechas o valores no son válidos. No deben ejecutarse contra este esquema hasta que se regeneren para el DER v2.
+Los seeders (`docs/base-de-datos/migraciones/seeders/`) insertan datos mínimos de ejemplo para las tablas base y usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
 
-
-| # | Inserción | Depedencia |
+| # | Inserción | Dependencia |
 | --- | --- | --- |
-|  |  |  |
+| 001 | `001_insert_user_account.sql` | — |
+| 002 | `002_insert_user_data.sql` | `user_account` |
+| 003 | `003_insert_profile.sql` | `user_account` |
+| 007 | `007_insert_vehicle_type.sql` | — |
+| 015 | `015_insert_crew.sql` | — |
+| 016 | `016_insert_crew_member.sql` | `crew` |
+| 017 | `017_insert_driver.sql` | `user_data`, `crew` |
 
 
 ## Ejecución usando `psql`
