@@ -222,7 +222,7 @@ erDiagram
     user_account_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -232,7 +232,7 @@ erDiagram
     user_data_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -242,7 +242,7 @@ erDiagram
     profile_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -252,7 +252,7 @@ erDiagram
     crew_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -262,7 +262,7 @@ erDiagram
     crew_member_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -272,7 +272,7 @@ erDiagram
     driver_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -282,7 +282,7 @@ erDiagram
     macroroute_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -292,7 +292,7 @@ erDiagram
     microroute_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -302,7 +302,7 @@ erDiagram
     assignment_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
@@ -312,7 +312,7 @@ erDiagram
     vehicle_log {
         UUID id
         UUID entity_id
-        TEXT actor
+        UUID actor_id
         ENUM action
         JSONB old_values
         INET request_ip
