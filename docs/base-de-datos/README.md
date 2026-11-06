@@ -1,4 +1,4 @@
-# Base de datos ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=fff&style=for-the-badge)
+# Base de datos ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=fff&style=for-the-badge) ![PostGIS Badge](https://img.shields.io/badge/PostGIS-5B8C85?logo=postgresql&logoColor=fff&style=for-the-badge)
 
 En esta guía se expone la documentación de la base de datos de VINTRA, su arquitectura y evolución.
 
@@ -22,7 +22,7 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 ## 1. Motor y Version Soportada
 
-El motor de la Base de Datos usada es: ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=fff) en conjunto con la extensión: ![PostGIS Badge](https://img.shields.io/badge/PostGIS-3.6-336791?logo=postgresql&logoColor=fff). Usando las versiones 16 para postgreSQL. Y por compatibilidad versionado 3.6.x en adelante.
+El motor de la Base de Datos usada es: ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=fff&style=plastic) en conjunto con la extensión: ![PostGIS Badge](https://img.shields.io/badge/PostGIS-3.6-5B8C85?logo=postgresql&logoColor=fff&style=plastic). Usando las versiones 16 para postgreSQL. Y por compatibilidad versionado 3.6.x en adelante.
 
 ## 2. Diagrama Entidad-Relación
 
