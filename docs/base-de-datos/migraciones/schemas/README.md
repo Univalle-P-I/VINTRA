@@ -2,6 +2,8 @@
 
 Las migraciones se ejecutan en orden numérico ascendente. El orden respeta las dependencias entre tablas: primero las entidades base, después las entidades que las referencian y al final las tablas transaccionales y de auditoría. A continuación, se presenta la propuesta de orden de ejución de las migraciones y datos semillas:
 
+Ultima modificación: 5/11/2026
+
 ## Migraciones
 
 | # | Migración | Dependencia |

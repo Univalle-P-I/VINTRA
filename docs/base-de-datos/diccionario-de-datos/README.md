@@ -2,7 +2,7 @@ bien# Sobre Diccionario de Datos
 
 El [Diccionario de Datos](/docs/base-de-datos/diccionario-de-datos/DD-BD_v2.pdf) aguarda la información descriptiva avanzada de las tablas de migración de la base de datos. Consulte el [`Diccionario de Datos`](/docs/base-de-datos/diccionario-de-datos/DD-BD_v2.pdf), para saber más información sobre cada tabla y sus atributos. A continuación, se le presenta un índice de la tablas que puede encontrar en el **Diccionario de Datos**.
 
-Ultima fecha de modificación: 5/11/2026
+Ultima modificación: 5/11/2026
 
 ## Índice
 
