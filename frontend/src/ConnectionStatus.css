@@ -1,0 +1,119 @@
+.connection-status {
+  width: min(100% - 40px, 760px);
+  margin: 40px auto;
+  padding: 24px;
+  border: 1px solid #dce6e2;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgb(15 48 38 / 8%);
+  color: #17352d;
+  text-align: left;
+}
+
+.connection-status__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.connection-status__eyebrow {
+  margin: 0 0 6px;
+  color: #16845c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.connection-status h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.connection-status__description {
+  margin: 7px 0 0;
+  color: #5b6d67;
+  font-size: 0.92rem;
+}
+
+.connection-status__retry {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border: 1px solid #16845c;
+  border-radius: 9px;
+  background: #fff;
+  color: #126b4b;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.connection-status__retry:hover {
+  background: #edf8f2;
+}
+
+.connection-status__retry:focus-visible {
+  outline: 3px solid #89d8b5;
+  outline-offset: 2px;
+}
+
+.connection-status__checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.connection-status__check {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1px solid #e4ebe8;
+  border-radius: 11px;
+  background: #fbfdfc;
+}
+
+.connection-status__indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #a7b3af;
+}
+
+.connection-status__check[data-state='available'] .connection-status__indicator {
+  background: #16945e;
+  box-shadow: 0 0 0 4px #dff4e9;
+}
+
+.connection-status__check[data-state='error'] .connection-status__indicator {
+  background: #c63d3d;
+  box-shadow: 0 0 0 4px #fde8e8;
+}
+
+.connection-status__label {
+  color: #536760;
+}
+
+.connection-status__check strong {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .connection-status {
+    width: calc(100% - 32px);
+    margin: 28px auto;
+    padding: 18px;
+  }
+
+  .connection-status__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .connection-status__checks {
+    grid-template-columns: 1fr;
+  }
+}

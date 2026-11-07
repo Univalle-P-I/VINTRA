@@ -23,6 +23,29 @@ describe('AppController (e2e)', () => {
       .expect('Hello World!');
   });
 
+  it('/health (GET) reports the backend as available', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health')
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      status: 'ok',
+      service: 'vintra-backend',
+    });
+  });
+
+  it('/health/db (GET) confirms a live PostgreSQL query', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health/db')
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      status: 'ok',
+      database: 'connected',
+    });
+    expect(response.body.time).toBeTruthy();
+  });
+
   afterEach(async () => {
     await app.close();
   });
