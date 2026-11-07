@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -27,9 +27,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      CORS_ORIGIN: http://localhost:5174
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5174}
     ports:
-      - "3003:3002"
+      - "${BACKEND_PORT:-3003}:3002"
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,7 +40,7 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3003}
     ports:
-      - "5174:80"
+      - "${FRONTEND_PORT:-5174}:80"
     depends_on:
       - backend
 
