@@ -1,0 +1,35 @@
+name: CD Staging to VPS
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ejecutar despliegue produccion en VPS
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+
+            TARGET_DIR="/var/www/vintra.qsuene.com/html-dev"
+
+            if [ ! -d "$TARGET_DIR" ]; then
+              git clone -b develop https://github.com/${{ github.repository }}.git "$TARGET_DIR"
+            fi
+
+            cd "$TARGET_DIR"
+            git fetch origin develop
+            git reset --hard origin/develop
+
+
+            docker compose -p vintra-dev up -d --build
+            docker image prune -f
