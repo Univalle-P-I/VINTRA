@@ -1,7 +1,9 @@
 
 services:
   postgres:
-    image: postgres:16
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
