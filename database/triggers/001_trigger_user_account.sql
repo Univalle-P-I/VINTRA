@@ -1,0 +1,8 @@
+BEGIN;
+
+CREATE OR REPLACE TRIGGER trg_user_account_audit
+AFTER INSERT OR UPDATE OR DELETE ON user_account
+FOR EACH ROW
+EXECUTE FUNCTION fn_audit_log();
+
+COMMIT;
