@@ -32,20 +32,7 @@ function App() {
         <LoginPage onHome={goToHome} onLogin={handleLogin} />
       )}
 
-<<<<<<< HEAD
-      <p className="backend-status" role="status">
-        {mensaje}
-      </p>
-<<<<<<< HEAD
-=======
-
-      <p className="backend-status" role="status">
-        {estadoDB}
-      </p>
->>>>>>> fe256838aace1b075037835871210c3b3b6658fb
-=======
       <ConnectionStatus />
->>>>>>> ddd2e44185321c7266369b5e41cc90eea28725d8
     </>
   )
 }
