@@ -557,9 +557,10 @@ Copiarlo a `.env` (que debe estar en `.gitignore`) y cambiar la contraseña.
 
 ```yaml
 services:
-  db:
-    image: postgis/postgis:16-3.4
-    container_name: vintra-db
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -586,7 +587,7 @@ docker compose up -d          # levantar la base
 docker compose ps             # verificar estado "healthy"
 
 # Ejecutar migraciones en orden (mientras no haya herramienta definida)
-for f in docs/base-de-datos/migraciones/migrations/*.sql; do
+for f in <RUTA RELATIVA>/database/migrations/*.sql; do
   docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
 done
 
