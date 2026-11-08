@@ -4,7 +4,7 @@
 
 Este documento resume el diccionario de datos remitido por el equipo de Base de Datos. Describe una propuesta de esquema PostgreSQL para cuentas, flota, cuadrillas, rutas y asignaciones. No reemplaza el archivo del equipo ni convierte automáticamente sus propuestas en decisiones aprobadas.
 
-El diseño físico, sus migraciones y cambios de tablas corresponden al equipo de BD. Backend debe consumir el esquema que ese equipo apruebe y coordinar con él los contratos y las reglas que la API necesita. El ORM de NestJS sigue pendiente de la decisión técnica #54.
+El diseño físico, sus migraciones y cambios de tablas corresponden al equipo de BD. Backend debe consumir el esquema que ese equipo apruebe y coordinar con él los contratos y las reglas que la API necesita. El backend ya usa TypeORM para conectar con PostgreSQL y comprobar el endpoint de salud; la decisión no ha producido aún entidades de negocio ni migraciones. Este documento continúa siendo una propuesta de modelo, no el esquema desplegado.
 
 El libro describe 23 entidades. Los campos siguientes reflejan lo especificado en las hojas; `N/A` significa que el diccionario no asigna longitud. Los ejemplos de roles, estados y catálogos no son una lista definitiva de valores.
 

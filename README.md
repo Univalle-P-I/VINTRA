@@ -1,205 +1,167 @@
-<!-- markdownlint-disable MD033 MD041 -->
-
 <div align="center">
 
-<h1> VINTRA </h1>
+<img src="docs/assets/vintra-brand.svg" alt="VINTRA — rutas claras, ciudad conectada" width="900">
 
-<p><strong>Sistema de coordinación y seguimiento de rutas de recolección de residuos sólidos.</strong></p>
+### Coordinación y seguimiento de rutas de recolección para Buenaventura
 
-<p>
-  <a href="#estado-del-proyecto"><img src="https://img.shields.io/badge/Estado-Desarrollo-yellow?style=for-the-badge" alt="Estado: desarrollo"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Universidad%20del%20Valle%20Buenaventura-blue?style=for-the-badge" alt="Universidad del Valle, Sede Buenaventura">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-Apache%202.0-green?style=for-the-badge" alt="Licencia Apache 2.0"></a>
-</p>
+![Estado](https://img.shields.io/badge/estado-prototipo_en_integración-78c6a3?style=flat-square)
+[![Frontend](https://img.shields.io/badge/frontend-React_%2B_Vite-61dafb?style=flat-square&logo=react&logoColor=white)](frontend/)
+[![Backend](https://img.shields.io/badge/backend-NestJS-e0234e?style=flat-square&logo=nestjs&logoColor=white)](backend/)
+[![Base de datos](https://img.shields.io/badge/datos-PostgreSQL-4169e1?style=flat-square&logo=postgresql&logoColor=white)](database/)
 
-<p>
-  <a href="docs/arquitectura/README.md">Arquitectura</a> ·
-  <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
-  <a href="CONTRIBUTING.md">Contribuir</a>
-</p>
+[Abrir sitio VINTRA](https://vintra.qsuene.com) · [Arquitectura](docs/ARCHITECTURE.md) · [Documentación](docs/README.md) · [Contribuir](CONTRIBUTING.md)
 
 </div>
 
-<!-- markdownlint-enable MD033 MD041 -->
-
 ---
 
-## ¿Qué es VINTRA?
+VINTRA busca hacer más visible y coordinada la operación de recolección de residuos: conecta a quienes planifican las rutas con la ciudadanía que necesita consultar el servicio y reportar novedades.
 
-VINTRA es una plataforma digital para la gestión, coordinación y seguimiento de rutas de recolección de residuos sólidos, que conecta la operación del servicio de aseo con la ciudadanía mediante información clara y oportuna sobre horarios, recorridos y novedades del servicio.
+> **Estado actual:** el repositorio integra una interfaz React, una API NestJS y PostgreSQL. La versión ejecutable sirve como base de integración y comprobación de conectividad. La gestión de rutas, el tracking de vehículos, los reportes ciudadanos, la autenticación y las notificaciones aún no están implementados como funcionalidades completas.
 
-## Génesis del proyecto
+## Inicio rápido
 
-VINTRA nace de un análisis realizado en clase sobre la problemática de la recolección de residuos sólidos en Buenaventura. Mediante un diagrama de Ishikawa, el equipo identificó y priorizó las causas del problema, encontrando que las de mayor peso eran:
-
-- Deficiencia en la planificación y coordinación de rutas (causa con mayor puntuación).
-- Falta de información en tiempo real sobre el paso del vehículo recolector.
-A partir de este diagnóstico, se concluyó que el problema no es únicamente la acumulación de basuras —que es una consecuencia—, sino la falta de organización, coordinación y comunicación entre el operador del servicio de aseo y la ciudadanía. VINTRA es la respuesta tecnológica a ese diagnóstico.
-
-## Problema que resuelve
-
-Deficiencias en la planificación, coordinación y comunicación del servicio de recolección de residuos sólidos en Buenaventura, que generan incertidumbre en la ciudadanía sobre el paso del vehículo recolector y favorecen la acumulación de residuos en las calles.
-
-## Propuesta de valor
-
-VINTRA convierte un servicio operado de forma dispersa y poco visible en un sistema coordinado, trazable y comunicado:
-
-| Para el operador | Para la ciudadanía |
-| --- | --- |
-| Planificación y asignación de rutas | Consulta de horarios y recorridos |
-| Seguimiento en tiempo real de vehículos | Aviso de proximidad del vehículo |
-| Registro de novedades e incumplimientos | Reporte de acumulación de residuos |
-| Indicadores de cumplimiento del servicio | Visibilidad del estado de sus reportes |
-
-## Objetivos
-
-### Objetivo general
-
-Desarrollar una plataforma web que permita gestionar, planificar y monitorear las rutas de recolección de residuos sólidos, proporcionando información operativa y geográfica que facilite la coordinación del servicio y permita a la ciudadanía reportar situaciones relacionadas con la acumulación de residuos.
-
-### Objetivos específicos
-
-- Centralizar la planificación y asignación de rutas y horarios de recolección.
-- Ofrecer seguimiento geográfico en tiempo real de los vehículos recolectores.
-- Reducir la incertidumbre ciudadana sobre el paso del servicio.
-- Permitir el registro y gestión de reportes ciudadanos.
-- Generar indicadores de cumplimiento para la toma de decisiones.
-
-## Arquitectura resumida
-
-```mermaid
-flowchart TD
-    A[VINTRA<br/>Plataforma de coordinación de rutas] --> B[Gestión de Rutas]
-    A --> C[Tracking y Geolocalización]
-    A --> D[Comunicación Ciudadana]
-    B --> E[Backend / REST API]
-    C --> E
-    D --> E
-    E --> F[(Base de datos)]
-    E --> G[Servicios geográficos]
-    E --> H[Notificaciones / Alertas]
-    E --> I[Frontend<br/>Dashboard y Mapa]
-    I --> J[Operador / Administrador]
-    I --> K[Ciudadanía]
-    subgraph DEVOPS["DevOps · Grupo GitHub-CI-CD-VPS"]
-        L[GitHub Actions - CI/CD]
-        M[VPS / Despliegue]
-    end
-    E -.integración y despliegue.-> DEVOPS
-    I -.integración y despliegue.-> DEVOPS
-```
-
-El detalle técnico de la arquitectura, el stack y los contratos entre componentes se documenta en [`docs/arquitectura/README.md`](docs/arquitectura/README.md).
-
-## Tecnologías
-
-El stack definido para esta prueba de integración es React + Vite en frontend, Node.js + NestJS en backend, y PostgreSQL con TypeORM y el driver `pg` para persistencia. El frontend usa Axios para consultar los endpoints de salud.
-
-| Componente | Tecnología | Responsable |
-| --- | --- | --- |
-| Frontend | React + Vite | Célula Backend / Frontend |
-| Backend | Node.js + NestJS | Célula Backend / Frontend |
-| Base de datos | PostgreSQL + TypeORM (`pg`) | Célula Base de Datos |
-| Infraestructura y despliegue | *Por definir* | Célula GitHub / CI-CD / VPS |
-
-## Ejecutar la prueba de conexión
-
-Requisitos: Docker Compose, Node.js 22 o superior y npm.
-
-### Ejecutar todo con Docker Compose
+Requisitos: Docker con Docker Compose v2. Para ejecutar los servicios directamente en el host, recomendamos Node.js 24 LTS (el backend requiere Node.js 22.22.3+, 24.15+ o 26+ según las dependencias fijadas) y npm. Evita Node.js 25, que no está dentro de los rangos declarados por los paquetes.
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up --build
+docker compose up --build -d
 ```
 
-Abre `http://localhost:5174`. La tarjeta **Estado del entorno** debe mostrar
-**API backend: Disponible** y **PostgreSQL: Disponible**. Los endpoints que
-comprueba son `http://localhost:3002/health` y `http://localhost:3002/health/db`.
+Abre <http://localhost:5174>. La sección **Estado del entorno** comprueba la API y PostgreSQL. También puedes verificar los endpoints desde PowerShell:
 
-### Ejecutar frontend y API en modo desarrollo
+```powershell
+Invoke-RestMethod http://localhost:3002/health
+Invoke-RestMethod http://localhost:3002/health/db
+```
 
-En la raíz, copia `.env.example` a `.env` y arranca PostgreSQL:
+Para detener los contenedores y conservar los datos locales:
+
+```powershell
+docker compose down
+```
+
+La contraseña de `.env.example` es únicamente para desarrollo local. Cámbiala en cualquier entorno compartido y nunca publiques `.env` ni secretos.
+
+## Qué funciona hoy
+
+| Área | Implementado en este repositorio | Pendiente |
+| --- | --- | --- |
+| Interfaz | Aplicación React/Vite; consulta y muestra el estado de la API y de la conexión a PostgreSQL. | Flujos completos de operador y ciudadanía. |
+| API | NestJS con `GET /health` y `GET /health/db`. | Módulos funcionales de rutas, vehículos, asignaciones y reportes. |
+| Persistencia | PostgreSQL 16 en Docker Compose; TypeORM comprueba la conexión. | Migraciones y modelo desplegado; no hay entidades de negocio cargadas aún. |
+| Entorno local | Docker Compose y ejecución independiente de frontend/API. | Configuración de producción y despliegue VPS verificable. |
+
+El diagrama muestra únicamente las conexiones que están implementadas ahora:
+
+```mermaid
+flowchart LR
+    U[Persona usuaria] -->|HTTP| FE[Frontend React + Vite]
+    FE -->|GET /health<br/>GET /health/db| API[API NestJS]
+    API -->|TypeORM / pg| DB[(PostgreSQL 16)]
+    subgraph Local[Docker Compose local]
+        FE
+        API
+        DB
+    end
+```
+
+## Ejecutar en modo desarrollo
+
+Desde la raíz del repositorio, prepara el entorno y arranca PostgreSQL:
 
 ```powershell
 Copy-Item .env.example .env
 docker compose up -d postgres
 ```
 
-En dos terminales, inicia API y frontend:
+En una terminal, inicia la API:
 
 ```powershell
-cd vintra-api
+Set-Location backend
 npm ci
 npm run start:dev
 ```
 
+En otra terminal, inicia Vite:
+
 ```powershell
-cd frontend
+Set-Location frontend
 npm ci
 npm run dev
 ```
 
-Abre `http://localhost:5173`. Para detener PostgreSQL ejecuta
-`docker compose down`; la base de datos conserva sus datos en el volumen.
+El frontend estará en <http://localhost:5173>; la API en <http://localhost:3002>. Los comandos de `npm` posteriores a `Set-Location` se ejecutan desde la carpeta indicada.
 
-## Equipo
+## Configuración
 
-| Célula | Responsabilidad |
-| --- | --- |
-| UI/UX | Diseño de la Landing Page |
-| Base de Datos | Diseño de la base de datos |
-| Backend / Frontend | Stack tecnológico, herramientas y configuración del entorno (PostgreSQL) |
-| Scrum | Historias de usuario |
-| GitHub / CI-CD / VPS | Repositorio, integración continua, despliegue y VPS |
+`.env.example` documenta las variables para ejecución local desde el host. Docker Compose define los valores de red propios de los contenedores, por lo que la API usa `postgres:5432` dentro de Compose y `localhost:5433` desde el host.
 
-## Estructura del repositorio
+| Variable | Uso | Valor de ejemplo local |
+| --- | --- | --- |
+| `POSTGRES_DB` | Nombre de la base de datos | `vintra` |
+| `POSTGRES_USER` | Usuario PostgreSQL | `vintra_user` |
+| `POSTGRES_PASSWORD` | Contraseña local de PostgreSQL | `vintra_password` |
+| `POSTGRES_PORT` | Puerto publicado del contenedor PostgreSQL | `5433` |
+| `DB_HOST`, `DB_PORT` | Conexión de la API ejecutada en el host | `localhost`, `5433` |
+| `PORT` | Puerto HTTP de la API en el host | `3002` |
+| `CORS_ORIGIN` | Origen permitido para la API en modo host | `http://localhost:5173` |
+| `VITE_API_URL` | URL de API que compila el frontend | `http://localhost:3002` |
 
-Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
+En Docker Compose, `DB_HOST`, `DB_PORT`, `PORT` y `CORS_ORIGIN` se configuran en el servicio `backend`; no cambies el host `postgres` por `localhost` dentro de la red de contenedores. `VITE_API_URL` se incorpora durante el build de la imagen frontend.
+
+En producción, `VITE_API_URL_PRODUCTION` (variable opcional de Actions) toma por defecto `https://vintra.qsuene.com/api`; en staging, `VITE_API_URL_STAGING` toma `http://vintra.qsuene.com:8080/api`. Los workflows verifican `/health` y `/health/db` antes de publicar. El backend debe permitir el origen del sitio mediante `CORS_ORIGIN`. Consulta [la guía de despliegue](docs/infraestructura/VPS.md).
+
+## Validaciones
+
+Los checks de GitHub Actions ejecutan las validaciones de backend y frontend en Pull Requests. También puedes correrlas localmente:
+
+```powershell
+# API (requiere PostgreSQL disponible para las pruebas e2e)
+Set-Location backend
+npm ci
+npm run lint
+npm test -- --runInBand
+npm run test:e2e -- --runInBand
+npm run build
+```
+
+```powershell
+# Interfaz
+Set-Location frontend
+npm ci
+npm run lint
+npm test
+npm run build
+```
+
+Para validar la configuración de contenedores sin arrancarlos: `docker compose config --quiet`.
+
+## Documentación
+
+- [Índice y estado de la documentación](docs/README.md)
+- [Arquitectura implementada y límites actuales](docs/ARCHITECTURE.md)
+- [Contratos propuestos para la API](docs/API_SPECIFICATION.md) — propuesta, no refleja endpoints de negocio ya implementados.
+- [Diseño de datos](docs/DATABASE_DESIGN.md) — referencia del equipo de Base de Datos; aún no hay migraciones ejecutables.
+- [Operación del VPS](docs/infraestructura/VPS.md) — validar antes de usar como runbook de producción.
+- [Contribuir y abrir Pull Requests](CONTRIBUTING.md)
+- [Propuesta académica del proyecto](VINTRA.pdf)
+
+## Estructura
 
 ```text
 .
-├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
-├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
-├── vintra-api/        # API REST con NestJS
-├── frontend/          # Dashboard y aplicación de cara a la ciudadanía
-├── database/          # Modelo de datos, migraciones y scripts
-├── infrastructure/    # Configuración de despliegue y VPS
+├── .github/       # Workflows y plantillas de Issues/Pull Requests
+├── backend/       # API NestJS y pruebas
+├── frontend/      # Interfaz React/Vite
+├── database/      # Destino para migraciones y scripts (pendientes)
+├── infrastructure/# Documentación de infraestructura
+├── docs/          # Arquitectura, contratos y documentación por área
+├── scripts/       # Comprobaciones reutilizables de despliegue
+├── docker-compose.yml
 └── README.md
 ```
 
-## Flujo de trabajo
-
-- **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
-- **Workflows de CI:** `ci.yml` valida whitespace, Markdown y enlaces, y ejecuta los workflows reutilizables de backend y frontend.
-- **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- **Despliegue:** VPS *(configuración pendiente)*
-Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.
-
-## Estado del proyecto
-
-VINTRA se encuentra en fase de definición. La propuesta general, el problema, los objetivos y la arquitectura resumida ya están establecidos. Falta que cada célula complete la información de su área:
-
-- [ ] **UI/UX** — Diseño de la landing page.
-- [ ] **Base de Datos** — Modelo y diseño de la base de datos.
-- [x] **Backend / Frontend** — Stack tecnológico y prueba base de conexión implementados; los módulos funcionales siguen pendientes.
-- [ ] **Scrum** — Historias de usuario.
-- [ ] **GitHub / CI-CD / VPS** — Plantillas de Issues/PR, workflows de CI/CD, estrategia de ramas ya definida, configuración y despliegue en el VPS.
-Este README se irá actualizando a medida que cada célula entregue su información.
-
-## Cómo contribuir
-
-*(Guía de flujo de trabajo para el equipo del proyecto. Aplica para todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
-
 ## Licencia
 
-*Apache 2.0 — Universidad del Valle, Sede Buenaventura.*
-
- <!-- markdownlint-disable MD033 -->
----
-
-<div align="center">
-**VINTRA** — Coordinación de rutas, información para la ciudadanía.
-
-</div>
-<!-- markdownlint-enable MD033 -->
+Este proyecto se distribuye bajo [Apache License 2.0](LICENSE).

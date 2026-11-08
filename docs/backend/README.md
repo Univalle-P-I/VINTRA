@@ -1,3 +1,5 @@
+> **Documento de propuesta y reglas candidatas.** Los únicos endpoints implementados ahora son `GET /health` y `GET /health/db`; consulta [la arquitectura ejecutable](../ARCHITECTURE.md) y [el contrato API](../API_SPECIFICATION.md) antes de integrar.
+
 # Backend — Documentación de la API y reglas de negocio de VINTRA
 
 **Estado:** `Borrador`
@@ -137,7 +139,7 @@ Respuesta propuesta:
 ```json
 {
   "status": "ok",
-  "service": "vintra-api"
+  "service": "vintra-backend"
 }
 ```
 
@@ -230,7 +232,7 @@ El registro de eventos deberá facilitar el diagnóstico de fallos y la trazabil
 ### Instalación local
 
 ```bash
-cd vintra-api
+cd backend
 npm install
 ```
 

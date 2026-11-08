@@ -8,7 +8,7 @@ function ConnectionStatus() {
   const [backend, setBackend] = useState(pendingStatus)
   const [database, setDatabase] = useState(pendingStatus)
   const [attempt, setAttempt] = useState(0)
-  const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '')
+  const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '')
 
   useEffect(() => {
     let active = true

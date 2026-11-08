@@ -1,46 +1,96 @@
 # Contribuir a VINTRA
 
-Esta guía describe el flujo vigente del repositorio. Las instrucciones de instalación y validación deben corresponder a las carpetas actuales del proyecto; si cambian los scripts o workflows, actualiza esta guía en el mismo PR.
+Guía de colaboración para código, documentación e infraestructura. Mantén las instrucciones alineadas con los scripts, workflows y rutas que existen en el repositorio.
 
-## Preparación
+## Contenido
 
-```powershell
+- [Antes de empezar](#antes-de-empezar)
+- [Ramas y flujo de trabajo](#ramas-y-flujo-de-trabajo)
+- [Commits y Pull Requests](#commits-y-pull-requests)
+- [Validación local](#validación-local)
+- [Checks de GitHub Actions](#checks-de-github-actions)
+
+## Antes de empezar
+
+Clona el repositorio e instala Docker Compose v2. Para desarrollo local usa Node.js 24 LTS y npm, como en el workflow del backend; no uses Node.js 25, que no está dentro de los rangos de versiones declarados por las dependencias.
+
+```bash
 git clone https://github.com/Univalle-P-I/VINTRA.git
 cd VINTRA
 ```
 
-Configura `user.name` y `user.email` una sola vez si Git aún no conoce tu identidad.
+Copia `.env.example` a `.env` para el desarrollo local. `.env` está ignorado por Git. No subas contraseñas, tokens ni credenciales reales.
 
-## Flujo de trabajo
+## Ramas y flujo de trabajo
 
-1. Actualiza `develop` y crea una rama de trabajo desde esa base.
-2. Incluye el identificador de la tarjeta Trello enlazada desde el Issue en el nombre de rama, por ejemplo `task/TRELLO-123-nombre-corto`. Si no existe una tarjeta aplicable, acuerda la referencia con Producto/Integración antes de crear la rama; no atribuyas a una tarjeta relacionada un alcance que no tiene.
-3. Mantén el cambio acotado al Issue y no incluyas archivos locales ajenos. Usa commits pequeños con prefijos `feat:`, `fix:`, `docs:`, `test:` o `chore:`.
-4. Abre un Pull Request hacia `develop`, enlaza el Issue (`Closes #56` cuando corresponda) y la tarjeta Trello, asigna una persona revisora y registra validaciones reales.
-5. Atiende los comentarios y checks. Marca el Issue como terminado solo después de integrar el PR y satisfacer sus criterios.
+Las ramas de trabajo parten de `develop` y se integran mediante Pull Request:
 
-```powershell
-git switch develop
-git pull origin develop
-git switch -c task/TRELLO-123-nombre-corto
+```mermaid
+flowchart LR
+    M[main] -->|versión integrada| D[develop]
+    D --> F[feature/TRELLO-ID-descripcion]
+    D --> X[fix/TRELLO-ID-descripcion]
+    D --> T[task/TRELLO-ID-descripcion]
+    F -->|Pull Request| D
+    X -->|Pull Request| D
+    T -->|Pull Request| D
 ```
 
-No uses `git add .` en un árbol con otros cambios locales. Selecciona explícitamente los archivos del PR.
+- `feature/`: funcionalidad nueva.
+- `fix/`: corrección.
+- `task/`: documentación, mantenimiento o configuración.
 
-## Validaciones locales
+Incluye el ID de Trello acordado por el equipo cuando exista. No inventes IDs ni asocies una tarea a una tarjeta que no corresponda.
 
-Desde `frontend/`, con Node/npm disponibles:
+```bash
+git switch develop
+git pull --ff-only origin develop
+git switch -c task/TRELLO-123-descripcion-corta
+```
 
-```powershell
+Mantén el cambio enfocado. Antes del commit, revisa el estado, el diff y los errores de whitespace:
+
+```bash
+git status
+git diff --check
+git diff
+```
+
+Agrega solo los archivos que pertenecen a la tarea; evita `git add .` si hay archivos locales ajenos.
+
+## Commits y Pull Requests
+
+Usa mensajes breves con prefijo convencional:
+
+| Prefijo | Uso |
+| --- | --- |
+| `feat:` | Funcionalidad nueva |
+| `fix:` | Corrección |
+| `docs:` | Documentación |
+| `test:` | Pruebas |
+| `refactor:` | Reorganización interna sin cambio funcional |
+| `chore:` | Mantenimiento o configuración |
+
+Abre el Pull Request hacia `develop` usando la [plantilla del repositorio](.github/PULL_REQUEST_TEMPLATE.md). Incluye objetivo, alcance, Issue/Trello relacionado, comandos realmente ejecutados y resultados. Adjunta capturas para cambios visuales y evidencia apropiada para backend o CI; para documentación, el diff revisado es suficiente. Asigna una persona revisora y atiende los comentarios en la misma rama.
+
+## Validación local
+
+### Frontend
+
+```bash
+cd frontend
 npm ci
 npm run lint
 npm test
 npm run build
 ```
 
-Desde `vintra-api/`, con Node.js y npm disponibles:
+### Backend
 
-```powershell
+Las pruebas end-to-end necesitan PostgreSQL disponible con los valores configurados en `.env`:
+
+```bash
+cd backend
 npm ci
 npm run lint
 npm test -- --runInBand
@@ -48,16 +98,23 @@ npm run test:e2e -- --runInBand
 npm run build
 ```
 
-El backend usa NestJS y estos scripts están definidos en `vintra-api/package.json`. El workflow reutilizable `backend.yml` aún contiene pasos TODO y no ejecuta estas comprobaciones; no reportes el job como evidencia de build o pruebas del backend. Ejecuta únicamente validaciones pertinentes al cambio y copia sus resultados en el PR. Para documentación/configuración, revisa también `git diff --check` y Markdown lint.
+### Integración Docker Compose
 
-## Pull Request y evidencia
+Desde la raíz del repositorio:
 
-- Describe objetivo, alcance, decisiones y archivos afectados.
-- Enlaza el Issue de origen y la tarjeta Trello correspondiente (si aplica).
-- Registra comandos y resultados; nunca afirmes que una comprobación pasó si no se ejecutó.
-- Adjunta captura para cambios visuales. Para backend, datos o CI, usa resultados/logs sanitizados; para documentación, el diff revisado es evidencia suficiente.
-- Solicita revisión a alguien distinto del autor. No fusiones con checks fallidos o criterios pendientes.
+```bash
+docker compose config --quiet
+docker compose up --build -d
+```
 
-## Automatizaciones disponibles
+Comprueba <http://localhost:5174> y los endpoints `http://localhost:3002/health` y `http://localhost:3002/health/db`. Al terminar, `docker compose down` detiene los servicios y conserva el volumen de PostgreSQL. No uses `docker compose down -v` si necesitas los datos.
 
-El workflow `ci.yml` verifica espacios en blanco, lint de Markdown, enlaces del README y llama a los workflows reutilizables de backend y frontend. Verifica el estado de cada job en el PR: que el workflow exista no demuestra por sí solo que el backend se haya compilado o probado.
+## Checks de GitHub Actions
+
+En Pull Requests hacia `develop`, el workflow `ci.yml` ejecuta:
+
+- Backend: lint, pruebas unitarias, pruebas end-to-end contra PostgreSQL y build (`backend.yml`).
+- Frontend: lint y build (`frontend.yml`).
+- Repositorio: `git diff --check`, markdownlint y revisión de enlaces del README.
+
+Los workflows `sonarqube.yml` y `deploy.yml` tienen eventos y requisitos propios; consulta sus definiciones antes de asumir que se ejecutan en cada Pull Request. Un workflow definido no prueba por sí solo que el job haya pasado: revisa los checks del PR y reporta solo resultados observados.

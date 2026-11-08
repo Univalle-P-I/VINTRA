@@ -1,5 +1,7 @@
 # Plan de trabajo backend de VINTRA
 
+> **Plan histórico sujeto a revisión:** sus referencias a PRs, issues, prioridades y criterios reflejan un corte anterior y no se han sincronizado con el estado actual del repositorio. No lo uses como backlog vigente; valida las tareas en GitHub/Trello con el equipo.
+
 ## Cómo leer este plan
 
 El plan separa lo confirmado de lo condicionado. Se asume que las PR #47, #49 y #50 se corregirán y fusionarán, como indicó el equipo; a la fecha de esta revisión siguen abiertas. #47 aporta el esqueleto NestJS/PostgreSQL/TypeORM/health/Compose/Sonar propuesto; #49 debe alinear su documentación, porque menciona `pg` y hoy no refleja todo lo implementado en la rama; #50 aporta modelado del MVP y deja pendiente validar reglas como el segundo viaje y el máximo por jornada. Ninguno de esos cambios se cuenta todavía como parte real de `develop`.

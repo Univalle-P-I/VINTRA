@@ -17,12 +17,12 @@
 
 ```
 
-## Imágenes de prueba
-<!-- Obligatorio: captura de pantalla o resultado de una prueba -->
+## Evidencia
+<!-- Para interfaz: captura. Para backend o CI: resultado/log sanitizado. Para documentación: enlaces revisados o diff. -->
 
 ## Checklist
 
-- [ ] El backend corre sin errores localmente
-- [ ] Las pruebas pasan
-- [ ] No rompe funcionalidad existente
-- [ ] Está listo para revisión
+- [ ] Registré los comandos de validación que ejecuté y sus resultados
+- [ ] Revisé los enlaces y las referencias a archivos afectados
+- [ ] Actualicé la documentación relacionada con este cambio
+- [ ] Solicité revisión a otra persona

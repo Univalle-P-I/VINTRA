@@ -2,7 +2,7 @@
 
 ## Estado y convenciones
 
-Contrato propuesto para discutir con frontend y backend. El issue #66 pide cerrar rutas, JSON, errores, validaciones, permisos y OpenAPI. No se debe presentar como API ya implementada. Las PR #47/#49/#50 aún están abiertas; #47 propone NestJS y health checks; deben alinearse sus nombres/rutas con el contrato aprobado.
+Este documento propone contratos de negocio para discutir con frontend y backend; no se debe presentar como API completa implementada. El estado ejecutable se describe en [la arquitectura actual](ARCHITECTURE.md). Hoy solo existen `GET /health` y `GET /health/db`; los recursos descritos más adelante son candidatos y deben aprobarse antes de implementarse.
 
 - Prefijo sugerido: `/api/v1`; publicar OpenAPI desde la aplicación y versionar cambios incompatibles.
 - JSON UTF-8. Fechas en ISO 8601 con zona/offset explícito; la zona operativa debe aprobarse. IDs opacos y estables, sin exponer detalles de base.
@@ -29,22 +29,25 @@ Contrato propuesto para discutir con frontend y backend. El issue #66 pide cerra
 
 ### `GET /health`
 
-Comprueba que el proceso responde. No requiere autenticación si el entorno necesita health checks del orquestador; la política de exposición debe confirmarse. No consulta ni revela datos de la DB.
+Implementado. Comprueba que el proceso responde; no consulta PostgreSQL.
 
 Respuesta `200`:
 
 ```json
-{"status":"ok"}
+{"status":"ok","service":"vintra-backend"}
 ```
 
 ### `GET /health/db`
 
-Comprueba disponibilidad de la conexión PostgreSQL para readiness. No muestra host, nombre de base, usuario ni error técnico.
+Implementado. Ejecuta `SELECT NOW()` para comprobar disponibilidad de PostgreSQL. No muestra host, nombre de base, usuario ni detalle técnico del error.
 
-Respuesta `200`: `{"status":"ok","dependencies":{"database":"ok"}}`.
-Respuesta `503`: `{"status":"error","dependencies":{"database":"unavailable"},"requestId":"..."}`.
+Respuesta `200`:
 
-La PR #47 propone ambos chequeos. Confirmar la ruta exacta con #66 y mantener el chequeo de DB separado del liveness.
+```json
+{"status":"ok","database":"connected","time":"2026-11-08T12:00:00.000Z"}
+```
+
+Si PostgreSQL no responde, el endpoint devuelve HTTP `500` y `{"status":"error","database":"disconnected"}`. La API mantiene el chequeo de proceso separado del chequeo de base de datos.
 
 ## Autenticación
 

@@ -1,28 +1,25 @@
 # Análisis de calidad con SonarQube Cloud
 
-El repositorio usa SonarQube Cloud para analizar el backend ASP.NET Core con
-SonarScanner for .NET. El workflow `.github/workflows/sonarqube.yml` se ejecuta
-en pull requests hacia `develop` o `main` y en pushes a esas ramas.
+El workflow [`.github/workflows/sonarqube.yml`](../.github/workflows/sonarqube.yml) analiza el backend NestJS ubicado en `backend/`. Se ejecuta en Pull Requests hacia `develop` o `main` y en pushes a esas ramas.
 
-## Configuración en GitHub
+## Configuración requerida en GitHub
 
-En la organización o en el repositorio, abre **Settings → Secrets and
-variables → Actions** y configura:
+En **Settings → Secrets and variables → Actions** configura:
 
-| Nombre | Tipo | Valor |
+| Nombre | Tipo | Uso |
 | --- | --- | --- |
-| `SONAR_PROJECT_KEY` | Variable | `Univalle-P-I_VINTRA` |
-| `SONAR_TOKEN` | Secreto | Un token cuya cuenta emisora tenga permiso para analizar el proyecto en SonarQube Cloud |
+| `SONAR_TOKEN` | Secret | Token de una cuenta con permiso para analizar el proyecto. |
+| `SONAR_PROJECT_KEY` | Variable | Clave del proyecto VINTRA en SonarQube Cloud. |
 
-Si las variables son de organización, confirma que el repositorio VINTRA esté
-incluido en el acceso. El workflow usa la clave de organización confirmada
-`univalle-p-i`. SonarScanner for .NET conecta con SonarQube Cloud directamente,
-por lo que no requiere `SONAR_HOST_URL`.
+La organización se configura en el workflow como `univalle-p-i`. No compartas el token ni lo incluyas en `.env`, workflows o logs.
 
-El token no otorga permisos por sí mismo: SonarQube Cloud evalúa los permisos de
-la cuenta que lo generó. Para analizar VINTRA, esa cuenta debe tener
-**Execute Analysis** en el proyecto.
+## Pasos del análisis
 
-Al subir un cambio a `develop` o `main`, o abrir un pull request hacia esas
-ramas, revisa el job **SonarQube / Analyze backend** en la pestaña **Actions**.
-El análisis actual cubre el backend .NET; el frontend React aún no está incluido.
+El job usa Node.js 24 y ejecuta desde `backend/`:
+
+1. `npm ci`
+2. `npm run build`
+3. `npm run test:cov -- --runInBand`
+4. SonarQube Scan sobre `src/`, con cobertura desde `coverage/lcov.info`.
+
+El frontend todavía no forma parte de este análisis. Revisa el job **Analyze NestJS backend** y el Quality Gate del Pull Request; la existencia del workflow no implica que el análisis haya pasado.

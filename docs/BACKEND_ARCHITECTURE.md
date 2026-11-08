@@ -1,5 +1,7 @@
 # Arquitectura backend de VINTRA
 
+> **Propuesta histórica:** este diseño conserva estados de PRs y tareas de una revisión anterior a la integración actual de NestJS. No describe el código vigente. Consulta [la arquitectura implementada](ARCHITECTURE.md) para endpoints, conexión y despliegue actuales.
+
 ## Estado y alcance
 
 Este documento propone cómo organizar el backend para el MVP de coordinación de rutas de recolección. Se basa en `develop`, documentación del repositorio, las HUs 1–12, issues #53–#93 y tarjetas visibles del tablero. Las PR #47, #49 y #50 siguen abiertas al momento de este diseño: se consideran como cambios esperados una vez corregidas y fusionadas, no como código ya integrado.

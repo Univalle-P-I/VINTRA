@@ -15,4 +15,6 @@ Guía para documentar el entorno que integra, prueba y despliega VINTRA.
 
 - Estado: `Borrador`
 - Responsable: Célula GitHub / CI-CD / VPS
-- Pendiente: documentar workflows y configuración del VPS.
+- Los workflows `deploy.yml` y `main-deploy.yml` publican solo el frontend en los directorios `html-dev` y `html-main`.
+- Los despliegues admiten `VITE_API_URL_STAGING` y `VITE_API_URL_PRODUCTION` como variables opcionales de Actions, además de los secrets SSH descritos en [VPS.md](VPS.md).
+- El backend y PostgreSQL no se despliegan mediante esos workflows; la configuración real del servidor debe verificarse antes de operar producción.
