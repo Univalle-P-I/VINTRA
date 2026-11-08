@@ -64,6 +64,9 @@ jobs:
         with:
           file-path: './README.md'
           config-file: 'mlc_config.json'
+          # Ignore local examples and VPS uptime here; they are outside Markdown link integrity.
+          check-modified-files-only: 'yes'
+          base-branch: 'develop'
 
   backend:
     name: Backend CI (Modular)

@@ -2,5 +2,13 @@
 {
   "retryOn429": true,
   "retryCount": 3,
-  "fallbackRetryDelay": "30s"
+  "fallbackRetryDelay": "30s",
+  "ignorePatterns": [
+    {
+      "pattern": "^https?://localhost(?::[0-9]+)?(?:/.*)?$"
+    },
+    {
+      "pattern": "^https://vintra\\.qsuene\\.com/?$"
+    }
+  ]
 }
