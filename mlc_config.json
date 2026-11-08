@@ -1,9 +1,11 @@
-
 {
   "retryOn429": true,
   "retryCount": 3,
   "fallbackRetryDelay": "30s",
   "ignorePatterns": [
+    {
+      "pattern": "^https://img\\.shields\\.io/"
+    },
     {
       "pattern": "^https?://localhost(?::[0-9]+)?(?:/.*)?$"
     },
