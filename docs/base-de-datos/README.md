@@ -26,7 +26,7 @@ El motor de la Base de Datos usada es: ![PostgreSQL Badge](https://img.shields.i
 
 ## 2. Diagrama Entidad-Relación
 
-Documentación del diagrama entidad-relación: [Diagrama ER](/docs/base-de-datos/diagrama-entidad-relacion/README.md). A continuación, se presenta el diagrama entidad-relación de base de datos.
+Documentación del diagrama entidad-relación: [Diagrama ER](diagrama-entidad-relacion/README.md). A continuación, se presenta el diagrama entidad-relación de base de datos.
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -428,7 +428,7 @@ Los seeders insertan datos mínimos de ejemplo para `user_account`, `user_data`,
 
 ### 5.4. Orden de ejecución
 
-El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](/database/schemas/README.md). La secuencia general es:
+El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](../../database/schemas/README.md). La secuencia general es:
 
 1. Ejecutar `000_create_extensions.sql`.
 2. Ejecutar las migrations `001` a `029` en orden ascendente.
