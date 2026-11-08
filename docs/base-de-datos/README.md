@@ -16,7 +16,7 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 - Estado: `Completada`
 - Responsable: Ricardo Farid Cuero
-- Ultima fecha de modificación: **5/11/2026**
+- Ultima fecha de modificación: **7/11/2026**
 
 ---
 
