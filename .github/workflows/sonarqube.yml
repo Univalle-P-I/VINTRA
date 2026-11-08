@@ -1,0 +1,70 @@
+
+name: SonarQube
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  analyze:
+    name: Analyze NestJS backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vintra-api/package-lock.json
+
+      - name: Install dependencies
+        working-directory: vintra-api
+        run: npm ci
+
+      - name: Build backend
+        working-directory: vintra-api
+        run: npm run build
+
+      - name: Run tests with coverage
+        working-directory: vintra-api
+        run: npm run test:cov -- --runInBand
+
+      - name: Validate SonarQube configuration
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+        run: |
+          test -n "$SONAR_TOKEN" || { echo "::error::Missing GitHub secret SONAR_TOKEN"; exit 1; }
+          test -n "$SONAR_PROJECT_KEY" || { echo "::error::Missing GitHub variable SONAR_PROJECT_KEY"; exit 1; }
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: vintra-api
+          args: >
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=univalle-p-i
+            -Dsonar.sources=src
+            -Dsonar.tests=src
+            -Dsonar.exclusions=src/**/*.spec.ts
+            -Dsonar.test.inclusions=src/**/*.spec.ts
+            -Dsonar.coverage.exclusions=src/**/*.spec.ts
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
