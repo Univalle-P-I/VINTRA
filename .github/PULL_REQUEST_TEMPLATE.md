@@ -1,7 +1,13 @@
 ## Descripción breve
 <!-- Contexto o motivo del cambio -->
 
-## Tarjeta de Trello
+## Issue de GitHub
+
+- **Issue relacionado:** #<número>
+- **Enlace al Issue:** <URL del Issue>
+- **Cierre automático (si aplica):** `Closes #<número>`
+
+## Tarjeta de Trello (si aplica)
 
 - **Enlace:** [Buenaventura Limpia UV](https://trello.com/b/KuIPJAME/buenaventuralimpiauv)
 
@@ -22,7 +28,10 @@
 
 ## Checklist
 
-- [ ] Registré los comandos de validación que ejecuté y sus resultados
-- [ ] Revisé los enlaces y las referencias a archivos afectados
-- [ ] Actualicé la documentación relacionada con este cambio
-- [ ] Solicité revisión a otra persona
+- [ ] Vinculé el Issue de GitHub correspondiente al tablero o indiqué que no aplica
+- [ ] El cambio respeta la arquitectura documentada; si la modifica, actualicé la documentación de arquitectura
+- [ ] Verifiqué las conexiones entre los componentes afectados (frontend, API y/o PostgreSQL) y su configuración
+- [ ] Ejecuté las validaciones pertinentes y anoté sus comandos y resultados en «Cómo se validó»
+- [ ] Revisé los cambios de configuración y confirmé que no incluyen secretos ni credenciales
+- [ ] Actualicé la documentación relacionada cuando fue necesario
+- [ ] Revisé la evidencia y solicité revisión a otra persona

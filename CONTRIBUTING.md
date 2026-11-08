@@ -71,7 +71,7 @@ Usa mensajes breves con prefijo convencional:
 | `refactor:` | Reorganización interna sin cambio funcional |
 | `chore:` | Mantenimiento o configuración |
 
-Abre el Pull Request hacia `develop` usando la [plantilla del repositorio](.github/PULL_REQUEST_TEMPLATE.md). Incluye objetivo, alcance, Issue/Trello relacionado, comandos realmente ejecutados y resultados. Adjunta capturas para cambios visuales y evidencia apropiada para backend o CI; para documentación, el diff revisado es suficiente. Asigna una persona revisora y atiende los comentarios en la misma rama.
+Abre el Pull Request hacia `develop` usando la [plantilla del repositorio](.github/PULL_REQUEST_TEMPLATE.md). Incluye el enlace al Issue de GitHub relacionado (y `Closes #<número>` cuando corresponda), la tarjeta de Trello si aplica, el objetivo, el alcance y los comandos realmente ejecutados con sus resultados. Comprueba que el cambio respete la arquitectura documentada y que las conexiones entre los componentes afectados sigan funcionando; actualiza la documentación de arquitectura si cambia. Adjunta capturas para cambios visuales y evidencia apropiada para backend o CI; para documentación, el diff revisado es suficiente. Asigna una persona revisora y atiende los comentarios en la misma rama.
 
 ## Validación local
 
