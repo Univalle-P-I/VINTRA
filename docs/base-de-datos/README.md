@@ -349,10 +349,9 @@ erDiagram
     vehicle ||--o{ vehicle_log : "genera"
 ```
 
-## 3. Diccionario de Datos:
+## 3. Diccionario de Datos
 
 Documentación del diccionario de datos: [Diccionario de datos](/docs/base-de-datos/diccionario-de-datos/README.md).
-
 
 ## 4. Relaciones con el Modelo de Dominio
 
@@ -445,7 +444,6 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 ### 5.6. Triggers
 
 El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](/database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](/database/schemas/README.md).
-
 
 ## 6. Políticas, Restauración y Datos Sensibles
 
@@ -541,6 +539,7 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | Tablas `*_log` | Definir un periodo de retención de auditoría; no eliminar sin aprobación |
 
 ## 7. Configuración Local
+
 Requisitos: Docker y Docker Compose. No se publican secretos: cada persona crea su propio `.env`.
 
 ### 7.1. Archivo `.env.example`
