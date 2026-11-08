@@ -351,7 +351,7 @@ erDiagram
 
 ## 3. Diccionario de Datos
 
-Documentación del diccionario de datos: [Diccionario de datos](/docs/base-de-datos/diccionario-de-datos/README.md).
+Documentación del diccionario de datos: [Diccionario de datos](diccionario-de-datos/README.md).
 
 ## 4. Relaciones con el Modelo de Dominio
 
@@ -401,7 +401,7 @@ Traducción de los conceptos del negocio a tablas de la base de datos. El modelo
 
 ## 5. Migraciones, Datos Iniciales y Orden de Ejecución
 
-Las [migraciones](/database/migrations/) crean las tablas de la base de datos y los [datos iniciales](/database/seeders/) insertan datos de ejemplo. Las migraciones están separadas por tabla y usan una numeración secuencial que determina el orden de ejecución. La carpeta de [funcionnes/triggers](/database/triggers/) almacena los disparadores para las tablas de auditoría: tablas [`*.log`](#56-triggers).
+Las [migraciones](../../database/migrations/) crean las tablas de la base de datos y los [datos iniciales](../../database/seeders/) insertan datos de ejemplo. Las migraciones están separadas por tabla y usan una numeración secuencial que determina el orden de ejecución. La carpeta de [funcionnes/triggers](../../database/triggers/) almacena los disparadores para las tablas de auditoría: tablas [`*.log`](#56-triggers).
 
 ### 5.1. Estructura de archivos
 
@@ -443,7 +443,7 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 
 ### 5.6. Triggers
 
-El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](/database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](/database/schemas/README.md).
+El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](../../database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](../../database/schemas/README.md).
 
 ## 6. Políticas, Restauración y Datos Sensibles
 
