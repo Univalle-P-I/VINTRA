@@ -402,14 +402,14 @@ Traducción de los conceptos del negocio a tablas de la base de datos. El modelo
 
 ## 5. Migraciones, Datos Iniciales y Orden de Ejecución
 
-Las [migraciones](/docs/base-de-datos/migraciones/migrations/) crean las tablas de la base de datos y los [datos iniciales](/docs/base-de-datos/migraciones/seeders/) insertan datos de ejemplo. Las migraciones están separadas por tabla y usan una numeración secuencial que determina el orden de ejecución.
+Las [migraciones](/database/migrations/) crean las tablas de la base de datos y los [datos iniciales](/database/seeders/) insertan datos de ejemplo. Las migraciones están separadas por tabla y usan una numeración secuencial que determina el orden de ejecución. La carpeta de [funcionnes/triggers](/database/triggers/) almacena los disparadores para las tablas de auditoría: tablas [`*.log`](#56-triggers).
 
 ### 5.1. Estructura de archivos
 
 | Tipo | Ubicación | Convención | Ejemplo |
 | --- | --- | --- | --- |
-| Migración | `docs/base-de-datos/migraciones/migrations/` | `NNN_create_<tabla>.sql` | `001_create_user_account.sql` |
-| Inserción | `docs/base-de-datos/migraciones/seeders/` | `NNN_insert_<tabla>.sql` | `001_insert_user_account.sql` |
+| Migración | `database/migrations/` | `NNN_create_<tabla>.sql` | `001_create_user_account.sql` |
+| Inserción | `database/seeders/` | `NNN_insert_<tabla>.sql` | `001_insert_user_account.sql` |
 
 - `NNN` es un número de tres dígitos que indica el orden de ejecución.
 - `create` identifica un archivo que crea una tabla.
@@ -425,15 +425,15 @@ AVISO: El orden de las migraciones no es alfabético ni arbitrario: respeta las 
 
 ### 5.3. Datos iniciales
 
-Los seeders insertan datos mínimos de ejemplo para `user_account`, `user_data`, `profile`, `vehicle_type`, `crew`, `crew_member` y `driver`. Usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
+Los seeders insertan datos mínimos de ejemplo para `user_account`, `user_data`, `vehicle_type` entre otras tablas. Usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
 
 ### 5.4. Orden de ejecución
 
-El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](/docs/base-de-datos/migraciones/schemas/README.md). La secuencia general es:
+El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](/database/schemas/README.md). La secuencia general es:
 
 1. Ejecutar `000_create_extensions.sql`.
-2. Ejecutar las migraciones `001` a `029` en orden ascendente.
-3. Ejecutar los seeders `001`, `002`, `003`, `007`, `015`, `016` y `017` en orden ascendente.
+2. Ejecutar las migrations `001` a `029` en orden ascendente.
+3. Ejecutar las seeders `001` a `029` (hasta donde lleguen las inserciones) en orden ascendente.
 
 ### 5.5. Índices mínimos
 
@@ -444,21 +444,8 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 
 ### 5.6. Triggers
 
-`updated_at` se actualiza automáticamente en cada `UPDATE` de las tablas que lo tienen, con una función común:
+El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](/database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](/database/schemas/README.md).
 
-```sql
-CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Un trigger por tabla (ejemplo)
-CREATE TRIGGER trg_vehicle_updated_at
-  BEFORE UPDATE ON vehicle
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-```
 
 ## 6. Políticas, Restauración y Datos Sensibles
 
@@ -475,7 +462,7 @@ Esta sección define cómo se respalda y restaura la base de datos y cómo se tr
 Reglas:
 
 - Los respaldos se almacenan cifrados y fuera del servidor de la base de datos.
-- Los respaldos contienen datos personales (sección 6.3), por lo que tienen el mismo nivel de protección que la base de producción.
+- Los respaldos contienen datos personales [sección 6.3](#63-datos-sensibles), por lo que tienen el mismo nivel de protección que la base de producción.
 - Cada respaldo se verifica al terminar con `pg_restore --list`.
 - Los respaldos vencidos se eliminan de forma segura.
 
@@ -537,7 +524,7 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | --- | --- |
 | Contraseña | Solo se almacena el hash Argon2id (incluye sal y parámetros) |
 | Tokens (sesión, restablecimiento, validación de correo) | Solo se almacena el hash SHA-256; el token en claro nunca se guarda |
-| `*_log.old_values` | Nunca contiene contraseñas ni hashes; la aplicación los filtra antes de insertar |
+| `*_log.old` | Nunca contiene contraseñas ni hashes; la aplicación los filtra antes de insertar |
 | `document_id` | Se muestra enmascarado y no se escribe en logs |
 | Datos personales | No se usan datos reales en desarrollo ni pruebas; los seeders contienen datos ficticios |
 | Posiciones GPS | Solo de asignaciones en curso (regla de la aplicación) |
