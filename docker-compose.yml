@@ -29,7 +29,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5174}
     ports:
-      - "${BACKEND_PORT:-3003}:3002"
+      - "${IP}:${BACKEND_PORT:-3003}:3002"
     depends_on:
       postgres:
         condition: service_healthy
@@ -38,11 +38,13 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:3003}
+        VITE_BASE_PATH: ${VITE_BASE_PATH:-/}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3002}
     ports:
-      - "${FRONTEND_PORT:-5174}:80"
+      - "${IP}:${FRONTEND_PORT:-5174}:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:
