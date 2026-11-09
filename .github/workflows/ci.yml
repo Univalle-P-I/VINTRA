@@ -8,7 +8,9 @@ on:
     branches:
       - develop
       - main
-      - task/ci-minimo
+      - 'feat/**'
+      - 'fix/**'
+      - 'docs/**'
 
 permissions:
   contents: read
@@ -63,6 +65,7 @@ jobs:
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           file-path: './README.md'
+          config-file: 'mlc_config.json'
 
   backend:
     name: Backend CI (Modular)

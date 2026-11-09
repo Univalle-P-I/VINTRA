@@ -1,6 +1,9 @@
+# Variables de entorno
 .env
 .env.*
 !.env.example
+
+# Dependencias y archivos generados por Node.js
 node_modules/
 dist/
 .vite/
@@ -24,3 +27,5 @@ TestResults/
 .vscode/
 .DS_Store
 Thumbs.db
+# Archivos de compilación de TypeScript
+*.tsbuildinfo

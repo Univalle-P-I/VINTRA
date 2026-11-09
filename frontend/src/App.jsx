@@ -1,28 +1,39 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
+
+import { useState } from 'react'
+import LandingPage from './LandingPage'
+import LoginPage from './LoginPage'
+import ConnectionStatus from './ConnectionStatus'
 import './App.css'
 
 function App() {
-  const [mensaje, setMensaje] = useState('Conectando con VINTRA Backend...')
+  const [screen, setScreen] = useState('landing')
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/health')
-      .then((response) => {
-        setMensaje(
-          `Backend conectado: ${response.data.service} - ${response.data.status}`
-        )
-      })
-      .catch(() => {
-        setMensaje('No se pudo conectar con el backend')
-      })
-  }, [])
+  const goToHome = () => {
+    setScreen('landing')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const goToLogin = () => {
+    setScreen('login')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleLogin = () => {
+    window.alert(
+      'El inicio de sesión se conectará cuando se integre la autenticación del backend.'
+    )
+  }
 
   return (
-    <div>
-      <h1>VINTRA</h1>
-      <p>{mensaje}</p>
-    </div>
+    <>
+      {screen === 'landing' ? (
+        <LandingPage onLogin={goToLogin} />
+      ) : (
+        <LoginPage onHome={goToHome} onLogin={handleLogin} />
+      )}
+
+      <ConnectionStatus />
+    </>
   )
 }
 
