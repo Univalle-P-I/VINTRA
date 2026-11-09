@@ -20,15 +20,16 @@ jobs:
           script: |
             set -e
 
-            TARGET_DIR="/var/www/vintra.qsuene.com/html-dev"
+            TARGET_DIR="/var/www/vintra.qsuene.com/html-dev/VINTRA"
 
+            mkdir -p "$TARGET_DIR"
             git config --global --add safe.directory "$TARGET_DIR" || true
 
-
             if [ ! -d "$TARGET_DIR/.git" ]; then
-              echo "Directorio no es un repositorio Git. Recreando y clonando..."
-              rm -rf "$TARGET_DIR"
-              git clone -b develop https://github.com/${{ github.repository }}.git "$TARGET_DIR"
+              echo "Inicializando repositorio Git en $TARGET_DIR"
+              cd "$TARGET_DIR"
+              git init
+              git remote add origin https://github.com/${{ github.repository }}.git
             fi
 
             cd "$TARGET_DIR"
