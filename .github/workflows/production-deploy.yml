@@ -29,7 +29,7 @@ jobs:
               echo "Inicializando el repositorio git en $TARGET_DIR"
               cd "$TARGET_DIR"
               git init
-              git remote add origin https://github.com${{ github.repository }}.git
+              git remote add origin https://github.com/${{ github.repository }}.git
             fi
 
             cd "$TARGET_DIR"
