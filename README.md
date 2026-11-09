@@ -16,7 +16,6 @@
 
   <p>
     <a href="docs/arquitectura/README.md">Arquitectura</a> ·
-    <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
     <a href="CONTRIBUTING.md">Cómo contribuir</a>
   </p>
 
