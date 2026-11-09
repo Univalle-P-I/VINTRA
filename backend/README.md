@@ -8,7 +8,7 @@ Desde la raíz del repositorio, copia `.env.example` a `.env` y arranca PostgreS
 
 ```powershell
 docker compose up -d postgres
-cd vintra-api
+cd backend
 npm ci
 npm run start:dev
 ```

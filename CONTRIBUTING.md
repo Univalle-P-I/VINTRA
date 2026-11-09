@@ -14,7 +14,7 @@ Configura `user.name` y `user.email` una sola vez si Git aún no conoce tu ident
 ## Flujo de trabajo
 
 1. Actualiza `develop` y crea una rama de trabajo desde esa base.
-2. Incluye el identificador de la tarjeta Trello enlazada desde el Issue en el nombre de rama, por ejemplo `task/TRELLO-123-nombre-corto`. Si no existe una tarjeta aplicable, acuerda la referencia con Producto/Integración antes de crear la rama; no atribuyas a una tarjeta relacionada un alcance que no tiene.
+2. Incluye el identificador de la tarjeta Trello enlazada desde el Issue en el nombre de rama, usando `feat/`, `fix/` o `docs/`, por ejemplo `feat/TRELLO-123-nombre-corto`. Si no existe una tarjeta aplicable, acuerda la referencia con Producto/Integración antes de crear la rama; no atribuyas a una tarjeta relacionada un alcance que no tiene.
 3. Mantén el cambio acotado al Issue y no incluyas archivos locales ajenos. Usa commits pequeños con prefijos `feat:`, `fix:`, `docs:`, `test:` o `chore:`.
 4. Abre un Pull Request hacia `develop`, enlaza el Issue (`Closes #56` cuando corresponda) y la tarjeta Trello, asigna una persona revisora y registra validaciones reales.
 5. Atiende los comentarios y checks. Marca el Issue como terminado solo después de integrar el PR y satisfacer sus criterios.
@@ -22,7 +22,7 @@ Configura `user.name` y `user.email` una sola vez si Git aún no conoce tu ident
 ```powershell
 git switch develop
 git pull origin develop
-git switch -c task/TRELLO-123-nombre-corto
+git switch -c feat/TRELLO-123-nombre-corto
 ```
 
 No uses `git add .` en un árbol con otros cambios locales. Selecciona explícitamente los archivos del PR.
@@ -38,7 +38,7 @@ npm test
 npm run build
 ```
 
-Desde `vintra-api/`, con Node.js y npm disponibles:
+Desde `backend/`, con Node.js y npm disponibles:
 
 ```powershell
 npm ci
@@ -48,7 +48,7 @@ npm run test:e2e -- --runInBand
 npm run build
 ```
 
-El backend usa NestJS y estos scripts están definidos en `vintra-api/package.json`. El workflow reutilizable `backend.yml` aún contiene pasos TODO y no ejecuta estas comprobaciones; no reportes el job como evidencia de build o pruebas del backend. Ejecuta únicamente validaciones pertinentes al cambio y copia sus resultados en el PR. Para documentación/configuración, revisa también `git diff --check` y Markdown lint.
+El backend usa NestJS y estos scripts están definidos en `backend/package.json`. El workflow reutilizable `backend.yml` ejecuta lint, pruebas unitarias con cobertura, pruebas e2e con PostgreSQL y compilación. Ejecuta únicamente validaciones pertinentes al cambio y copia sus resultados en el PR. Para documentación/configuración, revisa también `git diff --check` y Markdown lint.
 
 ## Pull Request y evidencia
 

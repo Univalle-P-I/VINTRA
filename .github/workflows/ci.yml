@@ -8,7 +8,9 @@ on:
     branches:
       - develop
       - main
-      - task/ci-minimo
+      - 'feat/**'
+      - 'fix/**'
+      - 'docs/**'
 
 permissions:
   contents: read
