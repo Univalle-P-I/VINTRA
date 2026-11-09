@@ -129,7 +129,7 @@ docker compose up -d postgres
 En dos terminales, inicia API y frontend:
 
 ```powershell
-cd vintra-api
+cd backend
 npm ci
 npm run start:dev
 ```
@@ -155,22 +155,33 @@ Abre `http://localhost:5173`. Para detener PostgreSQL ejecuta
 
 ## Estructura del repositorio
 
-Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
+Estructura actual del repositorio:
 
 ```text
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
-├── docs/              # Documentación técnica (arquitectura, contratos, historias de usuario)
-├── vintra-api/        # API REST con NestJS
-├── frontend/          # Dashboard y aplicación de cara a la ciudadanía
-├── database/          # Modelo de datos, migraciones y scripts
-├── infrastructure/    # Configuración de despliegue y VPS
+├── docs/                         # Documentación organizada por área
+│   ├── arquitectura/
+│   ├── backend/
+│   ├── base-de-datos/
+│   ├── frontend/
+│   ├── infraestructura/
+│   ├── modelado/
+│   ├── scrum/
+│   ├── ui-ux/
+│   └── README.md
+├── backend/                      # API REST con NestJS
+├── frontend/                     # Aplicación React + Vite
+├── database/                     # Espacio para migraciones y scripts de datos
+├── infrastructure/               # Documentación y apoyo de despliegue
+├── docker-compose.yml            # Ejecución conjunta de los servicios
+├── CONTRIBUTING.md
 └── README.md
 ```
 
 ## Flujo de trabajo
 
-- **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
+- **Estrategia de ramas:** `main` → `develop` → `feat/` · `fix/` · `docs/`
 - **Workflows de CI:** `ci.yml` valida whitespace, Markdown y enlaces, y ejecuta los workflows reutilizables de backend y frontend.
 - **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
