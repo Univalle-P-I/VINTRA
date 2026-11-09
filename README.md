@@ -2,21 +2,23 @@
 
 <div align="center">
 
-<h1> VINTRA </h1>
+  <img src="docs/assets/logo-vintra.png" alt="VINTRA" width="260">
 
-<p><strong>Sistema de coordinación y seguimiento de rutas de recolección de residuos sólidos.</strong></p>
+  <p><strong>Coordinación de rutas e información clara para la recolección de residuos.</strong></p>
+  <p>Proyecto piloto para Buenaventura, Colombia</p>
 
-<p>
-  <a href="#estado-del-proyecto"><img src="https://img.shields.io/badge/Estado-Desarrollo-yellow?style=for-the-badge" alt="Estado: desarrollo"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Universidad%20del%20Valle%20Buenaventura-blue?style=for-the-badge" alt="Universidad del Valle, Sede Buenaventura">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-Apache%202.0-green?style=for-the-badge" alt="Licencia Apache 2.0"></a>
-</p>
+  <p>
+    <img src="https://img.shields.io/badge/Estado-En%20desarrollo-2f7d3b?style=for-the-badge" alt="Estado: en desarrollo">
+    <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-149eca?style=for-the-badge&amp;logo=react&amp;logoColor=white" alt="Frontend: React y Vite">
+    <img src="https://img.shields.io/badge/Backend-NestJS-E0234E?style=for-the-badge&amp;logo=nestjs&amp;logoColor=white" alt="Backend: NestJS">
+    <img src="https://img.shields.io/badge/Base%20de%20datos-PostgreSQL-4169e1?style=for-the-badge&amp;logo=postgresql&amp;logoColor=white" alt="Base de datos: PostgreSQL">
+  </p>
 
-<p>
-  <a href="docs/arquitectura/README.md">Arquitectura</a> ·
-  <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
-  <a href="CONTRIBUTING.md">Contribuir</a>
-</p>
+  <p>
+    <a href="docs/arquitectura/README.md">Arquitectura</a> ·
+    <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
+    <a href="CONTRIBUTING.md">Cómo contribuir</a>
+  </p>
 
 </div>
 
