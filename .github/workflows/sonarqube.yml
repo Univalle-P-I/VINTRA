@@ -31,18 +31,18 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: vintra-api/package-lock.json
+          cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
-        working-directory: vintra-api
+        working-directory: backend
         run: npm ci
 
       - name: Build backend
-        working-directory: vintra-api
+        working-directory: backend
         run: npm run build
 
       - name: Run tests with coverage
-        working-directory: vintra-api
+        working-directory: backend
         run: npm run test:cov -- --runInBand
 
       - name: Validate SonarQube configuration
@@ -58,7 +58,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          projectBaseDir: vintra-api
+          projectBaseDir: backend
           args: >
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
             -Dsonar.organization=univalle-p-i
