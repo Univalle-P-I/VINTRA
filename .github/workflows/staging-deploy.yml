@@ -22,7 +22,12 @@ jobs:
 
             TARGET_DIR="/var/www/vintra.qsuene.com/html-dev"
 
-            if [ ! -d "$TARGET_DIR" ]; then
+            git config --global --add safe.directory "$TARGET_DIR" || true
+
+
+            if [ ! -d "$TARGET_DIR/.git" ]; then
+              echo "Directorio no es un repositorio Git. Recreando y clonando..."
+              rm -rf "$TARGET_DIR"
               git clone -b develop https://github.com/${{ github.repository }}.git "$TARGET_DIR"
             fi
 
