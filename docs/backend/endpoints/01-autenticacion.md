@@ -2,7 +2,7 @@
 
 Este documento describe los endpoints propuestos para gestionar la autenticación de usuarios en VINTRA, incluyendo el inicio y cierre de sesión, la consulta del usuario autenticado y la recuperación de contraseñas.
 
-> **Estado de la documentación:** propuesta de diseño para revisión. Las rutas y estructuras descritas no implican que los endpoints estén implementados en el backend.
+> **Pendiente de aprobación:** el mecanismo de autenticación y el contrato HTTP aún no están definidos (#54, #66 y #71). JWT/Bearer, los cuerpos y respuestas mostrados son propuestas; no deben considerarse decisiones implementadas.
 
 ## Contenido
 
@@ -30,7 +30,7 @@ Permite que un usuario acceda a VINTRA mediante su correo electrónico y contras
 
 El backend recibe las credenciales, identifica la cuenta asociada al correo electrónico, verifica la contraseña y comprueba que la cuenta tenga permitido iniciar sesión.
 
-Si las credenciales son correctas y la cuenta está habilitada, el sistema genera un token de acceso JWT, registra la sesión correspondiente y devuelve la información necesaria para que el usuario pueda acceder a los recursos autorizados según su rol.
+Si las credenciales son correctas y la cuenta está habilitada, la propuesta genera una credencial de acceso, registra la sesión correspondiente y devuelve la información necesaria para que el usuario pueda acceder a los recursos autorizados. El mecanismo y el formato de esa credencial están pendientes de aprobación.
 
 ### 1.2. Encabezados HTTP
 
@@ -65,17 +65,13 @@ Accept: application/json
     "email": "usuario@vintra.com",
     "firstName": "Juan",
     "lastName": "Pérez",
-    "role": {
-      "code": "ADMIN",
-      "name": "Administrador"
-    },
-    "status": {
-      "code": "ACTIVE",
-      "name": "Activo"
-    }
+    "role": "operations_manager",
+    "status": "active"
   }
 }
 ```
+
+La estructura de la respuesta, el tipo de token y su vigencia son ilustrativos y están pendientes de aprobación. Los valores ENUM del SQL también están marcados como marcadores de posición.
 
 **Consideraciones:**
 
@@ -94,8 +90,8 @@ Accept: application/json
 | 400 Bad Request | Faltan campos obligatorios o el formato del correo no es válido. |
 | 401 Unauthorized | El correo electrónico o la contraseña son incorrectos. |
 | 403 Forbidden | La cuenta existe, pero su estado no permite iniciar sesión. |
-| 423 Locked | La cuenta tiene un bloqueo temporal vigente, si se adopta esta respuesta. |
-| 429 Too Many Requests | Se superó el límite de solicitudes permitido. |
+| 423 Locked | Pendiente de acordar el código para una cuenta bloqueada. |
+| 429 Too Many Requests | Pendiente de definir si se aplicará limitación y con qué política. |
 | 500 Internal Server Error | Ocurrió un error inesperado durante el proceso de autenticación. |
 
 ### 1.6. Validaciones
@@ -108,11 +104,11 @@ El backend debe realizar las siguientes validaciones durante el inicio de sesió
 4. Buscar el correo en la tabla `user_data`.
 5. Identificar la cuenta correspondiente en `user_account` mediante la relación entre sus identificadores UUID.
 6. Verificar si la cuenta tiene un bloqueo temporal vigente mediante el campo `locked_until`.
-7. Consultar el estado de la cuenta mediante `status_id` y la tabla `user_status`.
+7. Consultar el estado de la cuenta mediante `user_account.user_status`, que es un ENUM en el SQL.
 8. Comparar la contraseña recibida con el hash almacenado en `user_account.pwd_hash`, utilizando el algoritmo de verificación correspondiente.
 9. Si las credenciales son incorrectas, incrementar `failed_attempts` y evaluar la política de bloqueo.
 10. Si las credenciales son correctas, reiniciar el contador de intentos fallidos.
-11. Obtener el perfil y el rol asociado a la cuenta.
+11. Obtener el perfil activo y su valor `profile.user_role`, que es un ENUM en el SQL.
 12. Actualizar el campo `last_login_at` con la fecha y hora del inicio de sesión.
 13. Generar un JWT con la información necesaria para identificar al usuario y su sesión.
 14. Registrar la sesión correspondiente en la tabla `session`.
@@ -122,7 +118,7 @@ El backend debe realizar las siguientes validaciones durante el inicio de sesió
 
 - **RN-01. Acceso según el rol:** el usuario únicamente podrá acceder a las funcionalidades autorizadas para su rol.
 - **RN-02. Integridad de datos:** la sesión debe quedar asociada a una cuenta existente.
-- **RN-03. Autenticación mediante credenciales:** el acceso debe realizarse mediante correo electrónico y contraseña.
+- **RN-03. Autenticación:** el método de autenticación y el origen de identidad están pendientes de aprobación (#54, #71); el correo y la contraseña de este ejemplo son una propuesta.
 - **RN-04. Protección de contraseñas:** las contraseñas deben almacenarse y verificarse mediante mecanismos de hash seguros. Nunca deben compararse ni almacenarse en texto plano.
 - **RN-05. Estado de la cuenta:** únicamente las cuentas habilitadas podrán iniciar sesión.
 - **RN-06. Control de intentos fallidos:** el sistema debe registrar los intentos fallidos y aplicar la política de bloqueo temporal definida.
@@ -133,7 +129,7 @@ El backend debe realizar las siguientes validaciones durante el inicio de sesió
 
 ### 1.8. Seguridad y gestión del JWT
 
-Se propone utilizar JSON Web Token (JWT) como mecanismo de autenticación para los endpoints protegidos.
+Se propone utilizar JSON Web Token (JWT) como mecanismo de autenticación para los endpoints protegidos. Esta propuesta no está aprobada; no debe asumirse JWT ni el esquema Bearer hasta cerrar #54 y #71.
 
 El token debería incluir:
 
@@ -158,10 +154,10 @@ La estructura definitiva dependerá de las columnas y restricciones de la tabla 
 |---|---|
 | `user_data` | Consultar el correo electrónico y los datos personales del usuario. |
 | `user_account` | Consultar el hash de la contraseña, el estado de la cuenta y los datos de control de autenticación. |
-| `user_status` | Verificar si la cuenta está habilitada para iniciar sesión. |
-| `profile` | Identificar el perfil asociado a la cuenta. |
-| `user_role` | Obtener el rol y los permisos asociados al usuario. |
+| `profile` | Identificar el perfil activo y su campo ENUM `user_role`. |
 | `session` | Registrar la sesión generada durante el inicio de sesión. |
+
+En el SQL, `user_account.user_status` y `user_account.document_type` son ENUM, no tablas. `profile.user_role` también es un ENUM; el SQL no define una tabla `user_role` ni una tabla `user_status`. Los valores definidos en el SQL son marcadores de posición sujetos a confirmación.
 
 ---
 
@@ -185,7 +181,7 @@ Esta información permitirá mostrar las opciones correspondientes y aplicar las
 
 ### 2.2. Autenticación y encabezados HTTP
 
-Requiere que el usuario tenga una sesión válida y se envíe el token JWT en el encabezado `Authorization`.
+La propuesta requiere una sesión válida y una credencial en el encabezado `Authorization`. El esquema de autenticación y el formato del encabezado están pendientes de aprobación.
 
 ```http
 Authorization: Bearer <access_token>
@@ -194,19 +190,19 @@ Accept: application/json
 
 El backend deberá:
 
-1. Recibir el token JWT enviado en el encabezado `Authorization`.
-2. Validar la firma y vigencia del token.
+1. Recibir la credencial enviada en el encabezado `Authorization`, según el mecanismo que se apruebe.
+2. Validar la credencial según el mecanismo aprobado.
 3. Identificar la sesión correspondiente en la tabla `session`.
 4. Verificar que la sesión no haya sido revocada (`revoked_at IS NULL`).
 5. Comprobar que la sesión no haya expirado (`expires_at` debe ser posterior a la fecha y hora actual).
 6. Identificar la cuenta asociada mediante `session.user_account_id`.
 7. Consultar la información personal en `user_data`.
-8. Obtener el estado de la cuenta mediante `user_status`.
-9. Obtener el perfil activo en `profile` y consultar su rol en `user_role`.
+8. Obtener el estado desde `user_account.user_status`.
+9. Obtener el perfil activo en `profile` y su campo `profile.user_role`.
 
 ### 2.3. Respuesta exitosa — 200 OK
 
-Estructura propuesta basada en las tablas `user_account`, `profile` y `user_role` del modelo de datos.
+Estructura propuesta basada en `user_account`, `user_data` y `profile`. Los valores de estado y rol son ejemplos de ENUM y su formato público queda pendiente del contrato común.
 
 ```json
 {
@@ -216,16 +212,8 @@ Estructura propuesta basada en las tablas `user_account`, `profile` y `user_role
   "lastName": "Montes",
   "email": "usuario@correo.com",
   "phone": "3001234567",
-  "status": {
-    "id": "uuid-del-estado",
-    "code": "ACTIVE",
-    "name": "Activo"
-  },
-  "role": {
-    "id": "uuid-del-rol",
-    "code": "ADMIN",
-    "name": "Administrador"
-  }
+  "status": "active",
+  "role": "operations_manager"
 }
 ```
 
@@ -250,10 +238,10 @@ Este endpoint permite identificar al usuario autenticado y obtener su rol para a
 3. Comprobar que corresponda a una sesión existente.
 4. Verificar que `expires_at` no haya vencido.
 5. Comprobar que `revoked_at` sea `NULL`.
-6. Verificar que la cuenta esté activa según el catálogo `user_status`.
+6. Verificar el estado en `user_account.user_status`; los valores ENUM del SQL son marcadores de posición.
 7. Consultar los datos personales asociados en `user_data`.
 8. Obtener el perfil cuyo `is_active` sea `TRUE`.
-9. Consultar el rol asociado a ese perfil en `user_role`.
+9. Consultar el valor `profile.user_role`.
 
 ### 2.7. Reglas de negocio
 
@@ -269,21 +257,17 @@ Este endpoint permite identificar al usuario autenticado y obtener su rol para a
 | `session` | Validar la sesión y comprobar su vigencia y revocación. |
 | `user_account` | Obtener la cuenta, el documento y el estado del usuario. |
 | `user_data` | Consultar nombres, apellidos, correo y teléfono. |
-| `user_status` | Obtener el código y nombre del estado de la cuenta. |
-| `profile` | Identificar el perfil activo del usuario. |
-| `user_role` | Obtener el rol asociado al perfil activo. |
-| `document_type` | Consultar el tipo de documento, si se requiere mostrarlo en la respuesta. |
+| `profile` | Identificar el perfil activo y su valor ENUM `user_role`. |
 
 **Relaciones principales**
 
 ```text
 session.user_account_id → user_account.id
 user_data.id → user_account.id
-user_account.status_id → user_status.id
-user_account.document_type_id → document_type.id
 profile.user_account_id → user_account.id
-profile.user_role_id → user_role.id
 ```
+
+`user_account.user_status`, `user_account.document_type` y `profile.user_role` son campos ENUM, no relaciones a tablas de catálogos.
 
 ---
 
@@ -478,7 +462,7 @@ El backend deberá realizar el siguiente proceso:
 |---|---|
 | `user_data` | Permite consultar el correo electrónico registrado. |
 | `user_account` | Permite identificar la cuenta asociada y consultar su estado. |
-| `user_status` | Permite verificar el estado de la cuenta. |
+| `user_account` | Permite consultar el estado de cuenta almacenado en el ENUM `user_status`. |
 | `password_reset_token` | Almacena el hash del token, la cuenta asociada, la IP de solicitud, la expiración y la utilización del token. |
 
 ---
@@ -566,12 +550,12 @@ Antes de actualizar la contraseña, el backend debe:
 - **RN-01. Seguridad de recuperación:** la recuperación debe realizarse mediante un token temporal y verificable.
 - **RN-02. Integridad de datos:** el token debe estar asociado a una cuenta existente.
 - **RN-03. Uso único:** el token solamente puede utilizarse una vez.
-- **RN-04. Vigencia del token:** el token tendrá una vigencia de 30 minutos.
+- **RN-04. Vigencia del token:** la duración está pendiente de definición.
 - **RN-05. Protección contra reutilización:** un token vencido o utilizado anteriormente no puede permitir otro cambio de contraseña.
 - **RN-06. Protección de contraseñas:** la contraseña debe almacenarse como hash, nunca como texto plano.
 - **RN-07. Política de contraseñas:** la nueva contraseña deberá cumplir la política de seguridad establecida.
 - **RN-08. Revocación de sesiones:** después de cambiar la contraseña, se deben revocar todas las sesiones activas de esa cuenta.
-- **RN-09. Notificación de seguridad:** después del cambio, se enviará una notificación al correo electrónico registrado.
+- **RN-09. Notificación de seguridad:** el canal y el envío de notificaciones están pendientes de definición.
 - **RN-10. Integridad de la operación:** la actualización de la contraseña, el uso del token y la revocación de sesiones se realizarán dentro de una misma transacción de base de datos.
 
 ### 5.8. Relación con la base de datos
@@ -600,5 +584,3 @@ session.user_account_id → user_account.id
 4. Los tokens de recuperación deben ser seguros, temporales y de un solo uso.
 5. Las contraseñas deben almacenarse utilizando mecanismos de hash seguros.
 6. Los permisos asociados a los roles deben comprobarse en el backend, no solamente en el frontend.
-
-**Nota:** las rutas, respuestas, nombres de campos y estructuras descritas corresponden a la propuesta de diseño de VINTRA. Deben contrastarse con el modelo de datos definitivo y la implementación del backend antes de considerarse contratos API aprobados.
