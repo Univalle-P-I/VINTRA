@@ -28,7 +28,7 @@ El backend debe verificar que el usuario tenga una sesión válida, activa y no 
 
 El endpoint recibe un objeto JSON con la información del turno.
 
-**Ejemplo:**
+#### Ejemplo
 
 ```json
 {
@@ -38,7 +38,7 @@ El endpoint recibe un objeto JSON con la información del turno.
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos
 
 **Campo:** `name`
 
@@ -118,11 +118,11 @@ Antes de registrar la información, el backend debe:
 
 Este endpoint utiliza principalmente la siguiente tabla:
 
-**Tabla: `schedule`**
+#### Tabla: `schedule`
 
 Almacena la información de los turnos registrados en el sistema.
 
-**Campos involucrados:**
+#### Campos involucrados
 
 - `id`: identificador UUID del turno.
 - `name`: nombre del turno.
@@ -134,7 +134,7 @@ Almacena la información de los turnos registrados en el sistema.
 
 ### 10. Relación con las historias de usuario
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos
 
 Este endpoint permite registrar los turnos de trabajo necesarios para organizar las jornadas operativas y posteriormente asociarlos a las microrrutas correspondientes.
 
@@ -146,19 +146,19 @@ Contribuye al cumplimiento del criterio que establece que el sistema debe permit
 
 **Método y ruta:** `GET /api/v1/schedules`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 25
 
 Permite consultar el listado de turnos registrados en el sistema, mostrando su información general, horarios y estado actual.
 
 La consulta facilita la administración de las jornadas de trabajo y permite identificar los turnos disponibles para la planificación operativa.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 25
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que la sesión del usuario se encuentre activa y que su rol tenga permisos para consultar turnos.
 
-### 3. Encabezados de la solicitud
+### 3. Encabezados de la solicitud — Endpoint 25
 
 - `Authorization: Bearer <token>`
 - `Accept: application/json`
@@ -167,11 +167,11 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 
 Este endpoint permite utilizar parámetros de consulta opcionales para filtrar y organizar los resultados.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud
 
 `GET /api/v1/schedules?isActive=true&page=0&size=10`
 
-**Descripción de los parámetros:**
+#### Descripción de los parámetros
 
 **Campo:** `isActive`
 
@@ -191,7 +191,7 @@ Este endpoint permite utilizar parámetros de consulta opcionales para filtrar y
 - Obligatorio: No.
 - Descripción: establece la cantidad máxima de registros que se devolverán por página.
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 25
 
 **Código HTTP:** `200 OK`
 
@@ -226,14 +226,14 @@ Este endpoint permite utilizar parámetros de consulta opcionales para filtrar y
 }
 ```
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 25
 
 - **400 Bad Request:** Algún parámetro de consulta tiene un formato inválido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
 - **403 Forbidden:** El usuario no tiene permisos para consultar turnos.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 25
 
 Antes de devolver la información, el backend debe:
 
@@ -244,7 +244,7 @@ Antes de devolver la información, el backend debe:
 5. Validar que los parámetros de paginación tengan valores permitidos.
 6. Consultar los turnos registrados aplicando los filtros enviados.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 25
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar los turnos.
 
@@ -256,15 +256,15 @@ Antes de devolver la información, el backend debe:
 
 **RN 05. Paginación:** la consulta debe permitir dividir los resultados en páginas cuando la cantidad de registros lo requiera.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 25
 
 Este endpoint utiliza la siguiente tabla:
 
-**Tabla: `schedule`**
+#### Tabla: `schedule` — Endpoint 25
 
 Contiene los registros de los turnos.
 
-**Campos involucrados:**
+#### Campos involucrados: — Endpoint 25
 
 - `id`
 - `name`
@@ -274,9 +274,9 @@ Contiene los registros de los turnos.
 - `created_at`
 - `updated_at`
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 25
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos — Endpoint 25
 
 Este endpoint permite consultar los turnos registrados para facilitar su administración y organización, identificando las jornadas disponibles para la planificación operativa.
 
@@ -286,19 +286,19 @@ Este endpoint permite consultar los turnos registrados para facilitar su adminis
 
 **Método y ruta:** `GET /api/v1/schedules/{id}`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 26 (3)
 
 Permite consultar la información detallada de un turno específico mediante su identificador UUID.
 
 La consulta devuelve el nombre del turno, sus horarios y su estado actual, facilitando la identificación de la jornada de trabajo.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 26 (3)
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que la sesión del usuario se encuentre activa y que su rol tenga permisos para consultar la información detallada de los turnos.
 
-### 3. Encabezados de la solicitud
+### 3. Encabezados de la solicitud — Endpoint 26 (3)
 
 - `Authorization: Bearer <token>`
 - `Accept: application/json`
@@ -311,11 +311,11 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - Obligatorio: Sí.
 - Descripción: identificador único del turno que se desea consultar.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud: — Endpoint 26
 
 `GET /api/v1/schedules/550e8400-e29b-41d4-a716-446655440010`
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 26 (3)
 
 **Código HTTP:** `200 OK`
 
@@ -335,7 +335,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 }
 ```
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 26 (3)
 
 - **400 Bad Request:** El identificador enviado no tiene un formato UUID válido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -343,7 +343,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - **404 Not Found:** No se encontró un turno con el identificador proporcionado. Este código debe contemplarse y confirmarse en el contrato definitivo de la API.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 26 (3)
 
 Antes de devolver la información, el backend debe:
 
@@ -354,7 +354,7 @@ Antes de devolver la información, el backend debe:
 5. Comprobar que exista un turno con el identificador proporcionado.
 6. Recuperar la información correspondiente al turno solicitado.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 26 (3)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar la información detallada de los turnos.
 
@@ -364,15 +364,15 @@ Antes de devolver la información, el backend debe:
 
 **RN 04. Integridad de la información:** la consulta debe devolver los datos correspondientes al registro existente en la tabla `schedule`.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 26 (3)
 
 Este endpoint utiliza la siguiente tabla:
 
-**Tabla: `schedule`**
+#### Tabla: `schedule` — Endpoint 26 (3)
 
 Contiene la información del turno solicitado.
 
-**Campos involucrados:**
+#### Campos involucrados: — Endpoint 26 (3)
 
 - `id`
 - `name`
@@ -382,9 +382,9 @@ Contiene la información del turno solicitado.
 - `created_at`
 - `updated_at`
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 26 (3)
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos — Endpoint 26 (3)
 
 Este endpoint permite consultar individualmente los turnos registrados, facilitando su administración y la organización de las jornadas de trabajo.
 
@@ -394,19 +394,19 @@ Este endpoint permite consultar individualmente los turnos registrados, facilita
 
 **Método y ruta:** `PATCH /api/v1/schedules/{id}`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 27 (4)
 
 Permite actualizar parcialmente la información de un turno existente mediante su identificador UUID.
 
 La operación permite modificar el nombre del turno, su hora de inicio, su hora de finalización y su estado, según las necesidades de organización de las jornadas operativas.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 27 (4)
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que la sesión del usuario se encuentre activa y que su rol tenga permisos para actualizar la información de los turnos.
 
-### 3. Encabezados de la solicitud
+### 3. Encabezados de la solicitud — Endpoint 27 (4)
 
 - `Authorization: Bearer <token>`
 - `Content-Type: application/json`
@@ -420,11 +420,11 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - Obligatorio: Sí.
 - Descripción: identificador del turno que se desea actualizar.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud: — Endpoint 27 (3)
 
 `PATCH /api/v1/schedules/550e8400-e29b-41d4-a716-446655440010`
 
-**Cuerpo de la solicitud (JSON):**
+#### Cuerpo de la solicitud (JSON)
 
 ```json
 {
@@ -435,7 +435,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos: — Endpoint 27
 
 **Campo:** `name`
 
@@ -467,7 +467,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 
 Todos los campos del cuerpo de la solicitud son opcionales, debido a que el método `PATCH` permite actualizar parcialmente la información.
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 27 (4)
 
 **Código HTTP:** `200 OK`
 
@@ -487,7 +487,7 @@ Todos los campos del cuerpo de la solicitud son opcionales, debido a que el mét
 }
 ```
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 27 (4)
 
 - **400 Bad Request:** Algún campo enviado tiene un formato inválido o no cumple las validaciones requeridas.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -495,7 +495,7 @@ Todos los campos del cuerpo de la solicitud son opcionales, debido a que el mét
 - **404 Not Found:** No se encontró un turno con el identificador proporcionado. Este código debe contemplarse y confirmarse en el contrato definitivo de la API.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la actualización.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 27 (4)
 
 Antes de actualizar la información, el backend debe:
 
@@ -511,7 +511,7 @@ Antes de actualizar la información, el backend debe:
 10. Validar que `isActive`, cuando se envíe, contenga un valor booleano válido.
 11. Actualizar el campo `updated_at` con la fecha y hora de la modificación.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 27 (4)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden modificar la información de los turnos.
 
@@ -525,15 +525,15 @@ Antes de actualizar la información, el backend debe:
 
 **RN 06. Fecha de actualización:** cada modificación debe actualizar el campo `updated_at`.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 27 (4)
 
 Este endpoint utiliza la siguiente tabla:
 
-**Tabla: `schedule`**
+#### Tabla: `schedule` — Endpoint 27 (4)
 
 Almacena y permite actualizar la información del turno.
 
-**Campos involucrados:**
+#### Campos involucrados: — Endpoint 27 (4)
 
 - `id`: identificador UUID del turno.
 - `name`: nombre del turno.
@@ -543,9 +543,9 @@ Almacena y permite actualizar la información del turno.
 - `created_at`: fecha de creación.
 - `updated_at`: fecha de actualización.
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 27 (4)
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos — Endpoint 27 (4)
 
 Este endpoint permite modificar la información de los turnos y controlar su estado para facilitar la organización de las jornadas de trabajo.
 

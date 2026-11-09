@@ -48,10 +48,10 @@ Accept: application/json
 }
 ```
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| email | string | Sí | Correo electrónico registrado en VINTRA. |
-| password | string | Sí | Contraseña correspondiente a la cuenta del usuario. |
+| Campo    | Tipo   | Obligatorio | Descripción                                         |
+| -------- | ------ | ----------- | --------------------------------------------------- |
+| email    | string | Sí          | Correo electrónico registrado en VINTRA.            |
+| password | string | Sí          | Contraseña correspondiente a la cuenta del usuario. |
 
 ### 1.4. Respuesta exitosa — 200 OK
 
@@ -73,7 +73,7 @@ Accept: application/json
 
 La estructura de la respuesta, el tipo de token y su vigencia son ilustrativos y están pendientes de aprobación. Los valores ENUM del SQL también están marcados como marcadores de posición.
 
-**Consideraciones:**
+#### Consideraciones
 
 - `accessToken`: JWT generado por el backend.
 - `tokenType`: tipo de autenticación utilizado.
@@ -85,14 +85,14 @@ La estructura de la respuesta, el tipo de token y su vigencia son ilustrativos y
 
 ### 1.5. Respuestas de error
 
-| Código HTTP | Descripción |
-|---|---|
-| 400 Bad Request | Faltan campos obligatorios o el formato del correo no es válido. |
-| 401 Unauthorized | El correo electrónico o la contraseña son incorrectos. |
-| 403 Forbidden | La cuenta existe, pero su estado no permite iniciar sesión. |
-| 423 Locked | Pendiente de acordar el código para una cuenta bloqueada. |
-| 429 Too Many Requests | Pendiente de definir si se aplicará limitación y con qué política. |
-| 500 Internal Server Error | Ocurrió un error inesperado durante el proceso de autenticación. |
+| Código HTTP               | Descripción                                                        |
+| ------------------------- | ------------------------------------------------------------------ |
+| 400 Bad Request           | Faltan campos obligatorios o el formato del correo no es válido.   |
+| 401 Unauthorized          | El correo electrónico o la contraseña son incorrectos.             |
+| 403 Forbidden             | La cuenta existe, pero su estado no permite iniciar sesión.        |
+| 423 Locked                | Pendiente de acordar el código para una cuenta bloqueada.          |
+| 429 Too Many Requests     | Pendiente de definir si se aplicará limitación y con qué política. |
+| 500 Internal Server Error | Ocurrió un error inesperado durante el proceso de autenticación.   |
 
 ### 1.6. Validaciones
 
@@ -140,7 +140,7 @@ El token debería incluir:
 
 No se deben incluir contraseñas, hashes de contraseñas ni información sensible.
 
-**Registro de sesiones**
+#### Registro de sesiones
 
 Se propone almacenar el hash del token en `session.token_hash`, en lugar de guardar el JWT original.
 
@@ -150,12 +150,12 @@ La estructura definitiva dependerá de las columnas y restricciones de la tabla 
 
 ### 1.9. Relación con la base de datos
 
-| Tabla | Uso |
-|---|---|
-| `user_data` | Consultar el correo electrónico y los datos personales del usuario. |
+| Tabla          | Uso                                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| `user_data`    | Consultar el correo electrónico y los datos personales del usuario.                                 |
 | `user_account` | Consultar el hash de la contraseña, el estado de la cuenta y los datos de control de autenticación. |
-| `profile` | Identificar el perfil activo y su campo ENUM `user_role`. |
-| `session` | Registrar la sesión generada durante el inicio de sesión. |
+| `profile`      | Identificar el perfil activo y su campo ENUM `user_role`.                                           |
+| `session`      | Registrar la sesión generada durante el inicio de sesión.                                           |
 
 En el SQL, `user_account.user_status` y `user_account.document_type` son ENUM, no tablas. `profile.user_role` también es un ENUM; el SQL no define una tabla `user_role` ni una tabla `user_status`. Los valores definidos en el SQL son marcadores de posición sujetos a confirmación.
 
@@ -219,15 +219,15 @@ Estructura propuesta basada en `user_account`, `user_data` y `profile`. Los valo
 
 ### 2.4. Respuestas de error
 
-| Código HTTP | Descripción |
-|---|---|
-| 401 Unauthorized | No existe una sesión válida o no se proporcionó autenticación. |
-| 403 Forbidden | El usuario está autenticado, pero no tiene permiso para acceder al recurso. |
-| 500 Internal Server Error | Ocurrió un error inesperado en el servidor. |
+| Código HTTP               | Descripción                                                                 |
+| ------------------------- | --------------------------------------------------------------------------- |
+| 401 Unauthorized          | No existe una sesión válida o no se proporcionó autenticación.              |
+| 403 Forbidden             | El usuario está autenticado, pero no tiene permiso para acceder al recurso. |
+| 500 Internal Server Error | Ocurrió un error inesperado en el servidor.                                 |
 
 ### 2.5. Relación con la historia de usuario
 
-**HU1 — Acceso según rol.**
+#### HU1 — Acceso según rol
 
 Este endpoint permite identificar al usuario autenticado y obtener su rol para aplicar las restricciones de acceso correspondientes.
 
@@ -252,14 +252,14 @@ Este endpoint permite identificar al usuario autenticado y obtener su rol para a
 
 ### 2.8. Relación con la base de datos
 
-| Tabla | Uso |
-|---|---|
-| `session` | Validar la sesión y comprobar su vigencia y revocación. |
-| `user_account` | Obtener la cuenta, el documento y el estado del usuario. |
-| `user_data` | Consultar nombres, apellidos, correo y teléfono. |
-| `profile` | Identificar el perfil activo y su valor ENUM `user_role`. |
+| Tabla          | Uso                                                       |
+| -------------- | --------------------------------------------------------- |
+| `session`      | Validar la sesión y comprobar su vigencia y revocación.   |
+| `user_account` | Obtener la cuenta, el documento y el estado del usuario.  |
+| `user_data`    | Consultar nombres, apellidos, correo y teléfono.          |
+| `profile`      | Identificar el perfil activo y su valor ENUM `user_role`. |
 
-**Relaciones principales**
+#### Relaciones principales
 
 ```text
 session.user_account_id → user_account.id
@@ -318,14 +318,14 @@ No devuelve un cuerpo de respuesta. El código HTTP indica que la solicitud se p
 
 ### 3.5. Respuestas de error
 
-| Código HTTP | Descripción |
-|---|---|
-| 401 Unauthorized | Token ausente, inválido, expirado o sesión ya revocada. |
-| 500 Internal Server Error | Error inesperado al procesar el cierre de sesión. |
+| Código HTTP               | Descripción                                             |
+| ------------------------- | ------------------------------------------------------- |
+| 401 Unauthorized          | Token ausente, inválido, expirado o sesión ya revocada. |
+| 500 Internal Server Error | Error inesperado al procesar el cierre de sesión.       |
 
 ### 3.6. Relación con la historia de usuario
 
-**HU1 — Acceso según rol.**
+#### HU1 — Acceso según rol. — Endpoint 3
 
 Este endpoint permite finalizar de forma segura la sesión del usuario autenticado.
 
@@ -351,13 +351,13 @@ Este endpoint permite finalizar de forma segura la sesión del usuario autentica
 
 La operación afecta principalmente a la tabla `session`.
 
-| Campo | Uso |
-|---|---|
-| `id` | Identifica el registro de sesión. |
-| `user_account_id` | Identifica la cuenta propietaria de la sesión. |
-| `token_hash` | Permite identificar la sesión mediante el mecanismo de validación del token. |
-| `revoked_at` | Registra cuándo se revocó la sesión. |
-| `expires_at` | Permite comprobar la vigencia de la sesión. |
+| Campo             | Uso                                                                          |
+| ----------------- | ---------------------------------------------------------------------------- |
+| `id`              | Identifica el registro de sesión.                                            |
+| `user_account_id` | Identifica la cuenta propietaria de la sesión.                               |
+| `token_hash`      | Permite identificar la sesión mediante el mecanismo de validación del token. |
+| `revoked_at`      | Registra cuándo se revocó la sesión.                                         |
+| `expires_at`      | Permite comprobar la vigencia de la sesión.                                  |
 
 ---
 
@@ -398,9 +398,9 @@ Accept: application/json
 }
 ```
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| email | string | Sí | Correo electrónico registrado en VINTRA. |
+| Campo | Tipo   | Obligatorio | Descripción                              |
+| ----- | ------ | ----------- | ---------------------------------------- |
+| email | string | Sí          | Correo electrónico registrado en VINTRA. |
 
 ### 4.4. Funcionamiento del endpoint
 
@@ -427,11 +427,11 @@ El backend deberá realizar el siguiente proceso:
 
 ### 4.6. Respuestas de error
 
-| Código HTTP | Descripción |
-|---|---|
-| 400 Bad Request | El correo no fue proporcionado o no tiene un formato válido. |
-| 429 Too Many Requests | Se superó el límite permitido de solicitudes de recuperación. |
-| 500 Internal Server Error | Ocurrió un error inesperado durante el procesamiento. |
+| Código HTTP               | Descripción                                                   |
+| ------------------------- | ------------------------------------------------------------- |
+| 400 Bad Request           | El correo no fue proporcionado o no tiene un formato válido.  |
+| 429 Too Many Requests     | Se superó el límite permitido de solicitudes de recuperación. |
+| 500 Internal Server Error | Ocurrió un error inesperado durante el procesamiento.         |
 
 ### 4.7. Validaciones
 
@@ -458,11 +458,11 @@ El backend deberá realizar el siguiente proceso:
 
 ### 4.9. Relación con la base de datos
 
-| Tabla | Uso |
-|---|---|
-| `user_data` | Permite consultar el correo electrónico registrado. |
-| `user_account` | Permite identificar la cuenta asociada y consultar su estado. |
-| `user_account` | Permite consultar el estado de cuenta almacenado en el ENUM `user_status`. |
+| Tabla                  | Uso                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `user_data`            | Permite consultar el correo electrónico registrado.                                                           |
+| `user_account`         | Permite identificar la cuenta asociada y consultar su estado.                                                 |
+| `user_account`         | Permite consultar el estado de cuenta almacenado en el ENUM `user_status`.                                    |
 | `password_reset_token` | Almacena el hash del token, la cuenta asociada, la IP de solicitud, la expiración y la utilización del token. |
 
 ---
@@ -508,11 +508,11 @@ Accept: application/json
 }
 ```
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| token | string | Sí | Token temporal recibido para recuperar la cuenta. |
-| newPassword | string | Sí | Nueva contraseña que desea establecer el usuario. |
-| confirmPassword | string | Sí | Confirmación de la nueva contraseña. Debe coincidir con `newPassword`. |
+| Campo           | Tipo   | Obligatorio | Descripción                                                            |
+| --------------- | ------ | ----------- | ---------------------------------------------------------------------- |
+| token           | string | Sí          | Token temporal recibido para recuperar la cuenta.                      |
+| newPassword     | string | Sí          | Nueva contraseña que desea establecer el usuario.                      |
+| confirmPassword | string | Sí          | Confirmación de la nueva contraseña. Debe coincidir con `newPassword`. |
 
 ### 5.4. Respuesta exitosa — 204 No Content
 
@@ -520,11 +520,11 @@ No se devuelve un cuerpo de respuesta. El código indica que la contraseña se a
 
 ### 5.5. Respuestas de error
 
-| Código HTTP | Descripción |
-|---|---|
-| 400 Bad Request | Faltan campos o la nueva contraseña no cumple la política establecida. |
-| 401 Unauthorized | El token es inválido, expiró o ya fue utilizado. |
-| 500 Internal Server Error | Ocurrió un error inesperado durante el proceso. |
+| Código HTTP               | Descripción                                                            |
+| ------------------------- | ---------------------------------------------------------------------- |
+| 400 Bad Request           | Faltan campos o la nueva contraseña no cumple la política establecida. |
+| 401 Unauthorized          | El token es inválido, expiró o ya fue utilizado.                       |
+| 500 Internal Server Error | Ocurrió un error inesperado durante el proceso.                        |
 
 ### 5.6. Validaciones
 
@@ -560,13 +560,13 @@ Antes de actualizar la contraseña, el backend debe:
 
 ### 5.8. Relación con la base de datos
 
-| Tabla | Uso |
-|---|---|
-| `password_reset_token` | Verificar el token, su vencimiento y si ya fue utilizado. |
-| `user_account` | Actualizar `pwd_hash`, `password_changed_at`, `updated_at`, `failed_attempts` y `locked_until`. |
-| `session` | Revocar las sesiones activas de la cuenta. |
+| Tabla                  | Uso                                                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------------------- |
+| `password_reset_token` | Verificar el token, su vencimiento y si ya fue utilizado.                                       |
+| `user_account`         | Actualizar `pwd_hash`, `password_changed_at`, `updated_at`, `failed_attempts` y `locked_until`. |
+| `session`              | Revocar las sesiones activas de la cuenta.                                                      |
 
-**Relaciones principales**
+#### Relaciones principales — Endpoint 5
 
 ```text
 password_reset_token.user_account_id → user_account.id

@@ -17,12 +17,12 @@ Permite consultar los barrios registrados en VINTRA. La información se utiliza 
 
 ### 3. Parámetros de consulta
 
-| Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| name | String | No | Buscar barrios por nombre. |
-| commune | String | No | Filtrar barrios por comuna. |
-| page | Integer | No | Número de página. |
-| limit | Integer | No | Cantidad de registros por página. |
+| Parámetro | Tipo    | Obligatorio | Descripción                       |
+| --------- | ------- | ----------- | --------------------------------- |
+| name      | String  | No          | Buscar barrios por nombre.        |
+| commune   | String  | No          | Filtrar barrios por comuna.       |
+| page      | Integer | No          | Número de página.                 |
+| limit     | Integer | No          | Cantidad de registros por página. |
 
 ### 4. Encabezados HTTP
 
@@ -79,7 +79,7 @@ Antes de realizar la consulta, el backend debe:
 
 ### 9. Relación con las historias de usuario
 
-**HU9. Asociar barrios a una microrruta**
+#### HU9. Asociar barrios a una microrruta
 
 Este endpoint permite cumplir los siguientes criterios:
 
@@ -88,11 +88,11 @@ Este endpoint permite cumplir los siguientes criterios:
 
 ### 10. Relación con la base de datos
 
-**Tabla involucrada:**
+#### Tabla involucrada
 
 - **btura_neighborhood:** Contiene la información registrada de los barrios, como su identificador, nombre, comuna y ubicación geográfica.
 
-**Campos utilizados:**
+#### Campos utilizados
 
 - `id`
 - `name`
@@ -106,24 +106,24 @@ No requiere relaciones adicionales para consultar el catálogo de barrios.
 
 ## Endpoint 35. Asociar barrio a microrruta
 
-### 1. Información general
+### 1. Información general — Endpoint 35
 
 - **Método:** POST
 - **Ruta:** `/api/v1/microroutes/{id}/neighborhoods`
 - **Autenticación:** Bearer Token (JWT).
 - **Body:** Sí requiere.
 
-### 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 35
 
 Permite asociar un barrio a una microrruta existente, registrando también el orden en el que debe visitarse dentro del recorrido.
 
 ### 3. Parámetros de ruta
 
-| Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| id | UUID | Sí | Identificador de la microrruta a la que se asociará el barrio. |
+| Parámetro | Tipo | Obligatorio | Descripción                                                    |
+| --------- | ---- | ----------- | -------------------------------------------------------------- |
+| id        | UUID | Sí          | Identificador de la microrruta a la que se asociará el barrio. |
 
-### 4. Encabezados HTTP
+### 4. Encabezados HTTP — Endpoint 35
 
 ```http
 Authorization: Bearer <access_token>
@@ -140,12 +140,12 @@ Accept: application/json
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| neighborhoodId | UUID | Sí | Identificador del barrio que se asociará. |
-| orderVisit | Integer | Sí | Orden de visita del barrio dentro de la microrruta. |
+| Campo          | Tipo    | Obligatorio | Descripción                                         |
+| -------------- | ------- | ----------- | --------------------------------------------------- |
+| neighborhoodId | UUID    | Sí          | Identificador del barrio que se asociará.           |
+| orderVisit     | Integer | Sí          | Orden de visita del barrio dentro de la microrruta. |
 
 ### 6. Respuesta exitosa — 201 Created
 
@@ -189,7 +189,7 @@ Antes de realizar la asociación, el backend debe:
 
 ### 10. Relación con las historias de usuario
 
-**HU9. Asociar barrios a una microrruta**
+#### HU9. Asociar barrios a una microrruta — Endpoint 35
 
 Este endpoint permite cumplir los siguientes criterios:
 
@@ -200,13 +200,13 @@ Este endpoint permite cumplir los siguientes criterios:
 
 ### 11. Relación con la base de datos
 
-**Tablas involucradas:**
+#### Tablas involucradas
 
 - **btura_neighborhood:** Contiene la información de los barrios registrados.
 - **microroute:** Contiene la información de las microrrutas a las que se asociarán los barrios.
 - **microrute_neighborhood:** Establece la relación entre las microrrutas y los barrios, almacenando también el orden de visita.
 
-**Relaciones principales:**
+#### Relaciones principales
 
 ```text
 microrute_neighborhood.neighborhood_id

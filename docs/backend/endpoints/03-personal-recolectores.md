@@ -10,29 +10,29 @@ Permite consultar el listado de recolectores, consultar su información individu
 
 Los recolectores se almacenan en la tabla `crew_member` y no requieren una cuenta de usuario para ser registrados en el sistema.
 
-**Endpoints incluidos:**
+### Endpoints incluidos
 
-| N.º | Operación | Método | Ruta |
-|---|---|---|---|
-| 12 | Listar personal | GET | `/api/v1/personnel` |
-| 13 | Consultar integrante del personal | GET | `/api/v1/personnel/{id}` |
-| 14 | Registrar integrante del personal | POST | `/api/v1/personnel` |
-| 15 | Actualizar información del integrante | PATCH | `/api/v1/personnel/{id}` |
+| N.º | Operación                             | Método | Ruta                     |
+| --- | ------------------------------------- | ------ | ------------------------ |
+| 12  | Listar personal                       | GET    | `/api/v1/personnel`      |
+| 13  | Consultar integrante del personal     | GET    | `/api/v1/personnel/{id}` |
+| 14  | Registrar integrante del personal     | POST   | `/api/v1/personnel`      |
+| 15  | Actualizar información del integrante | PATCH  | `/api/v1/personnel/{id}` |
 
 > **Nota:** Los endpoints documentados corresponden a una propuesta inicial para revisión. Su inclusión en este documento no significa que ya estén implementados en el backend.
 
 ---
 
-# Endpoint 12 — Listar personal
+## Endpoint 12 — Listar personal
 
-## 1. Información general
+### 1. Información general
 
 - **Método:** GET
 - **Ruta:** `/api/v1/personnel`
 - **Autenticación:** Bearer Token (JWT).
 - **Body:** No requiere.
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve?
 
 Permite consultar los recolectores registrados en las cuadrillas del sistema.
 
@@ -44,40 +44,40 @@ Este endpoint está destinado exclusivamente a los recolectores registrados en `
 
 La disponibilidad del personal según el turno no se determina mediante este listado, ya que corresponde a las reglas de disponibilidad de la HU6.
 
-## 3. Autenticación y permisos
+### 3. Autenticación y permisos
 
 Requiere una sesión activa y un Bearer Token válido.
 
 El sistema debe identificar al usuario autenticado y verificar que su rol tenga permisos para consultar la información de los recolectores, de acuerdo con la matriz de roles y permisos definida en HU1.
 
-## 4. Encabezados HTTP
+### 4. Encabezados HTTP
 
 ```http
 Authorization: Bearer <access_token>
 Accept: application/json
 ```
 
-## 5. Parámetros de consulta
+### 5. Parámetros de consulta
 
 No requiere un cuerpo de solicitud.
 
 Los criterios de búsqueda, filtrado y paginación se envían mediante parámetros en la URL.
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `crewId` | String (UUID) | No | Filtra los recolectores pertenecientes a una cuadrilla específica. |
-| `search` | String | No | Busca recolectores por su nombre completo almacenado en `full_name`. |
-| `isActive` | Boolean | No | Filtra los recolectores según su estado de actividad. Por defecto, el sistema devuelve únicamente los registros activos. |
-| `page` | Integer | No | Número de página. Por defecto es 1. |
-| `limit` | Integer | No | Cantidad de registros por página. Por defecto es 20, con un máximo de 100. |
+| Campo      | Tipo          | Obligatorio | Descripción                                                                                                              |
+| ---------- | ------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `crewId`   | String (UUID) | No          | Filtra los recolectores pertenecientes a una cuadrilla específica.                                                       |
+| `search`   | String        | No          | Busca recolectores por su nombre completo almacenado en `full_name`.                                                     |
+| `isActive` | Boolean       | No          | Filtra los recolectores según su estado de actividad. Por defecto, el sistema devuelve únicamente los registros activos. |
+| `page`     | Integer       | No          | Número de página. Por defecto es 1.                                                                                      |
+| `limit`    | Integer       | No          | Cantidad de registros por página. Por defecto es 20, con un máximo de 100.                                               |
 
-**Ejemplo de consulta:**
+#### Ejemplo de consulta
 
 ```http
 GET /api/v1/personnel?crewId=uuid-cuadrilla&search=Juan&isActive=true&page=1&limit=20
 ```
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa
 
 **Código HTTP:** `200 OK`
 
@@ -102,14 +102,14 @@ Devuelve el listado de integrantes que cumplen con los criterios de búsqueda y 
 }
 ```
 
-## 7. Respuestas de error
+### 7. Respuestas de error
 
 - **400 Bad Request:** Algún parámetro de consulta tiene un formato inválido o se encuentra fuera de los rangos permitidos.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
 - **403 Forbidden:** El usuario no tiene permisos para consultar el personal.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-## 8. Validaciones del backend
+### 8. Validaciones del backend
 
 Antes de devolver la información, el backend debe:
 
@@ -127,7 +127,7 @@ Antes de devolver la información, el backend debe:
 12. Realizar la paginación de los resultados.
 13. Devolver los registros correspondientes junto con los metadatos de paginación.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio
 
 - **RN-01. Acceso según rol:** Solamente los usuarios autorizados pueden consultar la información de los recolectores.
 - **RN-02. Asociación a cuadrillas:** Cada recolector debe estar asociado a una cuadrilla existente.
@@ -136,22 +136,22 @@ Antes de devolver la información, el backend debe:
 - **RN-05. Separación de tipos de personal:** Este endpoint consulta exclusivamente los registros de `crew_member`. Los conductores se gestionan mediante sus endpoints específicos.
 - **RN-06. Estado de actividad:** El campo `isActive` indica si el registro del recolector está activo, pero no representa su disponibilidad para un turno específico.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos
 
 Este endpoint involucra principalmente dos tablas:
 
 - **`crew_member`:** Contiene los recolectores registrados, incluyendo su identificador, cuadrilla, nombre completo, estado de actividad y fechas de creación y actualización.
 - **`crew`:** Permite identificar la cuadrilla a la que pertenece cada recolector.
 
-**Relación principal:**
+#### Relación principal
 
 ```text
 crew_member.crew_id → crew.id
 ```
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario
 
-**HU4 — Gestionar personal operativo.**
+#### HU4 — Gestionar personal operativo
 
 Este endpoint permite cumplir los siguientes criterios:
 
@@ -163,16 +163,16 @@ Este endpoint permite cumplir los siguientes criterios:
 
 ---
 
-# Endpoint 13 — Consultar integrante del personal
+## Endpoint 13 — Consultar integrante del personal
 
-## 1. Información general
+### 1. Información general — Endpoint 13
 
 - **Método:** GET
 - **Ruta:** `/api/v1/personnel/{id}`
 - **Autenticación:** Bearer Token (JWT).
 - **Body:** No requiere.
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 13
 
 Permite consultar el detalle de un recolector específico registrado en el sistema.
 
@@ -182,36 +182,36 @@ Se utiliza para mostrar la información individual del recolector y consultar su
 
 Este endpoint consulta exclusivamente los registros almacenados en `crew_member`. Los conductores se consultan mediante el endpoint correspondiente al módulo de conductores.
 
-## 3. Autenticación y permisos
+### 3. Autenticación y permisos — Endpoint 13
 
 Requiere una sesión activa y un Bearer Token válido.
 
 El sistema debe identificar al usuario autenticado y verificar que su rol tenga permisos para consultar la información de los recolectores.
 
-## 4. Encabezados HTTP
+### 4. Encabezados HTTP — Endpoint 13
 
 ```http
 Authorization: Bearer <access_token>
 Accept: application/json
 ```
 
-## 5. Parámetros de ruta
+### 5. Parámetros de ruta
 
 No requiere un cuerpo de solicitud.
 
 El identificador del integrante se envía directamente en la URL.
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | String (UUID) | Sí | Identificador único del recolector que se desea consultar. |
+| Campo | Tipo          | Obligatorio | Descripción                                                |
+| ----- | ------------- | ----------- | ---------------------------------------------------------- |
+| `id`  | String (UUID) | Sí          | Identificador único del recolector que se desea consultar. |
 
-**Ejemplo de consulta:**
+#### Ejemplo de consulta: — Endpoint 13
 
 ```http
 GET /api/v1/personnel/uuid-integrante
 ```
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa — Endpoint 13
 
 **Código HTTP:** `200 OK`
 
@@ -229,7 +229,7 @@ Devuelve la información detallada del integrante consultado.
 }
 ```
 
-## 7. Respuestas de error
+### 7. Respuestas de error — Endpoint 13
 
 - **400 Bad Request:** El identificador enviado no tiene un formato UUID válido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -237,7 +237,7 @@ Devuelve la información detallada del integrante consultado.
 - **404 Not Found:** No existe un integrante con el identificador enviado.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-## 8. Validaciones del backend
+### 8. Validaciones del backend — Endpoint 13
 
 Antes de devolver la información, el backend debe:
 
@@ -249,7 +249,7 @@ Antes de devolver la información, el backend debe:
 6. Obtener la información de la cuadrilla mediante su relación con `crew`.
 7. Responder con código `404 Not Found` si el integrante no existe.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio — Endpoint 13
 
 - **RN-01. Acceso según rol:** Solamente los usuarios autorizados pueden consultar la información de los recolectores.
 - **RN-02. Identificación del integrante:** El detalle debe permitir identificar al recolector mediante su nombre completo y la cuadrilla a la que pertenece.
@@ -258,22 +258,22 @@ Antes de devolver la información, el backend debe:
 
 La consulta del detalle no debe confundirse con la disponibilidad del recolector para un turno específico.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos — Endpoint 13
 
 Este endpoint involucra principalmente dos tablas:
 
 - **`crew_member`:** Contiene la información del recolector, incluyendo su identificador, nombre completo, estado de actividad y fecha de creación.
 - **`crew`:** Permite consultar la cuadrilla a la que pertenece el integrante.
 
-**Relación principal:**
+#### Relación principal: — Endpoint 13
 
 ```text
 crew_member.crew_id → crew.id
 ```
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario — Endpoint 13
 
-**HU4 — Gestionar personal operativo.**
+#### HU4 — Gestionar personal operativo. — Endpoint 13
 
 Este endpoint permite:
 
@@ -284,16 +284,16 @@ Este endpoint permite:
 
 ---
 
-# Endpoint 14 — Registrar integrante del personal
+## Endpoint 14 — Registrar integrante del personal
 
-## 1. Información general
+### 1. Información general — Endpoint 14 (3)
 
 - **Método:** POST
 - **Ruta:** `/api/v1/personnel`
 - **Autenticación:** Bearer Token (JWT).
 - **Body:** Sí requiere.
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 14 (3)
 
 Permite que el jefe de operaciones registre un nuevo recolector y lo asocie a una cuadrilla existente.
 
@@ -303,7 +303,7 @@ Los recolectores no requieren una cuenta de usuario para ser registrados, ya que
 
 Esta información será utilizada posteriormente para consultar los integrantes de las cuadrillas y organizar los recursos operativos.
 
-## 3. Autenticación y permisos
+### 3. Autenticación y permisos — Endpoint 14 (3)
 
 Requiere una sesión activa y un Bearer Token válido.
 
@@ -311,7 +311,7 @@ El sistema debe identificar al usuario autenticado y verificar que su rol tenga 
 
 La matriz de roles y permisos está pendiente de definición en HU1.
 
-## 4. Encabezados HTTP
+### 4. Encabezados HTTP — Endpoint 14 (3)
 
 ```http
 Authorization: Bearer <access_token>
@@ -319,7 +319,7 @@ Content-Type: application/json
 Accept: application/json
 ```
 
-## 5. Cuerpo de la solicitud
+### 5. Cuerpo de la solicitud
 
 El registro requiere un cuerpo de solicitud en formato JSON.
 
@@ -330,12 +330,12 @@ El registro requiere un cuerpo de solicitud en formato JSON.
 }
 ```
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `crewId` | String (UUID) | Sí | Identificador de la cuadrilla existente a la que pertenecerá el recolector. |
-| `fullName` | String | Sí | Nombre completo del recolector que se desea registrar. |
+| Campo      | Tipo          | Obligatorio | Descripción                                                                 |
+| ---------- | ------------- | ----------- | --------------------------------------------------------------------------- |
+| `crewId`   | String (UUID) | Sí          | Identificador de la cuadrilla existente a la que pertenecerá el recolector. |
+| `fullName` | String        | Sí          | Nombre completo del recolector que se desea registrar.                      |
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa — Endpoint 14 (3)
 
 **Código HTTP:** `201 Created`
 
@@ -353,7 +353,7 @@ Devuelve el integrante creado con su información correspondiente.
 }
 ```
 
-## 7. Respuestas de error
+### 7. Respuestas de error — Endpoint 14 (3)
 
 - **400 Bad Request:** Faltan campos obligatorios o los datos enviados no cumplen con el formato esperado.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -361,7 +361,7 @@ Devuelve el integrante creado con su información correspondiente.
 - **404 Not Found:** La cuadrilla indicada no existe.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante el registro.
 
-## 8. Validaciones del backend
+### 8. Validaciones del backend — Endpoint 14 (3)
 
 Antes de registrar el integrante, el backend debe:
 
@@ -377,7 +377,7 @@ Antes de registrar el integrante, el backend debe:
 10. Definir el valor inicial de `is_active`; el SQL no declara un valor predeterminado.
 11. `created_at` tiene `DEFAULT now()`; `updated_at` no tiene valor predeterminado en el SQL.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio — Endpoint 14 (3)
 
 - **RN-01. Acceso según rol:** Solamente los roles autorizados pueden registrar recolectores.
 - **RN-02. Asociación a cuadrillas:** El contrato propone asociar el recolector a una cuadrilla existente. Aunque existe la FK `crew_member.crew_id → crew.id`, el SQL no declara `crew_id` como `NOT NULL`; confirmar la obligatoriedad con Base de Datos.
@@ -385,22 +385,22 @@ Antes de registrar el integrante, el backend debe:
 - **RN-04. Estado inicial:** El valor inicial de `is_active` queda pendiente de confirmación; el SQL no declara un valor predeterminado.
 - **RN-05. Sin cuenta de usuario:** El registro de un recolector no debe crear un registro en `user_account`, `user_data` ni `profile`, ya que los recolectores no tienen acceso individual al sistema según el modelo definido.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos — Endpoint 14 (3)
 
 Este endpoint involucra principalmente dos tablas:
 
 - **`crew_member`:** Almacena el nuevo registro del integrante, incluyendo su identificador, cuadrilla, nombre completo, estado de actividad y fechas de creación y actualización.
 - **`crew`:** Permite verificar que la cuadrilla seleccionada exista y se encuentre registrada en el sistema.
 
-**Relación principal:**
+#### Relación principal: — Endpoint 14 (3)
 
 ```text
 crew_member.crew_id → crew.id
 ```
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario — Endpoint 14 (3)
 
-**HU4 — Gestionar personal operativo.**
+#### HU4 — Gestionar personal operativo. — Endpoint 14 (3)
 
 Este endpoint permite cumplir los siguientes criterios:
 
@@ -409,15 +409,15 @@ Este endpoint permite cumplir los siguientes criterios:
 - Almacenar el nombre completo de cada recolector.
 - Establecer el estado inicial de actividad del recolector.
 
-**HU5 — Gestionar cuadrillas y turnos.**
+#### HU5 — Gestionar cuadrillas y turnos
 
 Permite incorporar recolectores a una cuadrilla existente para conformar el personal operativo.
 
 ---
 
-# Endpoint 15 — Actualizar información del integrante del personal
+## Endpoint 15 — Actualizar información del integrante del personal
 
-## 1. Información general
+### 1. Información general — Endpoint 15 (4)
 
 - **Método:** PATCH
 - **Ruta:** `/api/v1/personnel/{id}`
@@ -425,7 +425,7 @@ Permite incorporar recolectores a una cuadrilla existente para conformar el pers
 - **Body:** Sí requiere.
 - **Operación:** Modificar la información de un integrante registrado y permitir su activación o desactivación lógica.
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 15 (4)
 
 Permite actualizar la información de un recolector previamente registrado en el sistema.
 
@@ -439,7 +439,7 @@ Un recolector inactivo no debe ser considerado para nuevas operaciones, de acuer
 
 Este endpoint modifica exclusivamente registros de `crew_member`. Los datos de los conductores se actualizan mediante los endpoints específicos del módulo de conductores.
 
-## 3. Autenticación y permisos
+### 3. Autenticación y permisos — Endpoint 15 (4)
 
 Requiere una sesión activa y un Bearer Token válido.
 
@@ -447,7 +447,7 @@ El sistema debe identificar al usuario autenticado y verificar que su rol tenga 
 
 La matriz de roles y permisos debe corresponder a lo establecido en HU1.
 
-## 4. Encabezados HTTP
+### 4. Encabezados HTTP — Endpoint 15 (4)
 
 ```http
 Authorization: Bearer <access_token>
@@ -455,13 +455,13 @@ Content-Type: application/json
 Accept: application/json
 ```
 
-## 5. Parámetros de ruta
+### 5. Parámetros de ruta — Endpoint 15
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `id` | String (UUID) | Sí | Identificador único del integrante que se desea modificar. |
+| Campo | Tipo          | Obligatorio | Descripción                                                |
+| ----- | ------------- | ----------- | ---------------------------------------------------------- |
+| `id`  | String (UUID) | Sí          | Identificador único del integrante que se desea modificar. |
 
-## 6. Cuerpo de la solicitud
+### 6. Cuerpo de la solicitud
 
 Todos los campos son opcionales individualmente, pero debe enviarse al menos uno.
 
@@ -473,13 +473,13 @@ Todos los campos son opcionales individualmente, pero debe enviarse al menos uno
 }
 ```
 
-| Campo | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
-| `crewId` | String (UUID) | No | Identificador de la nueva cuadrilla a la que pertenecerá el recolector. |
-| `fullName` | String | No | Nombre completo actualizado del recolector. |
-| `isActive` | Boolean | No | Estado de actividad del recolector. Permite activarlo o desactivarlo lógicamente. |
+| Campo      | Tipo          | Obligatorio | Descripción                                                                       |
+| ---------- | ------------- | ----------- | --------------------------------------------------------------------------------- |
+| `crewId`   | String (UUID) | No          | Identificador de la nueva cuadrilla a la que pertenecerá el recolector.           |
+| `fullName` | String        | No          | Nombre completo actualizado del recolector.                                       |
+| `isActive` | Boolean       | No          | Estado de actividad del recolector. Permite activarlo o desactivarlo lógicamente. |
 
-## 7. Respuesta exitosa
+### 7. Respuesta exitosa
 
 **Código HTTP:** `200 OK`
 
@@ -497,7 +497,7 @@ Devuelve la información del integrante actualizado con la misma estructura de r
 }
 ```
 
-## 8. Respuestas de error
+### 8. Respuestas de error
 
 - **400 Bad Request:** El cuerpo está vacío, contiene campos desconocidos o presenta datos con formato inválido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -506,7 +506,7 @@ Devuelve la información del integrante actualizado con la misma estructura de r
 - **409 Conflict:** El integrante no puede desactivarse porque tiene una asignación vigente, si esta restricción es aprobada.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante el proceso.
 
-## 9. Validaciones del backend
+### 9. Validaciones del backend
 
 Antes de actualizar la información, el backend debe:
 
@@ -526,7 +526,7 @@ Antes de actualizar la información, el backend debe:
 14. Actualizar `updated_at` con la fecha y hora de la modificación.
 15. Registrar los valores anteriores de la modificación en `crew_member_log`, de acuerdo con el mecanismo de auditoría implementado.
 
-## 10. Reglas de negocio
+### 10. Reglas de negocio
 
 - **RN-01. Acceso según rol:** Solamente los roles autorizados pueden modificar la información de los recolectores.
 - **RN-02. Integridad de datos:** La cuadrilla referenciada debe corresponder a un registro existente en `crew`.
@@ -535,7 +535,7 @@ Antes de actualizar la información, el backend debe:
 - **RN-05. Estado de actividad:** Un recolector inactivo no debe incluirse en nuevas operaciones que requieran personal activo.
 - **RN-06. Actualización parcial:** El sistema solamente debe modificar los campos enviados en la solicitud, conservando los valores de los campos que no se proporcionen.
 
-## 11. Relación con la base de datos
+### 11. Relación con la base de datos
 
 Este endpoint involucra principalmente dos tablas:
 
@@ -544,15 +544,15 @@ Este endpoint involucra principalmente dos tablas:
 
 Para la trazabilidad de los cambios, la propuesta contempla `crew_member_log`, de acuerdo con el mecanismo de auditoría implementado.
 
-**Relación principal:**
+#### Relación principal: — Endpoint 15 (4)
 
 ```text
 crew_member.crew_id → crew.id
 ```
 
-## 12. Relación con las historias de usuario
+### 12. Relación con las historias de usuario
 
-**HU4 — Gestionar personal operativo.**
+#### HU4 — Gestionar personal operativo. — Endpoint 15 (4)
 
 Este endpoint permite:
 
@@ -560,11 +560,11 @@ Este endpoint permite:
 - Actualizar la cuadrilla a la que pertenecen.
 - Activar o desactivar recolectores sin eliminarlos físicamente.
 
-**HU5 — Gestionar cuadrillas y turnos.**
+#### HU5 — Gestionar cuadrillas y turnos. — Endpoint 15
 
 Permite actualizar la asociación de un recolector con una cuadrilla existente, de acuerdo con las reglas de conformación de cuadrillas.
 
-**HU6 — Gestionar disponibilidad del personal.**
+#### HU6 — Gestionar disponibilidad del personal
 
 El estado de actividad del recolector debe considerarse al determinar si puede participar en una operación. Sin embargo, `isActive` no representa por sí solo la disponibilidad para un turno específico.
 

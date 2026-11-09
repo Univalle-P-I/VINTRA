@@ -8,15 +8,15 @@
 
 ---
 
-# Endpoint 16. Registrar un conductor
+## Endpoint 16. Registrar un conductor
 
-## 1. Método y ruta
+### 1. Método y ruta
 
 **Método:** `POST`
 
 **Ruta:** `/api/v1/drivers`
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve?
 
 Propone registrar un conductor, sus datos personales, su perfil y su relación laboral con una cuadrilla existente. La creación de una cuenta habilitada para iniciar sesión queda sujeta a las decisiones de seguridad indicadas arriba.
 
@@ -24,7 +24,7 @@ A diferencia de los recolectores, los conductores sí tienen acceso al sistema m
 
 El registro debe realizarse de manera conjunta para garantizar que la cuenta, los datos personales, el perfil y la vinculación laboral queden correctamente relacionados.
 
-## 3. Autenticación
+### 3. Autenticación
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
@@ -32,7 +32,7 @@ El backend debe verificar que el usuario autenticado tenga permisos para registr
 
 El conductor que se está registrando no necesita tener una cuenta previa, ya que este endpoint se encarga de crearla.
 
-## 4. Encabezados de la solicitud
+### 4. Encabezados de la solicitud
 
 ```http
 Authorization: Bearer <token>
@@ -40,7 +40,7 @@ Content-Type: application/json
 Accept: application/json
 ```
 
-## 5. Cuerpo de la solicitud
+### 5. Cuerpo de la solicitud
 
 Ejemplo de solicitud JSON:
 
@@ -59,7 +59,7 @@ Ejemplo de solicitud JSON:
 
 ### Descripción de los campos
 
-**Campo: documentType**
+#### Campo: documentType
 
 - Tipo: string.
 - Obligatorio: sí.
@@ -67,56 +67,56 @@ Ejemplo de solicitud JSON:
 - Valores permitidos: `CC`, `CE` y `PASSPORT`.
 - Almacenamiento: `user_account.document_type`, ENUM `document_type`. Los valores del SQL (`CC`, `CE`, `TI`, `PASSPORT`) son marcadores de posición.
 
-**Campo: documentId**
+#### Campo: documentId
 
 - Tipo: string.
 - Obligatorio: sí.
 - Descripción: número de documento de identidad del conductor.
 - Almacenamiento: `user_account.document_id`.
 
-**Campo: firstName**
+#### Campo: firstName
 
 - Tipo: string.
 - Obligatorio: sí.
 - Descripción: nombres del conductor.
 - Almacenamiento: `user_data.first_name`.
 
-**Campo: lastName**
+#### Campo: lastName
 
 - Tipo: string.
 - Obligatorio: sí.
 - Descripción: apellidos del conductor.
 - Almacenamiento: `user_data.last_name`.
 
-**Campo: email**
+#### Campo: email
 
 - Tipo: string.
 - Obligatorio: sí.
 - Descripción: correo electrónico asociado a la cuenta del conductor.
 - Almacenamiento: `user_data.email`.
 
-**Campo: phone**
+#### Campo: phone
 
 - Tipo: string.
 - Obligatorio: sí.
 - Descripción: número de contacto del conductor.
 - Almacenamiento: `user_data.phone`.
 
-**Campo: password**
+#### Campo: password
 
 - Tipo: string.
 - Obligatorio: por confirmar según el mecanismo de creación de credenciales aprobado.
 - Descripción: contraseña inicial de la cuenta del conductor.
 - Almacenamiento: el backend debe generar su hash y almacenarlo en `user_account.pwd_hash`. Nunca debe guardarse en texto plano.
 
-**Campo: crewId**
+#### Campo: crewId
 
 - Tipo: UUID.
 - Obligatorio: sí.
 - Descripción: identificador de la cuadrilla a la que se vinculará el conductor.
 - Relación: `driver.crew_id`.
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa
 
 **Código HTTP:** `201 Created`
 
@@ -145,7 +145,7 @@ Ejemplo de solicitud JSON:
 
 La respuesta no debe incluir la contraseña ni su hash.
 
-## 7. Respuestas de error
+### 7. Respuestas de error
 
 - **400 Bad Request:** el cuerpo está vacío, contiene campos desconocidos o presenta datos con formato inválido.
 - **401 Unauthorized:** no se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -154,7 +154,7 @@ La respuesta no debe incluir la contraseña ni su hash.
 - **409 Conflict:** el tipo y número de documento ya pertenecen a otro usuario, o se presenta un conflicto con otro dato que tenga restricción de unicidad.
 - **500 Internal Server Error:** ocurrió un error inesperado durante el proceso.
 
-## 8. Validaciones
+### 8. Validaciones
 
 Antes de registrar la información, el backend debe:
 
@@ -169,7 +169,7 @@ Antes de registrar la información, el backend debe:
 9. Validar que la contraseña cumpla con las políticas de seguridad establecidas, cuando se proporcione directamente.
 10. Ejecutar el registro dentro de una transacción para evitar registros incompletos si alguna operación falla.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden registrar conductores.
 
@@ -187,7 +187,7 @@ Antes de registrar la información, el backend debe:
 
 **RN 08. Integridad del registro:** la creación de la cuenta, los datos personales, el perfil y la vinculación laboral deben realizarse dentro de una misma transacción.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos
 
 Este endpoint involucra principalmente cinco tablas:
 
@@ -209,76 +209,76 @@ driver.user_data_id → user_data.id
 driver.crew_id → crew.id
 ```
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario
 
-**HU4. Gestionar personal operativo**
+#### HU4. Gestionar personal operativo
 
 Este endpoint se relaciona con el registro de conductores como personal operativo. La cuenta y el acceso individual del conductor siguen pendientes de decisión.
 
 También contribuye a identificar el tipo de personal registrado y consultar posteriormente su información dentro del sistema.
 
-**HU1. Acceso según rol**
+#### HU1. Acceso según rol
 
 La relación entre el conductor, los datos de usuario y el perfil está representada en el DER; el acceso y permisos del conductor siguen pendientes de aprobación.
 
 ---
 
-# Endpoint 17. Listar conductores
+## Endpoint 17. Listar conductores
 
-## 1. Método y ruta
+### 1. Método y ruta — Endpoint 17
 
 **Método:** `GET`
 
 **Ruta:** `/api/v1/drivers`
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 17
 
 Permite consultar el listado de conductores registrados en el sistema, incluyendo sus datos personales, la cuadrilla a la que pertenecen y el estado de su vinculación laboral.
 
 La consulta facilita la administración de los conductores y permite aplicar filtros para localizar registros específicos.
 
-## 3. Autenticación
+### 3. Autenticación — Endpoint 17
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que el usuario autenticado tenga permisos para consultar los conductores.
 
-## 4. Encabezados de la solicitud
+### 4. Encabezados de la solicitud — Endpoint 17
 
 ```http
 Authorization: Bearer <token>
 Accept: application/json
 ```
 
-## 5. Parámetros de entrada
+### 5. Parámetros de entrada
 
 Este endpoint no requiere un cuerpo de solicitud. Puede recibir los siguientes parámetros opcionales mediante la URL.
 
-**Parámetro: crewId**
+#### Parámetro: crewId
 
 - Tipo: UUID.
 - Obligatorio: no.
 - Descripción: filtra los conductores pertenecientes a una cuadrilla específica.
 
-**Parámetro: isActive**
+#### Parámetro: isActive
 
 - Tipo: boolean.
 - Obligatorio: no.
 - Descripción: filtra por el estado de la vinculación laboral.
 
-**Parámetro: search**
+#### Parámetro: search
 
 - Tipo: string.
 - Obligatorio: no.
 - Descripción: permite buscar por nombre, apellido, documento o correo electrónico.
 
-**Parámetro: page**
+#### Parámetro: page
 
 - Tipo: integer.
 - Obligatorio: no.
 - Descripción: número de página que se desea consultar.
 
-**Parámetro: limit**
+#### Parámetro: limit
 
 - Tipo: integer.
 - Obligatorio: no.
@@ -290,7 +290,7 @@ Este endpoint no requiere un cuerpo de solicitud. Puede recibir los siguientes p
 GET /api/v1/drivers?crewId=550e8400-e29b-41d4-a716-446655440000&isActive=true&page=1&limit=10
 ```
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa — Endpoint 17
 
 **Código HTTP:** `200 OK`
 
@@ -325,14 +325,14 @@ GET /api/v1/drivers?crewId=550e8400-e29b-41d4-a716-446655440000&isActive=true&pa
 }
 ```
 
-## 7. Respuestas de error
+### 7. Respuestas de error — Endpoint 17
 
 - **400 Bad Request:** uno o varios parámetros de consulta tienen un formato o valor inválido.
 - **401 Unauthorized:** no se proporcionó un token válido, la sesión expiró o fue revocada.
 - **403 Forbidden:** el usuario no tiene permisos para consultar conductores.
 - **500 Internal Server Error:** ocurrió un error inesperado durante la consulta.
 
-## 8. Validaciones
+### 8. Validaciones — Endpoint 17
 
 Antes de devolver la información, el backend debe:
 
@@ -348,7 +348,7 @@ Antes de devolver la información, el backend debe:
 10. Obtener la información de la cuadrilla asociada mediante `crew`.
 11. Aplicar los filtros y la paginación solicitados.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio — Endpoint 17
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar conductores.
 
@@ -362,7 +362,7 @@ Antes de devolver la información, el backend debe:
 
 **RN 06. Resultados paginados:** el listado debe permitir controlar la cantidad de registros devueltos mediante los parámetros de paginación.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos — Endpoint 17
 
 Este endpoint involucra principalmente cinco tablas:
 
@@ -384,56 +384,56 @@ profile.user_account_id → user_account.id
 driver.crew_id → crew.id
 ```
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario — Endpoint 17
 
-**HU4. Gestionar personal operativo**
+#### HU4. Gestionar personal operativo — Endpoint 17
 
 Este endpoint cumple el criterio de permitir consultar y listar los conductores registrados, facilitando la identificación de sus datos personales y de la cuadrilla a la que pertenecen.
 
 ---
 
-# Endpoint 18. Consultar el detalle del conductor
+## Endpoint 18. Consultar el detalle del conductor
 
-## 1. Método y ruta
+### 1. Método y ruta — Endpoint 18 (3)
 
 **Método:** `GET`
 
 **Ruta:** `/api/v1/drivers/{id}`
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 18 (3)
 
 Permite consultar la información detallada de un conductor específico mediante su identificador.
 
 Incluye sus datos personales, información de su cuenta, el rol asignado y los datos de la cuadrilla con la que mantiene su relación laboral.
 
-## 3. Autenticación
+### 3. Autenticación — Endpoint 18 (3)
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe comprobar que el usuario autenticado tenga permisos para consultar el detalle de los conductores.
 
-## 4. Encabezados de la solicitud
+### 4. Encabezados de la solicitud — Endpoint 18 (3)
 
 ```http
 Authorization: Bearer <token>
 Accept: application/json
 ```
 
-## 5. Parámetros de entrada
+### 5. Parámetros de entrada — Endpoint 18
 
-**Parámetro de ruta: id**
+#### Parámetro de ruta: id
 
 - Tipo: identificador del registro del conductor.
 - Obligatorio: sí.
 - Descripción: identificador del conductor registrado en la tabla `driver`.
 
-### Ejemplo de consulta
+### Ejemplo de consulta — Endpoint 18
 
 ```http
 GET /api/v1/drivers/550e8400-e29b-41d4-a716-446655440001
 ```
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa — Endpoint 18 (3)
 
 **Código HTTP:** `200 OK`
 
@@ -463,7 +463,7 @@ GET /api/v1/drivers/550e8400-e29b-41d4-a716-446655440001
 }
 ```
 
-## 7. Respuestas de error
+### 7. Respuestas de error — Endpoint 18 (3)
 
 - **400 Bad Request:** el identificador recibido tiene un formato inválido.
 - **401 Unauthorized:** no se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -471,7 +471,7 @@ GET /api/v1/drivers/550e8400-e29b-41d4-a716-446655440001
 - **404 Not Found:** no existe un conductor registrado con el identificador proporcionado.
 - **500 Internal Server Error:** ocurrió un error inesperado durante la consulta.
 
-## 8. Validaciones
+### 8. Validaciones — Endpoint 18 (3)
 
 Antes de devolver la información, el backend debe:
 
@@ -486,7 +486,7 @@ Antes de devolver la información, el backend debe:
 9. Obtener la información de la cuadrilla mediante `driver.crew_id`.
 10. Evitar devolver información sensible, como contraseñas, hashes o tokens de autenticación.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio — Endpoint 18 (3)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar el detalle de los conductores.
 
@@ -498,7 +498,7 @@ Antes de devolver la información, el backend debe:
 
 **RN 05. Identificación del conductor:** el identificador utilizado corresponde al registro del conductor en la tabla `driver`.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos — Endpoint 18 (3)
 
 Este endpoint involucra principalmente cinco tablas:
 
@@ -520,23 +520,23 @@ profile.user_account_id → user_account.id
 driver.crew_id → crew.id
 ```
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario — Endpoint 18 (3)
 
-**HU4. Gestionar personal operativo**
+#### HU4. Gestionar personal operativo — Endpoint 18 (3)
 
 Este endpoint cumple el criterio de permitir consultar individualmente la información de un conductor registrado, incluyendo sus datos personales y su relación con una cuadrilla.
 
 ---
 
-# Endpoint 19. Actualizar la información de un conductor
+## Endpoint 19. Actualizar la información de un conductor
 
-## 1. Método y ruta
+### 1. Método y ruta — Endpoint 19 (4)
 
 **Método:** `PATCH`
 
 **Ruta:** `/api/v1/drivers/{id}`
 
-## 2. ¿Para qué sirve?
+### 2. ¿Para qué sirve? — Endpoint 19 (4)
 
 Permite actualizar parcialmente la información personal y los datos de contacto de un conductor registrado en el sistema, sin necesidad de enviar todos sus datos nuevamente.
 
@@ -544,13 +544,13 @@ La actualización contempla los datos almacenados en `user_data` y, cuando corre
 
 Este endpoint no contempla el cambio de cuadrilla, debido a que primero debe definirse el procedimiento para conservar el historial de las vinculaciones laborales.
 
-## 3. Autenticación
+### 3. Autenticación — Endpoint 19 (4)
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que el usuario autenticado tenga permisos para actualizar la información de los conductores.
 
-## 4. Encabezados de la solicitud
+### 4. Encabezados de la solicitud — Endpoint 19 (4)
 
 ```http
 Authorization: Bearer <token>
@@ -558,9 +558,9 @@ Content-Type: application/json
 Accept: application/json
 ```
 
-## 5. Parámetros de entrada
+### 5. Parámetros de entrada — Endpoint 19 (3)
 
-**Parámetro de ruta: id**
+#### Parámetro de ruta: id — Endpoint 19
 
 - Tipo: identificador del registro del conductor.
 - Obligatorio: sí.
@@ -580,37 +580,37 @@ Ejemplo JSON:
 }
 ```
 
-### Descripción de los campos
+### Descripción de los campos — Endpoint 19
 
-**Campo: firstName**
+#### Campo: firstName — Endpoint 19
 
 - Tipo: string.
 - Obligatorio: no.
 - Descripción: actualiza los nombres del conductor.
 - Almacenamiento: `user_data`.
 
-**Campo: lastName**
+#### Campo: lastName — Endpoint 19
 
 - Tipo: string.
 - Obligatorio: no.
 - Descripción: actualiza los apellidos del conductor.
 - Almacenamiento: `user_data`.
 
-**Campo: email**
+#### Campo: email — Endpoint 19
 
 - Tipo: string.
 - Obligatorio: no.
 - Descripción: actualiza el correo electrónico asociado a la cuenta.
 - Almacenamiento: ubicación correspondiente del correo en el modelo de datos, por confirmar en el DER.
 
-**Campo: phone**
+#### Campo: phone — Endpoint 19
 
 - Tipo: string.
 - Obligatorio: no.
 - Descripción: actualiza el número de contacto.
 - Almacenamiento: `user_data`.
 
-**Campo: isActive**
+#### Campo: isActive
 
 - Tipo: boolean.
 - Obligatorio: no.
@@ -619,7 +619,7 @@ Ejemplo JSON:
 
 Todos los campos del cuerpo son opcionales porque el método `PATCH` permite actualizar parcialmente la información.
 
-## 6. Respuesta exitosa
+### 6. Respuesta exitosa — Endpoint 19 (4)
 
 **Código HTTP:** `200 OK`
 
@@ -643,7 +643,7 @@ Todos los campos del cuerpo son opcionales porque el método `PATCH` permite act
 }
 ```
 
-## 7. Respuestas de error
+### 7. Respuestas de error — Endpoint 19 (4)
 
 - **400 Bad Request:** uno o varios campos enviados tienen un formato inválido o no están permitidos.
 - **401 Unauthorized:** no se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -652,7 +652,7 @@ Todos los campos del cuerpo son opcionales porque el método `PATCH` permite act
 - **409 Conflict:** el correo electrónico ya está asociado a otra cuenta, cuando exista una restricción de unicidad.
 - **500 Internal Server Error:** ocurrió un error inesperado durante la actualización.
 
-## 8. Validaciones
+### 8. Validaciones — Endpoint 19 (4)
 
 Antes de actualizar la información, el backend debe:
 
@@ -668,7 +668,7 @@ Antes de actualizar la información, el backend debe:
 10. Actualizar el estado de la vinculación laboral en `driver`, si se envía `isActive`.
 11. Registrar los cambios mediante el mecanismo de auditoría correspondiente, si está implementado.
 
-## 9. Reglas de negocio
+### 9. Reglas de negocio — Endpoint 19 (4)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden actualizar la información de los conductores.
 
@@ -684,7 +684,7 @@ Antes de actualizar la información, el backend debe:
 
 **RN 07. Seguridad de credenciales:** este endpoint no permite modificar contraseñas ni exponer información de autenticación.
 
-## 10. Relación con la base de datos
+### 10. Relación con la base de datos — Endpoint 19 (4)
 
 Este endpoint involucra principalmente tres tablas:
 
@@ -707,13 +707,12 @@ Para la trazabilidad de los cambios también se dispone de:
 
 Estas tablas contemplan información como la acción realizada, los valores anteriores, el actor y la fecha del registro. Su generación debe estar implementada en el mecanismo de auditoría del sistema.
 
-## 11. Relación con las historias de usuario
+### 11. Relación con las historias de usuario — Endpoint 19 (4)
 
-**HU4. Gestionar personal operativo**
+#### HU4. Gestionar personal operativo — Endpoint 19 (4)
 
 Este endpoint cumple el criterio de permitir actualizar la información de los conductores registrados, incluyendo sus datos personales, de contacto y el estado de su vinculación laboral.
 
 ---
-
 
 **Nota final:** los conductores y los recolectores pertenecen al personal operativo y tienen estructuras diferentes. Los conductores se relacionan en el DER con `user_data`; que esa relación otorgue acceso individual al sistema queda pendiente de las decisiones de seguridad. Los recolectores se administran mediante `crew_member` y el DER no les asigna una cuenta.

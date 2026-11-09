@@ -464,7 +464,7 @@ flowchart TD
 ## 4. Listado priorizado de pantallas
 
 | # | Área | Pantalla | Rol | Prioridad | Flujo relacionado |
-|---|------|----------|-----|-----------|--------------------|
+| --- | ------ | ---------- | ----- | ----------- | -------------------- |
 | 1 | Compartida | Login | Todos | Alta | Acceso |
 | 2 | Compartida | Registro | Ciudadano | Alta | Acceso |
 | 3 | Compartida | Recuperar contraseña | Todos | Media | Acceso |
@@ -502,7 +502,7 @@ flowchart TD
 ### Por prioridad**
 
 | Prioridad | Pantallas |
-|---|---|
+| --- | --- |
 | Alta | 17 |
 | Media | 12 |
 | Baja | 2 |
@@ -510,7 +510,7 @@ flowchart TD
 ### Por rol (una pantalla puede aparecer en más de un rol)
 
 | Rol | Pantallas |
-|---|---|
+| --- | --- |
 | Administrador | 20 |
 | Ciudadano | 6 |
 | Conductor | 4 |

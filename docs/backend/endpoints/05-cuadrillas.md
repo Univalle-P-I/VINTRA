@@ -28,7 +28,7 @@ El backend debe verificar que el usuario tenga una sesión válida, activa y no 
 
 El endpoint recibe un objeto JSON con el nombre de la cuadrilla.
 
-**Ejemplo:**
+#### Ejemplo
 
 ```json
 {
@@ -36,7 +36,7 @@ El endpoint recibe un objeto JSON con el nombre de la cuadrilla.
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos
 
 **Campo:** `name`
 
@@ -96,11 +96,11 @@ Antes de registrar la información, el backend debe:
 
 Este endpoint utiliza principalmente la siguiente tabla:
 
-**Tabla: `crew`**
+#### Tabla: `crew`
 
 Almacena la información de las cuadrillas registradas en el sistema.
 
-**Campos involucrados:**
+#### Campos involucrados
 
 - `id`: identificador UUID de la cuadrilla.
 - `name`: nombre de la cuadrilla.
@@ -110,7 +110,7 @@ Almacena la información de las cuadrillas registradas en el sistema.
 
 ### 10. Relación con las historias de usuario
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos
 
 Este endpoint permite registrar las cuadrillas que posteriormente serán conformadas con personal operativo y asociadas a los turnos correspondientes.
 
@@ -122,19 +122,19 @@ Contribuye al cumplimiento del criterio que establece que el sistema debe permit
 
 **Método y ruta:** `GET /api/v1/crews`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 21
 
 Permite consultar el listado de cuadrillas registradas en el sistema, mostrando su información general y estado actual.
 
 La consulta facilita la administración de las cuadrillas y permite identificar cuáles se encuentran activas o inactivas.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 21
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que la sesión del usuario se encuentre activa y que su rol tenga permisos para consultar cuadrillas.
 
-### 3. Encabezados de la solicitud
+### 3. Encabezados de la solicitud — Endpoint 21
 
 - `Authorization: Bearer <token>`
 - `Accept: application/json`
@@ -143,11 +143,11 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 
 Este endpoint permite utilizar parámetros de consulta opcionales para filtrar y organizar los resultados.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud
 
 `GET /api/v1/crews?isActive=true&page=0&size=10`
 
-**Descripción de los parámetros:**
+#### Descripción de los parámetros
 
 **Campo:** `isActive`
 
@@ -167,7 +167,7 @@ Este endpoint permite utilizar parámetros de consulta opcionales para filtrar y
 - Obligatorio: No.
 - Descripción: establece la cantidad máxima de registros que se devolverán por página.
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 21
 
 **Código HTTP:** `200 OK`
 
@@ -198,14 +198,14 @@ Este endpoint permite utilizar parámetros de consulta opcionales para filtrar y
 }
 ```
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 21
 
 - **400 Bad Request:** Algún parámetro de consulta tiene un formato inválido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
 - **403 Forbidden:** El usuario no tiene permisos para consultar cuadrillas.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 21
 
 Antes de devolver la información, el backend debe:
 
@@ -216,7 +216,7 @@ Antes de devolver la información, el backend debe:
 5. Validar que los parámetros de paginación tengan valores permitidos.
 6. Consultar únicamente los registros que cumplan con los filtros enviados.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 21
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar las cuadrillas.
 
@@ -228,15 +228,15 @@ Antes de devolver la información, el backend debe:
 
 **RN 05. Paginación:** cuando la cantidad de registros sea elevada, la consulta debe permitir dividir los resultados en páginas.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 21
 
 Este endpoint utiliza la siguiente tabla:
 
-**Tabla: `crew`**
+#### Tabla: `crew` — Endpoint 21
 
 Contiene los registros de las cuadrillas.
 
-**Campos involucrados:**
+#### Campos involucrados: — Endpoint 21
 
 - `id`
 - `name`
@@ -244,9 +244,9 @@ Contiene los registros de las cuadrillas.
 - `created_at`
 - `updated_at`
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 21
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos — Endpoint 21
 
 Este endpoint permite consultar las cuadrillas registradas para facilitar su organización y administración, así como identificar cuáles se encuentran activas para la planificación operativa.
 
@@ -256,7 +256,7 @@ Este endpoint permite consultar las cuadrillas registradas para facilitar su org
 
 **Método y ruta:** `GET /api/v1/crews/{id}`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 22 (3)
 
 Permite consultar la información detallada de una cuadrilla específica mediante su identificador UUID.
 
@@ -264,13 +264,13 @@ La respuesta incluye los datos generales de la cuadrilla y el personal asociado 
 
 Es importante diferenciar ambos tipos de personal, ya que los conductores cuentan con una cuenta de usuario asociada, mientras que los recolectores se registran como integrantes del personal operativo sin necesidad de una cuenta de acceso.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 22 (3)
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que la sesión del usuario se encuentre activa y que su rol tenga permisos para consultar la información detallada de una cuadrilla.
 
-### 3. Encabezados de la solicitud
+### 3. Encabezados de la solicitud — Endpoint 22 (3)
 
 - `Authorization: Bearer <token>`
 - `Accept: application/json`
@@ -283,11 +283,11 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - Obligatorio: Sí.
 - Descripción: identificador único de la cuadrilla que se desea consultar.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud: — Endpoint 22
 
 `GET /api/v1/crews/550e8400-e29b-41d4-a716-446655440000`
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 22 (3)
 
 **Código HTTP:** `200 OK`
 
@@ -320,7 +320,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 }
 ```
 
-**Descripción de la información devuelta:**
+#### Descripción de la información devuelta
 
 - `id`: identificador de la cuadrilla.
 - `name`: nombre de la cuadrilla.
@@ -330,20 +330,20 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - `drivers`: listado de conductores asociados a la cuadrilla.
 - `crewMembers`: listado de recolectores asociados a la cuadrilla.
 
-**Información de los conductores:**
+#### Información de los conductores
 
 - `id`: identificador del conductor.
 - `firstName`: nombre del conductor.
 - `lastName`: apellido del conductor.
 - `isActive`: estado de su vinculación.
 
-**Información de los recolectores:**
+#### Información de los recolectores
 
 - `id`: identificador del recolector.
 - `fullName`: nombre completo del recolector.
 - `isActive`: estado de su vinculación.
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 22 (3)
 
 - **400 Bad Request:** El identificador enviado no tiene un formato UUID válido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -351,7 +351,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - **404 Not Found:** No se encontró una cuadrilla con el identificador proporcionado. Este código debe contemplarse y confirmarse en el contrato definitivo de la API.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 22 (3)
 
 Antes de devolver la información, el backend debe:
 
@@ -365,7 +365,7 @@ Antes de devolver la información, el backend debe:
 8. Consultar los recolectores relacionados mediante `crew_member.crew_id`.
 9. Devolver el estado actual de cada integrante según su correspondiente campo `is_active`.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 22 (3)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar la información detallada de una cuadrilla.
 
@@ -377,35 +377,35 @@ Antes de devolver la información, el backend debe:
 
 **RN 05. Integridad de la información:** la consulta debe respetar las relaciones establecidas entre `crew`, `driver`, `user_data` y `crew_member`.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 22 (3)
 
 Este endpoint involucra cuatro tablas principales:
 
-**Tabla: `crew`**
+#### Tabla: `crew` — Endpoint 22 (3)
 
 Almacena la información general de la cuadrilla.
 
-**Tabla: `driver`**
+#### Tabla: `driver`
 
 Registra los conductores asociados a una cuadrilla. Los conductores tienen una cuenta de usuario vinculada.
 
-**Tabla: `user_data`**
+#### Tabla: `user_data`
 
 Proporciona los datos personales de los conductores.
 
-**Tabla: `crew_member`**
+#### Tabla: `crew_member`
 
 Almacena los recolectores asociados a una cuadrilla. Estos registros no requieren una cuenta de usuario.
 
-**Relaciones principales:**
+#### Relaciones principales
 
 - `driver.crew_id → crew.id`
 - `driver.user_data_id → user_data.id`
 - `crew_member.crew_id → crew.id`
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 22 (3)
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos — Endpoint 22 (3)
 
 Este endpoint permite consultar la composición de una cuadrilla e identificar el personal que la integra, cumpliendo con el criterio de mostrar los integrantes asociados a cada cuadrilla.
 
@@ -417,19 +417,19 @@ También contribuye a la organización del personal operativo para su posterior 
 
 **Método y ruta:** `PATCH /api/v1/crews/{id}`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 23 (4)
 
 Permite actualizar parcialmente la información de una cuadrilla existente mediante su identificador UUID.
 
 La operación permite modificar el nombre de la cuadrilla y cambiar su estado para activarla o desactivarla según las necesidades de la operación.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 23 (4)
 
 Este endpoint requiere autenticación mediante un token JWT válido.
 
 El backend debe verificar que la sesión del usuario se encuentre activa y que su rol tenga permisos para actualizar la información de las cuadrillas.
 
-### 3. Encabezados de la solicitud
+### 3. Encabezados de la solicitud — Endpoint 23 (4)
 
 - `Authorization: Bearer <token>`
 - `Content-Type: application/json`
@@ -443,11 +443,11 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 - Obligatorio: Sí.
 - Descripción: identificador de la cuadrilla que se desea actualizar.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud: — Endpoint 23 (3)
 
 `PATCH /api/v1/crews/550e8400-e29b-41d4-a716-446655440000`
 
-**Cuerpo de la solicitud (JSON):**
+#### Cuerpo de la solicitud (JSON)
 
 ```json
 {
@@ -456,7 +456,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos: — Endpoint 23
 
 **Campo:** `name`
 
@@ -474,7 +474,7 @@ El backend debe verificar que la sesión del usuario se encuentre activa y que s
 
 Ambos campos son opcionales, debido a que el método `PATCH` permite actualizar parcialmente la información.
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 23 (4)
 
 **Código HTTP:** `200 OK`
 
@@ -492,7 +492,7 @@ Ambos campos son opcionales, debido a que el método `PATCH` permite actualizar 
 }
 ```
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 23 (4)
 
 - **400 Bad Request:** Algún parámetro o campo enviado tiene un formato inválido o no cumple las validaciones.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -500,7 +500,7 @@ Ambos campos son opcionales, debido a que el método `PATCH` permite actualizar 
 - **404 Not Found:** No se encontró una cuadrilla con el identificador proporcionado. Este código debe contemplarse y confirmarse en el contrato definitivo de la API.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la actualización.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 23 (4)
 
 Antes de actualizar la información, el backend debe:
 
@@ -514,7 +514,7 @@ Antes de actualizar la información, el backend debe:
 8. Validar que `isActive`, cuando se envíe, contenga un valor booleano válido.
 9. Actualizar el campo `updated_at` con la fecha y hora de la modificación.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 23 (4)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden modificar la información de las cuadrillas.
 
@@ -528,15 +528,15 @@ Antes de actualizar la información, el backend debe:
 
 **RN 06. Integridad de la información:** la actualización no debe modificar ni eliminar los registros históricos del personal asociado a la cuadrilla.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 23 (4)
 
 Este endpoint utiliza la siguiente tabla:
 
-**Tabla: `crew`**
+#### Tabla: `crew` — Endpoint 23 (4)
 
 Almacena y permite actualizar la información de la cuadrilla.
 
-**Campos involucrados:**
+#### Campos involucrados: — Endpoint 23 (3)
 
 - `id`: identificador UUID de la cuadrilla.
 - `name`: nombre de la cuadrilla.
@@ -544,9 +544,9 @@ Almacena y permite actualizar la información de la cuadrilla.
 - `created_at`: fecha de creación.
 - `updated_at`: fecha de actualización.
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 23 (4)
 
-**HU5. Gestionar cuadrillas y turnos**
+#### HU5. Gestionar cuadrillas y turnos — Endpoint 23 (4)
 
 Este endpoint permite administrar las cuadrillas registradas, modificar su información y controlar su estado para facilitar la organización del personal operativo.
 

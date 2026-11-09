@@ -13,7 +13,7 @@ La documentación describe los recursos propuestos, métodos HTTP, rutas, mecani
 La documentación se encuentra dividida por módulos funcionales:
 
 | N.º | Módulo | Archivo |
-|---|---|---|
+| --- | --- | --- |
 | 01 | Autenticación | `01-autenticacion.md` |
 | 02 | Vehículos | `02-vehiculos.md` |
 | 03 | Personal recolector | `03-personal-recolectores.md` |

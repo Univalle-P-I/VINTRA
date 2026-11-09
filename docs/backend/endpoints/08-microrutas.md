@@ -29,43 +29,43 @@ El rol del usuario debe tener permisos para consultar rutas, de acuerdo con la m
 
 No requiere cuerpo de solicitud.
 
-**Campo: `macrorouteId`**
+#### Campo: `macrorouteId`
 
 - Tipo: string (UUID).
 - Obligatorio: No.
 - Descripción: permite filtrar las microrrutas pertenecientes a una macrorruta específica.
 
-**Campo: `search`**
+#### Campo: `search`
 
 - Tipo: string.
 - Obligatorio: No.
 - Descripción: permite buscar microrrutas por su nombre.
 
-**Campo: `isActive`**
+#### Campo: `isActive`
 
 - Tipo: boolean.
 - Obligatorio: No.
 - Descripción: permite filtrar las microrrutas según su estado. Por defecto devuelve únicamente las microrrutas activas.
 
-**Campo: `includeGeometry`**
+#### Campo: `includeGeometry`
 
 - Tipo: boolean.
 - Obligatorio: No.
 - Descripción: indica si se debe incluir la geometría de la microrruta en formato GeoJSON. Por defecto es `false`.
 
-**Campo: `page`**
+#### Campo: `page`
 
 - Tipo: integer.
 - Obligatorio: No.
 - Descripción: número de página que se desea consultar. Por defecto es `1`.
 
-**Campo: `limit`**
+#### Campo: `limit`
 
 - Tipo: integer.
 - Obligatorio: No.
 - Descripción: cantidad de registros por página. Por defecto es `20` y permite un máximo de `100`.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud
 
 `GET /api/v1/microroutes?macrorouteId=uuid-macrorruta&isActive=true&page=1&limit=20`
 
@@ -95,7 +95,7 @@ No requiere cuerpo de solicitud.
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos
 
 - `id`: identificador único de la microrruta.
 - `name`: nombre de la microrruta.
@@ -148,7 +148,7 @@ Antes de devolver la información, el backend debe:
 
 Este endpoint involucra principalmente tres tablas:
 
-**Tabla: `microroute`**
+#### Tabla: `microroute`
 
 Contiene las microrrutas y su geometría.
 
@@ -162,22 +162,22 @@ Campos utilizados:
 - `created_at`
 - `updated_at`
 
-**Tabla: `macroroute`**
+#### Tabla: `macroroute`
 
 Contiene la macrorruta a la que pertenece cada microrruta.
 
-**Tabla: `microrute_neighborhood`**
+#### Tabla: `microrute_neighborhood`
 
 Permite contar los barrios asociados a cada microrruta.
 
-**Relaciones principales:**
+#### Relaciones principales
 
 - `microroute.macroroute_id → macroroute.id`
 - `microrute_neighborhood.microroute_id → microroute.id`
 
 ### 10. Relación con las historias de usuario
 
-**HU8. Crear microrrutas**
+#### HU8. Crear microrrutas
 
 Este endpoint cumple el criterio de permitir consultar las microrrutas creadas.
 
@@ -189,7 +189,7 @@ También facilita la identificación de los recorridos disponibles para su poste
 
 **Método y ruta:** `POST /api/v1/microroutes`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 32
 
 Permite que el jefe de operaciones registre una microrruta asociada a una macrorruta, definiendo un recorrido específico de atención.
 
@@ -197,13 +197,13 @@ Opcionalmente, se pueden indicar los horarios en los que opera la microrruta.
 
 Los barrios que serán atendidos se asocian posteriormente mediante el endpoint correspondiente al módulo de Barrios.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 32
 
 Este endpoint requiere un Bearer Token JWT y una sesión activa.
 
 Solamente podrán utilizarlo los roles autorizados para gestionar rutas.
 
-### 3. Encabezados HTTP
+### 3. Encabezados HTTP — Endpoint 32
 
 - `Authorization: Bearer <access_token>`
 - `Content-Type: application/json`
@@ -213,7 +213,7 @@ Solamente podrán utilizarlo los roles autorizados para gestionar rutas.
 
 El endpoint recibe un objeto JSON con la información de la microrruta.
 
-**Ejemplo:**
+#### Ejemplo
 
 ```json
 {
@@ -238,22 +238,22 @@ El endpoint recibe un objeto JSON con la información de la microrruta.
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos: — Endpoint 32
 
-**Campo: `macrorouteId`**
+#### Campo: `macrorouteId` — Endpoint 32
 
 - Tipo: string (UUID).
 - Obligatorio: Sí.
 - Descripción: identificador de la macrorruta a la que pertenece la microrruta. La macrorruta debe existir y estar activa.
 
-**Campo: `name`**
+#### Campo: `name`
 
 - Tipo: string.
 - El SQL no define longitud máxima para `name`; cualquier límite requiere confirmación de Base de Datos.
 - Obligatorio: Sí.
 - Descripción: nombre asignado a la microrruta.
 
-**Campo: `geometry`**
+#### Campo: `geometry`
 
 - Tipo: objeto GeoJSON de tipo `MultiLineString`.
 - Obligatorio: Pendiente de definir.
@@ -261,19 +261,19 @@ El endpoint recibe un objeto JSON con la información de la microrruta.
 
 La historia de usuario HU8 solicita registrar la información necesaria del recorrido, pero todavía no se ha definido si la geometría debe enviarse obligatoriamente al crear la microrruta.
 
-**Campo: `schedules`**
+#### Campo: `schedules`
 
 - Tipo: array.
 - Obligatorio: No.
 - Descripción: contiene los horarios en los que opera la microrruta. Está pendiente definir si se envían en este endpoint o mediante un endpoint independiente.
 
-**Campo: `schedules[].scheduleId`**
+#### Campo: `schedules[].scheduleId`
 
 - Tipo: string (UUID).
 - Obligatorio: Sí, dentro de cada elemento del arreglo.
 - Descripción: identificador del turno perteneciente al catálogo `schedule`.
 
-**Campo: `schedules[].dayOfWeek`**
+#### Campo: `schedules[].dayOfWeek`
 
 - Tipo: integer.
 - Obligatorio: Sí, dentro de cada elemento del arreglo.
@@ -281,13 +281,13 @@ La historia de usuario HU8 solicita registrar la información necesaria del reco
 
 El documento propone utilizar `1` para lunes y `7` para domingo, siguiendo la convención ISO, pero esta convención está pendiente de confirmación.
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 32
 
 **Código HTTP:** `201 Created`
 
 El endpoint devuelve la microrruta creada con la misma estructura de respuesta del endpoint 33, correspondiente a la consulta detallada de una microrruta.
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 32
 
 - **400 Bad Request:** Faltan campos obligatorios, la geometría no es un MultiLineString válido, el día de la semana está fuera de rango o existen horarios repetidos.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -296,7 +296,7 @@ El endpoint devuelve la microrruta creada con la misma estructura de respuesta d
 - **409 Conflict:** Ya existe una microrruta activa con el mismo nombre dentro de la macrorruta, si se aprueba esa restricción.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante el registro.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 32
 
 Antes de crear la microrruta, el backend debe:
 
@@ -315,7 +315,7 @@ Antes de crear la microrruta, el backend debe:
 13. Crear la microrruta y sus horarios en una misma transacción de base de datos, si se mantiene la inclusión de horarios en este endpoint.
 14. Registrar la creación en `microroute_log`; confirmar que su estrategia de logging cubra la creación, dado que el DER solo enumera `old` y `new` sin definir el comportamiento de auditoría.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 32
 
 **RN 01. Acceso según rol:** solamente los roles autorizados pueden crear microrrutas.
 
@@ -329,11 +329,11 @@ Antes de crear la microrruta, el backend debe:
 
 **RN 06. Integridad de horarios:** cuando se envíen horarios, estos deben corresponder a turnos existentes y no deben repetirse las combinaciones de turno y día.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 32
 
 Este endpoint involucra principalmente cuatro tablas:
 
-**Tabla: `microroute`**
+#### Tabla: `microroute` — Endpoint 32
 
 Permite crear el registro de la microrruta.
 
@@ -347,11 +347,11 @@ Campos involucrados:
 - `created_at`
 - `updated_at`
 
-**Tabla: `macroroute`**
+#### Tabla: `macroroute` — Endpoint 32
 
 Permite verificar la macrorruta a la que se asociará la nueva microrruta.
 
-**Tabla: `microroute_schedule`**
+#### Tabla: `microroute_schedule`
 
 Permite crear las relaciones entre la microrruta y sus horarios.
 
@@ -361,11 +361,11 @@ Campos involucrados:
 - `schedule_id`
 - `day_of_week`
 
-**Tabla: `microroute_log`**
+#### Tabla: `microroute_log`
 
 El DER define `entity_id`, `actor_id`, `action`, `old`, `new`, `request_ip` y `created_at`. Su uso para auditar la creación queda sujeto a la estrategia de auditoría que se acuerde.
 
-**Relaciones principales:**
+#### Relaciones principales: — Endpoint 32
 
 - `microroute.macroroute_id → macroroute.id`
 - `microroute_schedule.microroute_id → microroute.id`
@@ -373,16 +373,16 @@ El DER define `entity_id`, `actor_id`, `action`, `old`, `new`, `request_ip` y `c
 
 El SQL no declara restricciones `UNIQUE` ni `CHECK` para esta combinación o para `day_of_week`; cualquier garantía de unicidad o rango debe acordarse con Base de Datos.
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 32
 
-**HU8. Crear microrrutas**
+#### HU8. Crear microrrutas — Endpoint 32
 
 Este endpoint cumple los siguientes criterios:
 
 - Una microrruta debe estar asociada a una macrorruta.
 - Se debe poder registrar la información necesaria del recorrido.
 
-**HU9. Asociar barrios a una microrruta**
+#### HU9. Asociar barrios a una microrruta
 
 La creación permite establecer la microrruta a la que posteriormente se asociarán los barrios que atenderá.
 
@@ -392,7 +392,7 @@ La creación permite establecer la microrruta a la que posteriormente se asociar
 
 **Método y ruta:** `GET /api/v1/microroutes/{id}`
 
-### 1. ¿Para qué sirve?
+### 1. ¿Para qué sirve? — Endpoint 33 (3)
 
 Permite consultar el detalle de una microrruta específica, incluyendo:
 
@@ -403,32 +403,32 @@ Permite consultar el detalle de una microrruta específica, incluyendo:
 
 Esta información se utiliza para mostrar la microrruta en el visor de mapas y verificar los sectores que atenderá durante la operación.
 
-### 2. Autenticación
+### 2. Autenticación — Endpoint 33 (3)
 
 Este endpoint requiere un Bearer Token JWT y una sesión activa.
 
 El rol del usuario debe tener permisos para consultar rutas.
 
-### 3. Encabezados HTTP
+### 3. Encabezados HTTP — Endpoint 33 (3)
 
 - `Authorization: Bearer <access_token>`
 - `Accept: application/json`
 
 ### 4. Parámetros de ruta
 
-**Parámetro: `id`**
+#### Parámetro: `id`
 
 - Tipo: string (UUID).
 - Obligatorio: Sí.
 - Descripción: identificador único de la microrruta que se desea consultar.
 
-**Ejemplo de solicitud:**
+#### Ejemplo de solicitud: — Endpoint 33
 
 `GET /api/v1/microroutes/uuid-microrruta`
 
 No requiere cuerpo de solicitud.
 
-### 5. Respuesta exitosa
+### 5. Respuesta exitosa — Endpoint 33 (3)
 
 **Código HTTP:** `200 OK`
 
@@ -477,7 +477,7 @@ No requiere cuerpo de solicitud.
 }
 ```
 
-**Descripción de los campos:**
+#### Descripción de los campos: — Endpoint 33 (3)
 
 - `id`: identificador único de la microrruta.
 - `name`: nombre de la microrruta.
@@ -497,7 +497,7 @@ No requiere cuerpo de solicitud.
 - `createdAt`: fecha de creación.
 - `updatedAt`: fecha de última actualización.
 
-### 6. Respuestas de error
+### 6. Respuestas de error — Endpoint 33 (3)
 
 - **400 Bad Request:** El identificador no tiene un formato UUID válido.
 - **401 Unauthorized:** No se proporcionó un token válido, la sesión expiró o fue revocada.
@@ -505,7 +505,7 @@ No requiere cuerpo de solicitud.
 - **404 Not Found:** No existe una microrruta con el identificador enviado.
 - **500 Internal Server Error:** Ocurrió un error inesperado durante la consulta.
 
-### 7. Validaciones
+### 7. Validaciones — Endpoint 33 (3)
 
 Antes de devolver la información, el backend debe:
 
@@ -519,7 +519,7 @@ Antes de devolver la información, el backend debe:
 8. Consultar la información de los turnos mediante la tabla `schedule`.
 9. Devolver la geometría en formato GeoJSON.
 
-### 8. Reglas de negocio
+### 8. Reglas de negocio — Endpoint 33 (3)
 
 **RN 01. Acceso según rol:** solamente los usuarios autorizados pueden consultar rutas.
 
@@ -531,35 +531,35 @@ Antes de devolver la información, el backend debe:
 
 **RN 05. Estado de la microrruta:** una microrruta inactiva puede consultarse, pero el sistema debe indicar que se encuentra inactiva.
 
-### 9. Relación con la base de datos
+### 9. Relación con la base de datos — Endpoint 33 (3)
 
 Este endpoint involucra principalmente cinco tablas:
 
-**Tabla: `microroute`**
+#### Tabla: `microroute` — Endpoint 33 (3)
 
 Contiene los datos generales y el trazado geográfico de la microrruta.
 
-**Tabla: `macroroute`**
+#### Tabla: `macroroute` — Endpoint 33 (3)
 
 Contiene la macrorruta a la que pertenece.
 
-**Tabla: `microrute_neighborhood`**
+#### Tabla: `microrute_neighborhood` — Endpoint 33
 
 Contiene los barrios asociados a la microrruta y su orden de visita.
 
-**Tabla: `btura_neighborhood`**
+#### Tabla: `btura_neighborhood`
 
 Contiene la información de cada barrio, como su identificador, nombre y comuna.
 
-**Tabla: `microroute_schedule`**
+#### Tabla: `microroute_schedule` — Endpoint 33
 
 Contiene las relaciones entre las microrrutas y los horarios de operación.
 
-**Tabla: `schedule`**
+#### Tabla: `schedule`
 
 Contiene la información general de los turnos asociados.
 
-**Relaciones principales:**
+#### Relaciones principales: — Endpoint 33 (3)
 
 - `microroute.macroroute_id → macroroute.id`
 - `microrute_neighborhood.microroute_id → microroute.id`
@@ -567,13 +567,13 @@ Contiene la información general de los turnos asociados.
 - `microroute_schedule.microroute_id → microroute.id`
 - `microroute_schedule.schedule_id → schedule.id`
 
-### 10. Relación con las historias de usuario
+### 10. Relación con las historias de usuario — Endpoint 33 (3)
 
-**HU8. Crear microrrutas**
+#### HU8. Crear microrrutas — Endpoint 33 (3)
 
 Permite consultar la información de la microrruta creada.
 
-**HU9. Asociar barrios a una microrruta**
+#### HU9. Asociar barrios a una microrruta — Endpoint 33
 
 Permite consultar los barrios asociados a la microrruta y el orden en el que deben atenderse.
 
