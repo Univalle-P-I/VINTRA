@@ -230,7 +230,7 @@ El registro de eventos deberá facilitar el diagnóstico de fallos y la trazabil
 ### Instalación local
 
 ```bash
-cd vintra-api
+cd backend
 npm install
 ```
 
