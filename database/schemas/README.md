@@ -28,7 +28,7 @@ Ultima modificación: 5/11/2026
 | 017 | `017_create_driver.sql` | `user_data`, `crew` |
 | 018 | `018_create_assignment.sql` | `driver`, `microroute_schedule`, `vehicle` |
 | 019 | `019_create_vehicle_position.sql` | `assignment`, PostGIS 3.6 |
-| 020 | `020_create_user_account_log.sql` | `user_account`, `user_account` ([RELACIÓN DOBLE](../../docs/base-de-datos/diccionario-de-datos/README.md)) |
+| 020 | `020_create_user_account_log.sql` | `user_account`, `user_account` ([RELACIÓN DOBLE](../../docs/base-de-datos/diccionario-de-datos.md)) |
 | 021 | `021_create_user_data_log.sql` | `user_data`, `user_account` |
 | 022 | `022_create_profile_log.sql` | `profile`, `user_account` |
 | 023 | `023_create_crew_log.sql` | `crew`, `user_account` |
