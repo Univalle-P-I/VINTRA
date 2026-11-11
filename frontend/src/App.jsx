@@ -22,7 +22,6 @@ function App() {
 
   }
   
-
   const goToPeople = () => {
     setScreen('people')
     window.scrollTo({ top: 0, behavior: 'smooth' })
