@@ -14,7 +14,7 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 ## Estado
 
-- Estado: `Completada`
+- Estado: `En revisión`
 - Responsable: Ricardo Farid Cuero
 - Ultima fecha de modificación: **11/11/2026**
 
@@ -427,12 +427,15 @@ Las [migraciones](../../database/migrations/) crean las tablas de la base de dat
 | --- | --- | --- | --- |
 | Migración | `database/migrations/` | `NNN_create_<tabla>.sql` | `001_create_user_account.sql` |
 | Inserción | `database/seeders/` | `NNN_insert_<tabla>.sql` | `001_insert_user_account.sql` |
+| Trigger | `database/triggers/` | `NNN_trigger_<tabla>.sql` | `001_trigger_user_account.sql` |
 
 - `NNN` es un número de tres dígitos que indica el orden de ejecución.
 - `create` identifica un archivo que crea una tabla.
 - `insert` identifica un archivo que inserta datos iniciales de ejemplo.
 - `<tabla>` corresponde al nombre de la tabla afectada.
 - `000_create_extensions.sql` habilita las extensiones `postgis` y `pgcrypto`; no crea una tabla.
+
+- `000_function_audit_log.sql` crea la función compartida de auditoría. En los demás triggers, `NNN` coincide con el número de la migración de la tabla auditada.
 
 ### 5.2. Migraciones
 
@@ -444,6 +447,8 @@ AVISO: El orden de las migraciones no es alfabético ni arbitrario: respeta las 
 
 Los seeders insertan datos mínimos de ejemplo para `user_account`, `user_data`, `vehicle_type` entre otras tablas. Usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
 
+Los seeders solo se ejecutan en desarrollo y pruebas; nunca en producción, porque incluyen cuentas de usuario de ejemplo.
+
 ### 5.4. Orden de ejecución
 
 El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](../../database/schemas/README.md). La secuencia general es:
@@ -453,16 +458,30 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 3. Ejecutar las seeders `001` a `029` (hasta donde lleguen las inserciones) en orden ascendente.
 4. Ejecutar los triggers después de los seeders.
 
+Los triggers van después de las migraciones porque dependen de que existan las tablas y sus `*_log`. Al ejecutarse después de los seeders, los datos de ejemplo no quedan registrados en la auditoría.
+
 ### 5.5. Índices mínimos
 
 - `GIST (geom)` en `macroroute`, `microroute`, `btura_neighborhood` y `vehicle_position`.
 - `(assignment_id, recorded_at)` en `vehicle_position`.
 - `(scheduled_start_at)` en `assignment`.
-- `(entity_id)` y `(created_at)` en cada tabla `*_log`.
+- `(entity_id)`, `(actor_id)` y `(created_at)` en cada tabla `*_log`.
 
 ### 5.6. Triggers
 
-El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](../../database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Si un `UPDATE` cambia `is_active` a `FALSE`, el trigger registra la acción como `DELETE` (borrado lógico). El borrado operativo es lógico (`is_active = FALSE`); no se debe ejecutar `DELETE` físico sobre entidades con historial de auditoría. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](../../database/schemas/README.md).
+El modelo **sí** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría. Estos [disparadores](../../database/triggers/) se ejecutan cada vez que se inserta, modifica o elimina un registro de una tabla auditada, y guardan el cambio en su tabla `*_log`. Para conocer más información acerca de los disparadores consulte el [orden de ejecución](../../database/schemas/README.md).
+
+Comportamiento de los triggers:
+
+- Hay 10 triggers, uno por entidad auditada, y una función compartida (`fn_audit_log()`) que escribe en la tabla `*_log` correspondiente.
+- Se disparan con `AFTER INSERT OR UPDATE OR DELETE`. `INSERT` se registra como `CREATE`, `UPDATE` como `UPDATE` y `DELETE` como `DELETE` (tipo ENUM `audit_action`, que se crea en la migración `020`).
+- `old` guarda el registro anterior en `UPDATE` y `DELETE`; en un `CREATE` queda en `NULL`.
+- `new` guarda el registro nuevo en `CREATE` y `UPDATE`; en un `DELETE` queda en `NULL`.
+- Ambos guardan la fila completa en JSON. Solo se excluye `pwd_hash` de `user_account`; el resto de columnas, incluidos los datos personales, se registra.
+- `actor_id` se toma de la variable de sesión `app.current_user_id` y `request_ip` de `app.request_ip`. Si no están definidas, se guardan como `NULL`.
+- La aplicación debe definirlas en cada transacción. Ejemplo: `SELECT set_config('app.current_user_id', '<uuid_del_usuario>', true);`
+- Si una variable tiene un valor que no es un UUID o una IP válidos, el trigger falla y la operación original también.
+- `entity_id` y `actor_id` tienen clave foránea hacia `user_account` o hacia la tabla auditada. Por eso no se puede borrar físicamente una fila auditada y la baja de registros es lógica.
 
 ## 6. Políticas, Restauración y Datos Sensibles
 
@@ -509,7 +528,7 @@ pg_restore -h <host> -U <usuario> -d <base_de_datos> --no-owner --exit-on-error 
 
 El respaldo ya incluye la creación de las extensiones `postgis` y `pgcrypto`, por lo que no se ejecuta `000_create_extensions.sql` en este caso.
 
-Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql`, las migraciones `001` a `029` y los seeders de la sección 5.3, en orden ascendente.
+Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql`, las migraciones `001` a `029`, los seeders de la sección 5.3 y los triggers de la sección 5.6, en orden ascendente.
 
 Validación posterior:
 
@@ -532,7 +551,7 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | Clasificación | Datos |
 | --- | --- |
 | Secreto (nunca se expone ni se registra) | `user_account.pwd_hash`, `session.token_hash`, `password_reset_token.token_hash`, `email_validation_token.token_hash` |
-| Personal | `user_account.document_id`, `user_data.first_name`, `user_data.last_name`, `user_data.email`, `user_data.phone`, `crew_member.full_name`, `email_validation_token.email` |
+| Personal | `user_account.document_id`, `user_data.first_name`, `user_data.last_name`, `user_data.email`, `user_data.phone`, `crew_member.full_name`, `email_validation_token.email`, `*_log.old` y `*_log.new` |
 | Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_validation_token`, `*_log`), `*_log.actor_id`, `vehicle_position` (`geom`, `recorded_at`) |
 
 #### 6.3.2. Reglas de tratamiento
@@ -600,35 +619,41 @@ volumes:
 
 ### 7.3. Puesta en marcha
 
+Los comandos se ejecutan desde la raíz del repositorio, en Git Bash o WSL.
+
 ```bash
 cp .env.example .env          # editar la contraseña
 docker compose up -d          # levantar la base
 docker compose ps             # verificar estado "healthy"
 
-# Ejecutar migraciones en orden (mientras no haya herramienta definida)
-for f in <RUTA RELATIVA>/database/migrations/*.sql; do
-  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
-done
-
-# Ejecutar los seeders en orden ascendente (ver sección 5.3).
-for f in <RUTA RELATIVA>/database/seeders/*.sql; do
-  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
-done
-
-# Ejecutar los triggers después de los seeders.
-for f in <RUTA RELATIVA>/database/triggers/*.sql; do
-  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+# Migraciones, seeders (solo en desarrollo) y triggers, en este orden
+for dir in migrations seeders triggers; do
+  for f in database/$dir/*.sql; do
+    docker compose exec -T database psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+  done
 done
 ```
+
+En PowerShell, la redirección `<` no existe. La alternativa es:
+
+```powershell
+foreach ($dir in "migrations","seeders","triggers") {
+  Get-ChildItem "database\$dir\*.sql" | Sort-Object Name | ForEach-Object {
+    Get-Content $_.FullName -Raw -Encoding UTF8 | docker compose exec -T database psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra
+  }
+}
+```
+
+Si se cambia `POSTGRES_USER` o `POSTGRES_DB` en el `.env`, hay que usar los mismos valores en los comandos.
 
 ### 7.4. Comandos útiles
 
 ```bash
 # Entrar a la consola SQL
-docker exec -it vintra-db psql -U vintra_app -d vintra
+docker compose exec database psql -U vintra_app -d vintra
 
-# Verificar PostGIS (dentro de psql)
-SELECT postgis_full_version();
+# Verificar PostGIS
+docker compose exec database psql -U vintra_app -d vintra -c "SELECT postgis_full_version();"
 
 # Reiniciar desde cero (borra todos los datos locales)
 docker compose down -v && docker compose up -d
