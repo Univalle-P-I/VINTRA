@@ -41,7 +41,7 @@ Ultima modificación: 5/11/2026
 
 ## Datos Semillas
 
-Los seeders (`docs/base-de-datos/migraciones/seeders/`) insertan datos mínimos de ejemplo para las tablas base y usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
+Los seeders (`database/seeders/`) insertan datos mínimos de ejemplo para las tablas base y usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
 
 | # | Inserción | Dependencia |
 | --- | --- | --- |
@@ -56,7 +56,7 @@ Los seeders (`docs/base-de-datos/migraciones/seeders/`) insertan datos mínimos 
 
 ## Triggers
 
-Los triggers de auditoría se ejecutan después de las migraciones `001` a `029`. La función compartida `fn_audit_log()` inserta el registro en la tabla `*_log` correspondiente.
+Los triggers de auditoría se ejecutan después de las migraciones `001` a `029` y de los seeders. La función compartida `fn_audit_log()` inserta el registro en la tabla `*_log` correspondiente.
 
 | # | Trigger | Tabla auditada | Tabla log | Evento |
 | --- | --- | --- | --- | --- |
@@ -75,10 +75,12 @@ Los triggers de auditoría se ejecutan después de las migraciones `001` a `029`
 Comportamiento:
 
 - `INSERT` se registra como `CREATE`; `UPDATE` como `UPDATE`; `DELETE` como `DELETE`.
+- Un `UPDATE` que cambia `is_active` a `FALSE` se registra como `DELETE` (borrado lógico); `old` y `new` conservan el cambio.
 - `old` contiene el registro anterior en `UPDATE` y `DELETE`.
 - `new` contiene el registro nuevo en `INSERT` y `UPDATE`.
-- `user_account.pwd_hash` se excluye de `old` y `new`.
+- `user_account.pwd_hash` y `user_account.document_id` se excluyen de `old` y `new`.
 - `actor_id` se toma de `app.current_user_id` y `request_ip` de `app.request_ip`; si no están definidos, se registran como `NULL`.
+- El borrado operativo es lógico (`is_active = FALSE`); no se debe ejecutar `DELETE` físico sobre entidades con historial de auditoría.
 - El ENUM `audit_action` admite `CREATE`, `UPDATE` y `DELETE` (se define en la [primera tabla de auditoría](../migrations/020_create_user_account_log.sql)).
 
 

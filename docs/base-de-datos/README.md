@@ -16,7 +16,7 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 - Estado: `Completada`
 - Responsable: Ricardo Farid Cuero
-- Ultima fecha de modificación: **7/11/2026**
+- Ultima fecha de modificación: **11/11/2026**
 
 ---
 
@@ -390,7 +390,7 @@ Traducción de los conceptos del negocio a tablas de la base de datos. El modelo
 | Horario de recolección | `schedule`, `microroute_schedule` | Franja horaria por microruta y día de la semana |
 | Asignación operativa | `assignment` | Conductor, programación de microruta y vehículo |
 | Seguimiento en tiempo real | `vehicle_position` | Puntos GPS de una asignación |
-| Trazabilidad | `*_log` | Registro de CREATE y UPDATE por entidad |
+| Trazabilidad | `*_log` | Registro de CREATE, UPDATE y DELETE por entidad |
 | Autenticación | `session`, `password_reset_token`, `email_validation_token` | Solo se almacenan hashes de los tokens |
 
 ### 4.2. Relaciones y cardinalidades
@@ -611,6 +611,14 @@ for f in <RUTA RELATIVA>/database/migrations/*.sql; do
 done
 
 # Ejecutar los seeders en orden ascendente (ver sección 5.3).
+for f in <RUTA RELATIVA>/database/seeders/*.sql; do
+  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+done
+
+# Ejecutar los triggers después de los seeders.
+for f in <RUTA RELATIVA>/database/triggers/*.sql; do
+  docker exec -i vintra-db psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+done
 ```
 
 ### 7.4. Comandos útiles

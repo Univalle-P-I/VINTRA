@@ -18,6 +18,12 @@ BEGIN
         WHEN 'DELETE' THEN 'DELETE'::audit_action
     END;
 
+    IF TG_OP = 'UPDATE'
+        AND (to_jsonb(OLD) ->> 'is_active')::boolean IS DISTINCT FROM (to_jsonb(NEW) ->> 'is_active')::boolean
+        AND (to_jsonb(NEW) ->> 'is_active')::boolean IS FALSE THEN
+        v_action := 'DELETE'::audit_action;
+    END IF;
+
     IF TG_OP = 'DELETE' THEN
         v_entity_id := OLD.id;
         v_old := to_jsonb(OLD);
@@ -33,8 +39,8 @@ BEGIN
     END IF;
 
     IF TG_TABLE_NAME = 'user_account' THEN
-        v_old := v_old - 'pwd_hash';
-        v_new := v_new - 'pwd_hash';
+        v_old := v_old - 'pwd_hash' - 'document_id';
+        v_new := v_new - 'pwd_hash' - 'document_id';
     END IF;
 
     v_actor_id := NULLIF(current_setting('app.current_user_id', true), '')::uuid;
