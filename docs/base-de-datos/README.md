@@ -26,7 +26,11 @@ El motor de la Base de Datos usada es: ![PostgreSQL Badge](https://img.shields.i
 
 ## 2. Diagrama Entidad-Relación
 
-Documentación del diagrama entidad-relación: [Diagrama ER](diagrama-entidad-relacion/README.md). A continuación, se presenta el diagrama entidad-relación de base de datos.
+El siguiente DER cuenta con **29 tablas**. 10 de ellas son tablas de registros (logs) y las 19 restantes pertenecen a tablas de datos, catalogos y transaccionales.
+Para conocer más información acerca de las características y restricciones de cada atributo en las tablas consulte lo documentado en el diccionario de datos [`3. Diccionario de Datos`](diccionario-de-datos.md).
+Para conocer más acerca de las relaciones consulte lo documentado en el titular [`4. Relaciones con el Modelo de Dominio`](#4-relaciones-con-el-modelo-de-dominio).
+
+> Aclaración: todas las tablas de auditoría (`*_log`) cuenta con una llave foránea (FK) hacia su tabla entidad como objeto que fue modificado; sin embargo, por seguimiento conserva un segunda llave foránea (FK) hacia user_account(id), como actor. Asociando al registro el actor que realiza tal modificación.
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -122,6 +126,7 @@ erDiagram
         VARCHAR code
         VARCHAR name
         MULTILINESTRING geom
+        TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
 
@@ -131,6 +136,7 @@ erDiagram
         VARCHAR code
         VARCHAR name
         MULTILINESTRING geom
+        TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
 
@@ -139,15 +145,17 @@ erDiagram
         VARCHAR commune
         VARCHAR name
         MULTIPOLYGON geom
+        TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
 
     schedule {
         UUID id
-        SMALLINT day_of_week
+        VARCHAR name
         TIME start_time
         TIME end_time
         BOOLEAN is_active
+        TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
 
@@ -224,7 +232,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -234,7 +243,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -244,7 +254,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -254,7 +265,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -264,7 +276,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -274,7 +287,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -284,7 +298,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -294,7 +309,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -304,7 +320,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -314,7 +331,8 @@ erDiagram
         UUID entity_id
         UUID actor_id
         ENUM action
-        JSONB old_values
+        JSONB old
+        JSONB new
         INET request_ip
         TIMESTAMPTZ created_at
     }
@@ -351,7 +369,7 @@ erDiagram
 
 ## 3. Diccionario de Datos
 
-Documentación del diccionario de datos: [Diccionario de datos](diccionario-de-datos/README.md).
+El Diccionario de Datos aguarda la información descriptiva de cada atributo de las tablas de migración de la base de datos. Consulte el [`Diccionario de Datos`](diccionario-de-datos.md), para saber más información sobre cada tabla y sus atributos.
 
 ## 4. Relaciones con el Modelo de Dominio
 
@@ -397,11 +415,11 @@ Traducción de los conceptos del negocio a tablas de la base de datos. El modelo
 | `btura_neighborhood` → `microroute_neighborhood` | 1 a N | Un barrio puede ser atendido por varias microrrutas |
 | `microroute` → `microroute_neighborhood` | 1 a N | Una microrruta pasa por varios barrios |
 | `vehicle_type` → `vehicle` | 1 a N | Tipo de vehículo |
-| Cada entidad → su tabla `*_log` | 1 a N | Registra `entity`, `actor`, `action`, `old_values` y `request_ip` |
+| Cada entidad → su tabla `*_log` | 1 a N | Registra `entity_id`, `actor_id`, `action`, `old`, `new` y `request_ip` |
 
 ## 5. Migraciones, Datos Iniciales y Orden de Ejecución
 
-Las [migraciones](../../database/migrations/) crean las tablas de la base de datos y los [datos iniciales](../../database/seeders/) insertan datos de ejemplo. Las migraciones están separadas por tabla y usan una numeración secuencial que determina el orden de ejecución. La carpeta de [funcionnes/triggers](../../database/triggers/) almacena los disparadores para las tablas de auditoría: tablas [`*.log`](#56-triggers).
+Las [migraciones](../../database/migrations/) crean las tablas de la base de datos y los [datos iniciales](../../database/seeders/) insertan datos de ejemplo. Las migraciones están separadas por tabla y usan una numeración secuencial que determina el orden de ejecución. La carpeta de [funcionnes/triggers](../../database/triggers/) almacena los disparadores para las tablas de auditoría: tablas [`*_log`](#56-triggers).
 
 ### 5.1. Estructura de archivos
 
@@ -433,6 +451,7 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 1. Ejecutar `000_create_extensions.sql`.
 2. Ejecutar las migrations `001` a `029` en orden ascendente.
 3. Ejecutar las seeders `001` a `029` (hasta donde lleguen las inserciones) en orden ascendente.
+4. Ejecutar los triggers después de los seeders.
 
 ### 5.5. Índices mínimos
 
@@ -443,7 +462,7 @@ El orden completo, las dependencias de cada tabla y los comandos de ejecución c
 
 ### 5.6. Triggers
 
-El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](../../database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](../../database/schemas/README.md).
+El modelo **si** cuenta con triggers (disparadores) por su diseño de trazabilidad y auditoría de los registros. Estos [disparadores](../../database/triggers/) se ejecutan cada vez que se presentan una de las 3 operaciones del **CRUD**, `CREATE`, `UPDATE` y `DELETE`; en los registros de las tablas. Si un `UPDATE` cambia `is_active` a `FALSE`, el trigger registra la acción como `DELETE` (borrado lógico). El borrado operativo es lógico (`is_active = FALSE`); no se debe ejecutar `DELETE` físico sobre entidades con historial de auditoría. Para conocer más información acerca de los disparadores consulte el [orden de ejecucción](../../database/schemas/README.md).
 
 ## 6. Políticas, Restauración y Datos Sensibles
 
@@ -514,7 +533,7 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | --- | --- |
 | Secreto (nunca se expone ni se registra) | `user_account.pwd_hash`, `session.token_hash`, `password_reset_token.token_hash`, `email_validation_token.token_hash` |
 | Personal | `user_account.document_id`, `user_data.first_name`, `user_data.last_name`, `user_data.email`, `user_data.phone`, `crew_member.full_name`, `email_validation_token.email` |
-| Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_validation_token`, `*_log`), `*_log.actor`, `vehicle_position` (`geom`, `recorded_at`) |
+| Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_validation_token`, `*_log`), `*_log.actor_id`, `vehicle_position` (`geom`, `recorded_at`) |
 
 #### 6.3.2. Reglas de tratamiento
 
@@ -522,8 +541,8 @@ Se recomienda una restauración de prueba mensual en un ambiente aislado.
 | --- | --- |
 | Contraseña | Solo se almacena el hash Argon2id (incluye sal y parámetros) |
 | Tokens (sesión, restablecimiento, validación de correo) | Solo se almacena el hash SHA-256; el token en claro nunca se guarda |
-| `*_log.old` | Nunca contiene contraseñas ni hashes; la aplicación los filtra antes de insertar |
-| `document_id` | Se muestra enmascarado y no se escribe en logs |
+| `*_log.old` / `*_log.new` | El trigger `fn_audit_log()` excluye `pwd_hash` y `document_id` de `user_account`; nunca deben contener contraseñas, hashes ni `document_id`. |
+| `document_id` | Se muestra enmascarado y no se escribe en logs; el trigger lo excluye de `user_account`. |
 | Datos personales | No se usan datos reales en desarrollo ni pruebas; los seeders contienen datos ficticios |
 | Posiciones GPS | Solo de asignaciones en curso (regla de la aplicación) |
 | Credenciales de conexión | En variables de entorno o gestor de secretos; nunca en el repositorio |
