@@ -49,8 +49,6 @@ Documentación de las 29 tablas.
 
 cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles)
 
-### Atributos
-
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único de la cuenta de usuario. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | user_account_pkey (id) |
@@ -65,15 +63,11 @@ cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles)
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - (No tiene llaves foráneas)
 
 ## user_data
 
 datos personales de la cuenta (relación 1 a 1 con user_account)
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -86,15 +80,11 @@ datos personales de la cuenta (relación 1 a 1 con user_account)
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - id referencia user_account(id): relación 1 a 1; cada cuenta tiene exactamente un registro de datos personales y viceversa.
 
 ## profile
 
 perfil; rol que ejerce una cuenta (una cuenta puede tener varios perfiles)
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -104,15 +94,11 @@ perfil; rol que ejerce una cuenta (una cuenta puede tener varios perfiles)
 | is_active | Indica si el perfil está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - user_account_id referencia user_account(id): una cuenta puede tener muchos perfiles; cada perfil pertenece a una sola cuenta.
 
 ## session
 
 sesiones abiertas por las cuentas de usuario
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -125,15 +111,11 @@ sesiones abiertas por las cuentas de usuario
 | expires_at | Fecha y hora de vencimiento de la sesión. Pasada esta fecha deja de ser válida. | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_session_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - user_account_id referencia user_account(id): una cuenta puede abrir muchas sesiones; cada sesión pertenece a una sola cuenta.
 
 ## password_reset_token
 
 tokens de un solo uso para restablecer la contraseña
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -145,15 +127,11 @@ tokens de un solo uso para restablecer la contraseña
 | expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_password_reset_token_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - user_account_id referencia user_account(id): una cuenta puede tener muchas solicitudes; cada token pertenece a una sola cuenta.
 
 ## email_validation_token
 
 tokens de un solo uso para validar el correo electrónico
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -166,15 +144,11 @@ tokens de un solo uso para validar el correo electrónico
 | expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_email_validation_token_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - user_data_id referencia user_data(id): unos datos personales pueden tener muchas solicitudes de validación; cada token pertenece a un solo registro de datos personales.
 
 ## vehicle_type
 
 catálogo de tipos de vehículo
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -184,15 +158,11 @@ catálogo de tipos de vehículo
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - (No tiene llaves foráneas)
 
 ## vehicle
 
 vehículos de la flota
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -206,15 +176,11 @@ vehículos de la flota
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - vehicle_type_id referencia vehicle_type(id): un tipo puede estar en muchos vehículos; cada vehículo tiene un solo tipo.
 
 ## macroroute
 
 macrorruta; zona o área general que agrupa microrrutas
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -225,15 +191,11 @@ macrorruta; zona o área general que agrupa microrrutas
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - (No tiene llaves foráneas)
 
 ## microroute
 
 microrruta; trayecto especifico de recolección dentro de una macrorruta
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -245,15 +207,11 @@ microrruta; trayecto especifico de recolección dentro de una macrorruta
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - macroroute_id referencia macroroute(id): una macrorruta tiene muchas microrrutas; cada microrruta pertenece a una sola macrorruta.
 
 ## btura_neighborhood
 
 barrios de Buenaventura
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -264,15 +222,11 @@ barrios de Buenaventura
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - (No tiene llaves foráneas)
 
 ## schedule
 
 horario (franja horaria)
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -284,15 +238,11 @@ horario (franja horaria)
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - (No tiene llaves foráneas)
 
 ## microroute_schedule
 
 plantilla semanal; qué horario y qué día corre cada microruta
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -304,16 +254,12 @@ plantilla semanal; qué horario y qué día corre cada microruta
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - microroute_id referencia microroute(id): una microrruta tiene muchos horarios semanales; cada registro corresponde a una sola microrruta.
 - schedule_id referencia schedule(id): un horario puede aplicarse a muchas microrrutas y días; cada registro usa un solo horario.
 
 ## microroute_neighborhood
 
 barrios que atiende cada microrruta y su orden de visita
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -322,16 +268,12 @@ barrios que atiende cada microrruta y su orden de visita
 | neighborhood_id | Barrio atendido por la microrruta. | UUID | N/A | SI | SI | FK | FK btura_neighborhood(id); UNIQUE (microroute_id, neighborhood_id) via uq_microroute_neighborhood | idx_microroute_neighborhood_neighborhood_id (neighborhood_id); uq_microroute_neighborhood (microroute_id, neighborhood_id) |
 | order_visit | Orden en que la microrruta visita el barrio. No puede repetirse dentro de la misma microrruta. | INTEGER | N/A | SI | SI | N/A | UNIQUE (microroute_id, order_visit) via uq_microroute_neighborhood_order; CHECK (order_visit > 0) | uq_microroute_neighborhood_order (microroute_id, order_visit) |
 
-### Relaciones
-
 - microroute_id referencia microroute(id): una microrruta pasa por muchos barrios; cada registro corresponde a una sola microrruta.
 - neighborhood_id referencia btura_neighborhood(id): un barrio puede ser atendido por muchas microrrutas; cada registro corresponde a un solo barrio.
 
 ## crew
 
 cuadrilla de recolección
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -341,15 +283,11 @@ cuadrilla de recolección
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - (No tiene llaves foráneas)
 
 ## crew_member
 
 integrantes de la cuadrilla
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -360,15 +298,11 @@ integrantes de la cuadrilla
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - crew_id referencia crew(id): una cuadrilla tiene muchos integrantes; cada integrante pertenece a una sola cuadrilla.
 
 ## driver
 
 conductor asignado a una cuadrilla
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -381,16 +315,12 @@ conductor asignado a una cuadrilla
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - user_data_id referencia user_data(id): unos datos personales pueden corresponder a varios registros de conductor; cada registro de conductor pertenece a unos datos personales.
 - crew_id referencia crew(id): una cuadrilla puede tener varios conductores; cada registro de conductor pertenece a una sola cuadrilla.
 
 ## assignment
 
 ejecución concreta de una programación de microrruta con conductor y vehículo
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -407,8 +337,6 @@ ejecución concreta de una programación de microrruta con conductor y vehículo
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - driver_id referencia driver(id): un conductor puede tener muchas asignaciones; cada asignación tiene un solo conductor.
 - microroute_schedule_id referencia microroute_schedule(id): una programación de microrruta puede tener muchas asignaciones; cada asignación corresponde a una sola programación.
 - vehicle_id referencia vehicle(id): un vehículo puede tener muchas asignaciones; cada asignación usa un solo vehículo.
@@ -416,8 +344,6 @@ ejecución concreta de una programación de microrruta con conductor y vehículo
 ## vehicle_position
 
 posiciones GPS reportadas por el vehículo durante una asignación
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -427,15 +353,11 @@ posiciones GPS reportadas por el vehículo durante una asignación
 | recorded_at | Fecha y hora en que el dispositivo registró la posición (distinta de created_at, que es la del servidor). | TIMESTAMPTZ | N/A | SI | NO | N/A | — | idx_vehicle_position_assignment_recorded (assignment_id, recorded_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-### Relaciones
-
 - assignment_id referencia assignment(id): una asignación tiene muchas posiciones; cada posición pertenece a una sola asignación.
 
 ## user_account_log
 
 auditoría de cambios en user_account
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -448,16 +370,12 @@ auditoría de cambios en user_account
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_account_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia user_account(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## user_data_log
 
 auditoría de cambios en user_data
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -470,16 +388,12 @@ auditoría de cambios en user_data
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_data_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia user_data(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## profile_log
 
 auditoría de cambios en profile
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -492,16 +406,12 @@ auditoría de cambios en profile
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_profile_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia profile(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## crew_log
 
 auditoría de cambios en crew
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -514,16 +424,12 @@ auditoría de cambios en crew
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_crew_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia crew(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## crew_member_log
 
 auditoría de cambios en crew_member
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -536,16 +442,12 @@ auditoría de cambios en crew_member
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_crew_member_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia crew_member(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## driver_log
 
 auditoría de cambios en driver
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -558,16 +460,12 @@ auditoría de cambios en driver
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_driver_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia driver(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## macroroute_log
 
 auditoría de cambios en macroroute
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -580,16 +478,12 @@ auditoría de cambios en macroroute
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_macroroute_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia macroroute(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## microroute_log
 
 auditoría de cambios en microroute
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -602,16 +496,12 @@ auditoría de cambios en microroute
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia microroute(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## assignment_log
 
 auditoría de cambios en assignment
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -624,16 +514,12 @@ auditoría de cambios en assignment
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_assignment_log_created_at (created_at) |
 
-### Relaciones
-
 - entity_id referencia assignment(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## vehicle_log
 
 auditoría de cambios en vehicle
-
-### Atributos
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -645,8 +531,6 @@ auditoría de cambios en vehicle
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_log_created_at (created_at) |
-
-### Relaciones
 
 - entity_id referencia vehicle(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
