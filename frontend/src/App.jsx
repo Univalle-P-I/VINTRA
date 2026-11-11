@@ -19,9 +19,8 @@ function App() {
   const goToLogin = () => {
     setScreen('login')
     window.scrollTo({ top: 0, behavior: 'smooth' })
-
   }
-  
+
   const goToPeople = () => {
     setScreen('people')
     window.scrollTo({ top: 0, behavior: 'smooth' })
