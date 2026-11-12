@@ -6,6 +6,8 @@ type Vehicle = { id: string; plate: string; type: string; capacity: string; mode
 
 const emptyVehicle: Vehicle = { id: "", plate: "", type: "Compactador", capacity: "", model: "", year: "", fuel: "", status: "Disponible", driver: "" }
 
+const normalizePlate = (plate: string) => plate.replace(/\s/g, "").toUpperCase()
+
 export default function FleetPanel() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [draft, setDraft] = useState<Vehicle>(emptyVehicle)
@@ -20,15 +22,16 @@ export default function FleetPanel() {
 
   function save(event: FormEvent) {
     event.preventDefault()
-    if (!draft.plate.trim() || !draft.model.trim()) {
+    const plate = normalizePlate(draft.plate)
+    if (!plate || !draft.model.trim()) {
       setMessage("Completa la placa y el modelo.")
       return
     }
-    if (vehicles.some(v => v.plate.toLowerCase() === draft.plate.toLowerCase())) {
+    if (vehicles.some(v => normalizePlate(v.plate) === plate)) {
       setMessage("La placa ya está registrada.")
       return
     }
-    setVehicles(current => [...current, { ...draft, id: draft.id || crypto.randomUUID() }])
+    setVehicles(current => [...current, { ...draft, plate, id: draft.id || crypto.randomUUID() }])
     setDraft(emptyVehicle)
     setMessage("Vehículo agregado a la lista local. La persistencia requiere conexión con el backend.")
   }
@@ -48,9 +51,9 @@ export default function FleetPanel() {
           <option>Todos</option><option>Disponible</option><option>En operación</option><option>Mantenimiento</option><option>Inhabilitado</option>
         </SelectField>
       </div>
-      <div className="data-table responsive-table">
+      <div className="data-table responsive-table fleet-table">
         <div className="table-row table-head"><span>Código</span><span>Placa</span><span>Tipo</span><span>Modelo</span><span>Estado</span></div>
-        {filtered.length ? filtered.map(v => <div className="table-row" key={v.id}><span>{v.id}</span><span>{v.plate}</span><span>{v.type}</span><span>{v.model}</span><span>{v.status}</span></div>) : <p className="empty-state">No hay vehículos registrados para mostrar.</p>}
+        {filtered.length ? filtered.map(v => <div className="table-row" key={v.id}><span data-label="Código">{v.id}</span><span data-label="Placa">{v.plate}</span><span data-label="Tipo">{v.type}</span><span data-label="Modelo">{v.model}</span><span data-label="Estado">{v.status}</span></div>) : <p className="empty-state">No hay vehículos registrados para mostrar.</p>}
       </div>
     </Section>
     <Section title="Registrar vehículo" subtitle="Completa los datos del vehículo. Al guardar, el registro se conserva únicamente en el estado local de esta pantalla.">
