@@ -1,6 +1,6 @@
 
 services:
-  postgres:
+  database:
     build:
       context: ./database
       dockerfile: Dockerfile
@@ -9,14 +9,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "0.0.0.0:${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - vintra_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   backend:
     build:
@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: 3002
-      DB_HOST: postgres
+      DB_HOST: database
       DB_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -33,7 +33,7 @@ services:
     ports:
       - "${IP}:${BACKEND_PORT:-3003}:3002"
     depends_on:
-      postgres:
+      database:
         condition: service_healthy
     healthcheck:
         test:
@@ -59,4 +59,4 @@ services:
         condition: service_healthy
 
 volumes:
-  postgres_data:
+  vintra_pgdata:

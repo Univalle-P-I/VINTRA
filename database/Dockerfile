@@ -2,8 +2,8 @@ FROM postgis/postgis:16-3.6
 
 WORKDIR /database
 
-COPY migrations/ /docker-entrypoint-initdb.d/
-COPY triggers/ /docker-entrypoint-initdb.d/
-COPY seeders/ /docker-entrypoint-initdb.d/
+COPY migrations/ /database/migrations/
+COPY seeders/ /database/seeders/
+COPY triggers/ /database/triggers/
 
 EXPOSE 5432
