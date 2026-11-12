@@ -37,7 +37,7 @@ export default function PeoplePanel() {
       <div className="filters"><Field label="Buscar" value={search} onChange={setSearch} placeholder="Nombre, documento o rol" /><SelectField label="Cuenta" value={status} onChange={setStatus}><option>Todos</option><option>Activo</option><option>Inactivo</option></SelectField></div>
       <div className="data-table responsive-table staff-table">
         <div className="table-row table-head"><span>Nombre</span><span>Documento</span><span>Rol</span><span>Disponibilidad</span><span>Cuenta</span></div>
-        {filtered.length ? filtered.map(p=><div className="table-row" key={p.id}><span>{p.name}</span><span>{p.document}</span><span>{p.role}</span><span>{p.availability}</span><span>{p.account}</span></div>) : <p className="empty-state">No hay personal registrado para mostrar.</p>}
+        {filtered.length ? filtered.map(p=><div className="table-row" key={p.id}><span data-label="Nombre">{p.name}</span><span data-label="Documento">{p.document}</span><span data-label="Rol">{p.role}</span><span data-label="Disponibilidad">{p.availability}</span><span data-label="Cuenta">{p.account}</span></div>) : <p className="empty-state">No hay personal registrado para mostrar.</p>}
       </div>
     </Section>
     <Section title="Registrar personal" subtitle="En el MVP, las cuentas son de uso administrativo y operativo. No se habilita registro público de ciudadanos.">

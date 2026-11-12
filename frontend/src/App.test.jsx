@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import App from './App'
@@ -94,5 +94,28 @@ describe('App connection smoke test', () => {
     await user.click(
       screen.getByRole('button', { name: /volver|inicio|regresar/i })
     )
+  })
+
+  it('opens fleet from the module navigation after login', async () => {
+    axios.get.mockReturnValue(new Promise(() => {}))
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(
+      await screen.findByRole('button', {
+        name: /iniciar sesión|iniciar sesion|ingresar|acceder|login/i,
+      })
+    )
+    await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+    await user.click(
+      within(
+        screen.getByRole('navigation', { name: 'Navegación de módulos' })
+      ).getByRole('button', { name: 'Gestión de flota' })
+    )
+
+    expect(
+      screen.getByText('Gestión de flota', { selector: '.page-title' })
+    ).toBeInTheDocument()
   })
 })
