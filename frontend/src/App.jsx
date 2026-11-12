@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
+import FleetPanel from './FleetPanel'
 import PeoplePanel from './PeoplePanel'
 import RoutePanel from './RoutePanel'
 import OperationsPanel from './OperationsPanel'
@@ -36,6 +37,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const goToFleet = () => {
+    setScreen('fleet')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const handleLogin = () => {
     goToPeople()
   }
@@ -53,6 +59,7 @@ function App() {
       {screen === 'people' && <PeoplePanel />}
       {screen === 'routes' && <RoutePanel />}
       {screen === 'operations' && <OperationsPanel />}
+      {screen === 'fleet' && <FleetPanel />}
 
       <ConnectionStatus />
     </>
