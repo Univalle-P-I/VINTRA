@@ -430,16 +430,17 @@ Las [migraciones](../../database/migrations/) crean las tablas de la base de dat
 | Trigger | `database/triggers/` | `NNN_trigger_<tabla>.sql` | `001_trigger_user_account.sql` |
 
 - `NNN` es un número de tres dígitos que indica el orden de ejecución.
-- `create` identifica un archivo que crea una tabla.
+- `create` identifica un archivo que crea una tabla u objeto de base de datos.
 - `insert` identifica un archivo que inserta datos iniciales de ejemplo.
 - `<tabla>` corresponde al nombre de la tabla afectada.
 - `000_create_extensions.sql` habilita las extensiones `postgis` y `pgcrypto`; no crea una tabla.
+- `030_create_updated_at_function.sql` crea la función `fn_set_updated_at()` y los triggers que actualizan `updated_at` para cada update del registro.
 
 - `000_function_audit_log.sql` crea la función compartida de auditoría. En los demás triggers, `NNN` coincide con el número de la migración de la tabla auditada.
 
 ### 5.2. Migraciones
 
-Cada migración crea una tabla con sus restricciones (`PK`, `FK`, `UNIQUE`, `CHECK`) y los índices principales. Los archivos están envueltos en `BEGIN`/`COMMIT` para que la ejecución sea atómica. Los catálogos que antes eran tablas (estados, roles y tipo de documento) ahora son tipos `ENUM` definidos en la migración que los usa.
+Las migraciones de tablas crean cada tabla con sus restricciones (`PK`, `FK`, `UNIQUE`, `CHECK`) y los índices principales. Los archivos están envueltos en `BEGIN`/`COMMIT` para que la ejecución sea atómica. Los catálogos que antes eran tablas (estados, roles y tipo de documento) ahora son tipos `ENUM` definidos en la migración que los usa.
 
 AVISO: El orden de las migraciones no es alfabético ni arbitrario: respeta las dependencias entre tablas. Primero se crean las entidades base, después las entidades que las referencian y al final las tablas transaccionales y de auditoría. Por eso una migración con número mayor puede depender de una anterior y no debe ejecutarse de forma aislada.
 
@@ -454,7 +455,7 @@ Los seeders solo se ejecutan en desarrollo y pruebas; nunca en producción, porq
 El orden completo, las dependencias de cada tabla y los comandos de ejecución con `psql` están documentados en el [orden de ejecución](../../database/schemas/README.md). La secuencia general es:
 
 1. Ejecutar `000_create_extensions.sql`.
-2. Ejecutar las migrations `001` a `029` en orden ascendente.
+2. Ejecutar las migrations `001` a `030` en orden ascendente.
 3. Ejecutar las seeders `001` a `029` (hasta donde lleguen las inserciones) en orden ascendente.
 4. Ejecutar los triggers después de los seeders.
 
@@ -477,11 +478,12 @@ Comportamiento de los triggers:
 - Se disparan con `AFTER INSERT OR UPDATE OR DELETE`. `INSERT` se registra como `CREATE`, `UPDATE` como `UPDATE` y `DELETE` como `DELETE` (tipo ENUM `audit_action`, que se crea en la migración `020`).
 - `old` guarda el registro anterior en `UPDATE` y `DELETE`; en un `CREATE` queda en `NULL`.
 - `new` guarda el registro nuevo en `CREATE` y `UPDATE`; en un `DELETE` queda en `NULL`.
-- Ambos guardan la fila completa en JSON. Solo se excluye `pwd_hash` de `user_account`; el resto de columnas, incluidos los datos personales, se registra.
+- Ambos guardan la fila completa en JSON. Solo se excluye `pwd_hash` y `document_id` de `user_account`; el resto de columnas, incluidos los datos personales, se registra.
 - `actor_id` se toma de la variable de sesión `app.current_user_id` y `request_ip` de `app.request_ip`. Si no están definidas, se guardan como `NULL`.
 - La aplicación debe definirlas en cada transacción. Ejemplo: `SELECT set_config('app.current_user_id', '<uuid_del_usuario>', true);`
 - Si una variable tiene un valor que no es un UUID o una IP válidos, el trigger falla y la operación original también.
 - `entity_id` y `actor_id` tienen clave foránea hacia `user_account` o hacia la tabla auditada. Por eso no se puede borrar físicamente una fila auditada y la baja de registros es lógica.
+- La migración `030` instala triggers de tipo `BEFORE UPDATE` (`trg_<tabla>_updated_at`) que actualizan `updated_at` en las tablas que tienen esa columna cada vez que ocurra una `update`.
 
 ## 6. Políticas, Restauración y Datos Sensibles
 
@@ -528,7 +530,7 @@ pg_restore -h <host> -U <usuario> -d <base_de_datos> --no-owner --exit-on-error 
 
 El respaldo ya incluye la creación de las extensiones `postgis` y `pgcrypto`, por lo que no se ejecuta `000_create_extensions.sql` en este caso.
 
-Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql`, las migraciones `001` a `029`, los seeders de la sección 5.3 y los triggers de la sección 5.6, en orden ascendente.
+Reconstrucción sin respaldo (desarrollo y pruebas): ejecutar `000_create_extensions.sql`, las migraciones `001` a `030`, los seeders de la [sección 5.3](#53-datos-iniciales) y los triggers de la [sección 5.6](#56-triggers), en orden ascendente.
 
 Validación posterior:
 

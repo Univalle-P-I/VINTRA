@@ -59,4 +59,4 @@ services:
         condition: service_healthy
 
 volumes:
-  vintra_pgdata:
+  postgres_data:

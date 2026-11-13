@@ -2,7 +2,7 @@
 
 Las migraciones se ejecutan en orden numérico ascendente. El orden respeta las dependencias entre tablas: primero las entidades base, después las entidades que las referencian y al final las tablas transaccionales y de auditoría. A continuación, se presenta la propuesta de orden de ejución de las migraciones y datos semillas:
 
-Ultima modificación: 5/11/2026
+Ultima modificación: 12/11/2026
 
 ## Migraciones
 
@@ -38,6 +38,7 @@ Ultima modificación: 5/11/2026
 | 027 | `027_create_microroute_log.sql` | `microroute`, `user_account` |
 | 028 | `028_create_assignment_log.sql` | `assignment`, `user_account` |
 | 029 | `029_create_vehicle_log.sql` | `vehicle`, `user_account` |
+| 030 | `030_create_updated_at_function.sql` | todas tablas con `updated_at` |
 
 ## Datos Semillas
 
@@ -56,7 +57,9 @@ Los seeders (`database/seeders/`) insertan datos mínimos de ejemplo para las ta
 
 ## Triggers
 
-Los triggers de auditoría se ejecutan después de las migraciones `001` a `029` y de los seeders. La función compartida `fn_audit_log()` inserta el registro en la tabla `*_log` correspondiente.
+Los triggers se ejecutan después de las migraciones `001` a `030` y de los seeders. La función compartida `fn_audit_log()` inserta el registro en la tabla `*_log` correspondiente.
+
+La migración `030_create_updated_at_function.sql` define `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at`, que actualizan `updated_at` antes de cada `UPDATE` en las tablas que tienen esa columna.
 
 | # | Trigger | Tabla auditada | Tabla log | Evento |
 | --- | --- | --- | --- | --- |
