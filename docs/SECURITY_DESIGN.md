@@ -2,13 +2,13 @@
 
 ## Estado
 
-Propuesta para validar antes de exponer endpoints de negocio. El repositorio y issue #71 no confirman un mecanismo de autenticación definitivo; issue #54 pide aprobarlo. No asumir JWT, proveedor externo, login social ni roles de usuarios finales antes de esa decisión. La autorización por rol/acción debe derivarse de la matriz #70.
+JWT Bearer se aprobó como base técnica inicial para el backend. No representa una aprobación final del ciclo de vida de sesiones, identidad ni permisos (#54/#70/#71). La autorización por rol/acción debe derivarse de la matriz #70.
 
 ## Identidad y autenticación
 
-- Definir en ADR #54 el origen de identidad, mecanismo, ciclo de vida de sesión, expiración, revocación, recuperación y protección ante intentos repetidos.
-- Guardar hashes de credenciales con algoritmo de derivación de contraseñas reconocido y parámetros vigentes al implementarlo; nunca texto plano ni cifrado reversible. La selección concreta se registra con fecha y justificación al aprobar autenticación.
-- Si se eligen tokens: definir emisor/audiencia, expiración, rotación/refresh, revocación, almacenamiento del frontend y protección XSS/CSRF acorde al mecanismo; no crear un token propio ad hoc.
+- El login inicial es `POST /api/v1/auth/login`, con email/contraseña y JWT de acceso firmado con HS256. El secreto se obtiene de `JWT_SECRET` (mínimo 32 bytes); la duración configurable inicial es de 900 segundos.
+- Verificar hashes Argon2id guardados en `user_account.pwd_hash`; nunca guardar contraseñas en texto claro ni cifrado reversible. Los parámetros Argon2id deben acordarse para los flujos que creen o actualicen hashes.
+- La base inicial no implementa refresh, revocación inmediata, persistencia de sesiones ni recuperación. Acordar emisor/audiencia, rotación, almacenamiento del frontend y protección XSS/CSRF antes de ampliarla.
 - Si se eligen cookies: `Secure`, `HttpOnly`, `SameSite` apropiado, dominio y protección CSRF según despliegue HTTPS.
 - No incluir credenciales/tokens en URL, logs, capturas de CI ni mensajes de error.
 
@@ -77,7 +77,7 @@ El diccionario compartido por BD propone estos controles de almacenamiento:
 - Los roles y perfiles del diccionario incluyen administración, jefe de operaciones y conductor. Confirmar el alcance con #70 antes de habilitar conductor; el issue vigente limita el MVP a roles administrativos.
 - `audit_log` es append-only según la propuesta. Los campos JSON no deben incluir credenciales, hashes ni información personal innecesaria. Su `entity_id` polimórfico y `actor` textual no tienen FK formal, por lo que se debe revisar integridad y atribución con BD.
 
-La hoja propone almacenamiento y campos, pero no define por sí sola el protocolo HTTP de login, cookies/tokens, CSRF, recuperación, autorización por endpoint ni requisitos de privacidad. Esos contratos siguen sujetos a #54/#70/#71 y revisión de seguridad.
+La base inicial define el protocolo de login y JWT de acceso, pero el diccionario no define por sí solo cookies/tokens, CSRF, recuperación, autorización por endpoint ni requisitos de privacidad. Esos puntos siguen sujetos a #54/#70/#71 y revisión de seguridad.
 
 ## Lista de verificación para aceptar el diseño
 

@@ -22,10 +22,10 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 
 ## ADR-003 — Base relacional PostgreSQL
 
-- **Estado:** PostgreSQL aparece en documentos y en el diccionario compartido por BD; confirmar elección de extensión y soporte en issue #54.
+- **Estado:** PostgreSQL se usa provisionalmente en backend/Compose; PR #115, aún abierto, propone PostGIS 16.3.6.
 - **Contexto:** Las tarjetas/modelado y Compose contemplan PostgreSQL; el dominio requiere relaciones, restricciones, transacciones e integridad.
 - **Decisión propuesta:** PostgreSQL relacional para datos operativos. El diccionario de BD propone PostGIS para macrorutas, microrutas, barrios y puntos de ubicación de vehículos.
-- **Pendiente:** confirmar producto/arquitectura si se implementa GIS y seguimiento GPS, SRID, frecuencia, retención, privacidad y ambiente (#54/#58/#91). La propuesta del diccionario no equivale por sí sola a alcance aprobado.
+- **Pendiente:** confirmar el alcance de GIS y seguimiento GPS, SRID, frecuencia, retención, privacidad y ambientes (#54/#58/#91). Compose utiliza la imagen PostGIS indicada por PR #115 para ser compatible con las entidades; no ejecuta migraciones ni aprueba por sí mismo el alcance funcional.
 - **Consecuencias:** Migraciones versionadas, FKs/constraints para invariantes, backups y manejo de concurrencia.
 
 ## ADR-004 — ORM o acceso con `pg`
@@ -38,24 +38,24 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 
 ## ADR-005 — REST y contrato OpenAPI
 
-- **Estado:** Propuesta pendiente de contrato #66.
+- **Estado:** Generación OpenAPI implementada en `/api/docs`; el contrato funcional sigue pendiente de aprobación (#66).
 - **Contexto:** React/Vite necesita contrato de integración estable; issues piden API REST y documentación de request/response.
-- **Decisión propuesta:** REST/JSON versionada y OpenAPI, errores comunes y validaciones publicadas desde backend.
+- **Decisión propuesta:** REST/JSON versionada y OpenAPI generado desde los controladores y DTO realmente implementados. Los permisos, reglas de negocio y formato global de errores continúan provisionales.
 - **Consecuencias:** Contratos probables se validan con frontend antes de implementar. Las rutas de recursos no se consideran finales hasta que modelo/HUs se aprueben.
 
 ## ADR-006 — Autenticación y permisos
 
-- **Estado:** Parcialmente informado por el diccionario de BD; protocolo/flujo y permisos pendientes #54/#70/#71.
-- **Contexto:** HU1 y Trello mencionan usuarios/roles. El diccionario propone `user_account`, perfiles/roles, hash Argon2id, sesiones con token hash SHA-256, bloqueo temporal y tokens de restablecimiento de un solo uso. No confirma transporte del token, expiraciones, canales de recuperación, identidad local/institucional ni permisos por operación.
-- **Decisión:** No seleccionar JWT, OAuth, proveedor externo, cookie o flujo de recuperación por inferencia. Resolver mecanismo y amenaza/entorno antes de codificar.
-- **Consecuencias:** Mantener endpoints de negocio protegidos; el frontend no define autoridad. La matriz de roles/acciones es requisito para B-13.
+- **Estado:** Base técnica inicial autorizada; ciclo de vida de sesión, recuperación e identidad institucional y permisos siguen pendientes #54/#70/#71.
+- **Contexto:** HU1 y Trello mencionan usuarios/roles. El diccionario propone `user_account`, perfiles/roles, hash Argon2id, sesiones con token hash SHA-256, bloqueo temporal y tokens de restablecimiento de un solo uso.
+- **Decisión inicial:** `POST /api/v1/auth/login` recibe email/contraseña, verifica Argon2id y emite JWT de acceso HS256 con `sub` igual al UUID de la cuenta. El secreto es obligatorio por entorno y tiene mínimo 32 bytes. La duración inicial configurable es 900 segundos. No se emiten roles en el token.
+- **Consecuencias:** La implementación actual persiste sesiones con el hash SHA-256 del JWT y permite revocarlas con logout; no implementa refresh, recuperación ni verificación por correo. Los permisos aplicados por `RolesGuard` son provisionales y deben revisarse contra la matriz #70 antes de producción.
 
 ## ADR-007 — Geografía y rastreo
 
 - **Estado:** Pendiente #54/#58/#91.
 - **Contexto:** Recolección tiene contexto geográfico, pero “mapa de ruta”, “GPS en vivo”, “ETA” y “mapa ciudadano” implican capacidades y datos distintos. Trello #7 menciona PostGIS; aún falta aprobación de requisito.
-- **Decisión:** No agregar PostGIS, proveedor de mapas, GPS, geocodificación ni ETA hasta completar un spike y decisión de alcance.
-- **Consecuencias:** Modelo inicial admite sector/ruta y deja geometría opcional. Si se aprueba GIS, documentar SRID, datos, consulta, privacidad, frecuencia, precisión y costo.
+- **Decisión:** El Compose local usa `postgis/postgis:16-3.6`, como referencia provisional del PR #115 y de las columnas geométricas de TypeORM. Esto solo hace posible preparar el entorno; no se ejecutan migraciones ni se aprueba el uso funcional de mapas/GPS.
+- **Consecuencias:** La API admite geometrías y posiciones según el modelo provisional. Confirmar con BD/producto SRID, formato, privacidad, frecuencia, precisión y costo antes de habilitar el alcance en un entorno compartido o de producción.
 
 ## ADR-008 — Configuración y secretos externos al código
 

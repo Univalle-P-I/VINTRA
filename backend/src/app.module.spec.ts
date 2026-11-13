@@ -26,13 +26,22 @@ describe('createDatabaseOptions', () => {
       password: 'test_password',
       database: 'vintra',
       autoLoadEntities: true,
+      uuidExtension: 'pgcrypto',
+      installExtensions: false,
       synchronize: false,
     });
   });
 
   it('uses localhost and port 5432 when defaults are needed', () => {
+    const values: Record<string, string> = {
+      POSTGRES_USER: 'vintra_user',
+      POSTGRES_PASSWORD: 'test_password',
+      POSTGRES_DB: 'vintra',
+    };
     const config = {
-      get: jest.fn((_key: string, defaultValue?: string) => defaultValue),
+      get: jest.fn((key: string, defaultValue?: string) =>
+        values[key] ?? defaultValue,
+      ),
     } as unknown as ConfigService;
 
     const options = createDatabaseOptions(config);
@@ -42,7 +51,19 @@ describe('createDatabaseOptions', () => {
       host: 'localhost',
       port: 5432,
       autoLoadEntities: true,
+      uuidExtension: 'pgcrypto',
+      installExtensions: false,
       synchronize: false,
     });
+  });
+
+  it('rejects missing database credentials', () => {
+    const config = {
+      get: jest.fn((_key: string, defaultValue?: string) => defaultValue),
+    } as unknown as ConfigService;
+
+    expect(() => createDatabaseOptions(config)).toThrow(
+      'POSTGRES_USER es obligatorio para conectar con PostgreSQL',
+    );
   });
 });
