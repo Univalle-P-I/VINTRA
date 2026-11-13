@@ -1,6 +1,10 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import type { EntityManager, Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 
+import {
+  createAuditContext,
+  createManager,
+} from '../../test/helpers/audit-mocks';
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { CuentaUsuario } from '../usuarios/entidades/cuenta-usuario.entity';
 import { Perfil, RolUsuario } from './entidades/perfil.entity';
@@ -13,24 +17,6 @@ const REQUEST_IP = '192.0.2.10';
 const ACCOUNT_ID = 'c0a80101-0000-4000-8000-000000000001';
 const PROFILE_ID = 'c0a80101-0000-4000-8000-000000000002';
 const CREATED_AT = new Date('2026-01-01T00:00:00.000Z');
-
-function createManager(repositories: Map<Function, object>) {
-  return {
-    getRepository: jest.fn((entity: Function) => repositories.get(entity)),
-  };
-}
-
-function createAuditContext(manager: object) {
-  return {
-    ejecutar: jest.fn(
-      async (
-        _actorId: string,
-        _requestIp: string,
-        operation: (transactionManager: EntityManager) => Promise<unknown>,
-      ) => operation(manager as unknown as EntityManager),
-    ),
-  };
-}
 
 function createService(
   profileRepository: object = {},

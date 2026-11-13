@@ -1,7 +1,11 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ILike } from 'typeorm';
-import type { EntityManager, Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 
+import {
+  createAuditContext,
+  createManager,
+} from '../../test/helpers/audit-mocks';
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { Barrio } from './entidades/barrio.entity';
 import { Macroruta } from './entidades/macroruta.entity';
@@ -17,24 +21,6 @@ const MICRORUTA_ID = 'c0a80101-0000-4000-8000-000000000003';
 const LINK_ID = 'c0a80101-0000-4000-8000-000000000004';
 const MULTIPOLYGON = { type: 'MultiPolygon', coordinates: [] };
 const MULTILINESTRING = { type: 'MultiLineString', coordinates: [] };
-
-function createManager(repositories: Map<Function, object>) {
-  return {
-    getRepository: jest.fn((entity: Function) => repositories.get(entity)),
-  };
-}
-
-function createAuditContext(manager: object) {
-  return {
-    ejecutar: jest.fn(
-      async (
-        _actorId: string,
-        _requestIp: string,
-        operation: (transactionManager: EntityManager) => Promise<unknown>,
-      ) => operation(manager as unknown as EntityManager),
-    ),
-  };
-}
 
 function createService(
   repositories: {

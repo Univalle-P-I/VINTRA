@@ -1,6 +1,10 @@
 import { NotFoundException } from '@nestjs/common';
-import type { EntityManager, Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 
+import {
+  createAuditContext,
+  createManager,
+} from '../../test/helpers/audit-mocks';
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { ActualizarCuadrillaDto } from './dto/actualizar-cuadrilla.dto';
 import { ActualizarIntegranteCuadrillaDto } from './dto/actualizar-integrante-cuadrilla.dto';
@@ -14,24 +18,6 @@ const ACTOR_ID = 'f0836911-5b63-490c-88a2-9176b9b2b4a1';
 const REQUEST_IP = '192.0.2.10';
 const CREW_ID = 'c0a80101-0000-4000-8000-000000000001';
 const MEMBER_ID = 'c0a80101-0000-4000-8000-000000000002';
-
-function createManager(repositories: Map<Function, object>) {
-  return {
-    getRepository: jest.fn((entity: Function) => repositories.get(entity)),
-  };
-}
-
-function createAuditContext(manager: object) {
-  return {
-    ejecutar: jest.fn(
-      async (
-        _actorId: string,
-        _requestIp: string,
-        operation: (transactionManager: EntityManager) => Promise<unknown>,
-      ) => operation(manager as unknown as EntityManager),
-    ),
-  };
-}
 
 function createService(
   crewRepository: object = {},

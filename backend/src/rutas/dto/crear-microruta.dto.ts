@@ -1,33 +1,8 @@
-import { Transform } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsObject,
-  IsString,
-  MaxLength,
-  IsUUID,
-  MinLength,
-  Validate,
-} from 'class-validator';
+import { IsUUID } from 'class-validator';
 
-import { GeoJsonGeometryValidator } from '../../comun/geojson.validator';
+import { CamposRutaLinealDto } from './campos-ruta-lineal.dto';
 
-export class CrearMicrorutaDto {
+export class CrearMicrorutaDto extends CamposRutaLinealDto {
   @IsUUID()
   macrorouteId: string;
-
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  @IsString()
-  @MinLength(1)
-  @MaxLength(30)
-  code: string;
-
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
-  name: string;
-
-  @IsObject()
-  @Validate(GeoJsonGeometryValidator, ['MultiLineString'])
-  geometry: Record<string, unknown>;
 }

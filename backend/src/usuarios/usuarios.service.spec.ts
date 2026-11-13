@@ -2,6 +2,10 @@ import * as argon2 from 'argon2';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import type { EntityManager } from 'typeorm';
 
+import {
+  createAuditContext,
+  createManager,
+} from '../../test/helpers/audit-mocks';
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { Perfil, RolUsuario } from '../perfiles/entidades/perfil.entity';
 import {
@@ -90,24 +94,6 @@ describe('UsuariosService', () => {
 
 const USER_ID = 'f0836911-5b63-490c-88a2-9176b9b2b4a1';
 const REQUEST_IP = '192.0.2.10';
-
-function createManager(repositories: Map<Function, object>) {
-  return {
-    getRepository: jest.fn((entity: Function) => repositories.get(entity)),
-  };
-}
-
-function createAuditContext(manager: object) {
-  return {
-    ejecutar: jest.fn(
-      async (
-        _actorId: string,
-        _requestIp: string,
-        operation: (transactionManager: EntityManager) => Promise<unknown>,
-      ) => operation(manager as unknown as EntityManager),
-    ),
-  };
-}
 
 describe('UsuariosService read and update operations', () => {
   describe('listar', () => {

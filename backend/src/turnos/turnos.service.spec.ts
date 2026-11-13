@@ -3,8 +3,12 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import type { EntityManager, Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 
+import {
+  createAuditContext,
+  createManager,
+} from '../../test/helpers/audit-mocks';
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { Microruta } from '../rutas/entidades/microruta.entity';
 import { ActualizarHorarioDto } from './dto/actualizar-horario.dto';
@@ -20,24 +24,6 @@ const REQUEST_IP = '192.0.2.10';
 const SCHEDULE_ID = 'c0a80101-0000-4000-8000-000000000001';
 const ROUTE_ID = 'c0a80101-0000-4000-8000-000000000002';
 const LINK_ID = 'c0a80101-0000-4000-8000-000000000003';
-
-function createManager(repositories: Map<Function, object>) {
-  return {
-    getRepository: jest.fn((entity: Function) => repositories.get(entity)),
-  };
-}
-
-function createAuditContext(manager: object) {
-  return {
-    ejecutar: jest.fn(
-      async (
-        _actorId: string,
-        _requestIp: string,
-        operation: (transactionManager: EntityManager) => Promise<unknown>,
-      ) => operation(manager as unknown as EntityManager),
-    ),
-  };
-}
 
 function createService(
   horarioRepository: object = {},
