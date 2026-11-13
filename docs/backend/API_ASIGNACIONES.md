@@ -101,7 +101,7 @@ Permite consultar las asignaciones registradas, aplicar filtros por conductor, c
 GET /api/v1/assignments?page=1&limit=20&assignmentStatus=scheduled
 ```
 
-**Respuesta exitosa: 200 OK**
+Respuesta exitosa: 200 OK
 
 ```json
 {
@@ -174,7 +174,7 @@ Utiliza `ConsultarAsignacionesDto`, por lo que admite los mismos filtros y pará
 GET /api/v1/assignments/me?page=1&limit=20
 ```
 
-**Respuesta exitosa: 200 OK**
+Respuesta exitosa: 200 OK
 
 ```json
 {
@@ -235,7 +235,7 @@ Permite consultar una asignación específica mediante su identificador UUID.
 GET /api/v1/assignments/uuid-asignacion
 ```
 
-**Respuesta exitosa: 200 OK**
+Respuesta exitosa: 200 OK
 
 Devuelve la entidad `Asignacion` con las siguientes relaciones:
 

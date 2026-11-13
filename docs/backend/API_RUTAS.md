@@ -538,7 +538,7 @@ GET /api/v1/microroutes?macrorouteId=550e8400-e29b-41d4-a716-446655440000&search
 3. Ordena los resultados por código ascendente.
 4. Si se envía `macrorouteId`, filtra por el identificador de la macroruta.
 5. Si se envía `search`, busca coincidencias en nombre o código mediante `ILIKE`.
-6. 6. Si `includeGeometry` es `false`, selecciona explícitamente los campos básicos de la microruta y los datos de identificación de su macroruta asociada. Se omite la geometría de ambas entidades en esa consulta.
+6. Si `includeGeometry` es `false`, selecciona explícitamente los campos básicos de la microruta y los datos de identificación de su macroruta asociada. Se omite la geometría de ambas entidades en esa consulta.
 7. La paginación predeterminada utiliza página 1 y límite 20.
 8. El servicio devuelve `items`, `total`, `page` y `limit`.
 

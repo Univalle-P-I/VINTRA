@@ -169,6 +169,7 @@ Los valores de los enums se almacenan en mayúsculas. `EstadoUsuario` expone val
 - Solo `user_data.phone`, `user_data.email_verified_at` y los campos marcados `NULL` permiten valor nulo. Los timestamps con default `now()` siguen siendo obligatorios.
 - El enum del rol usa el nombre PostgreSQL exacto `user_role`; los tipos `user_status_enum` y `document_type_enum` también se declaran con esos nombres exactos.
 - Estos nombres y restricciones reflejan el código actual y la propuesta del PR #115; la aprobación del PR y la validación del equipo de base de datos siguen pendientes.
+
 ## 3. Personal y cuadrillas
 
 Este conjunto de tablas representa las cuadrillas operativas, sus integrantes y los conductores vinculados al sistema.
@@ -232,10 +233,12 @@ Este conjunto de tablas representa las cuadrillas operativas, sus integrantes y 
 **Clave primaria:** `id`.
 
 **Claves foráneas:**
+
 - `user_data_id` referencia `user_data.id`.
 - `crew_id` referencia `crew.id`.
 
 **Relaciones:**
+
 - Muchos a uno (`ManyToOne`) desde `Conductor` hacia `DatosUsuario`.
 - Muchos a uno (`ManyToOne`) desde `Conductor` hacia `Cuadrilla`.
 
@@ -397,10 +400,12 @@ Este conjunto de tablas representa la estructura geográfica de VINTRA mediante 
 **Clave primaria:** `id`.
 
 **Claves foráneas:**
+
 - `neighborhood_id` referencia `btura_neighborhood.id`.
 - `microroute_id` referencia `microroute.id`.
 
 **Relaciones:**
+
 - Muchos a uno (`ManyToOne`) desde `MicrorutaBarrio` hacia `Barrio`.
 - Muchos a uno (`ManyToOne`) desde `MicrorutaBarrio` hacia `Microruta`.
 
@@ -458,10 +463,12 @@ Este conjunto de tablas permite definir horarios operativos y asociarlos con las
 **Clave primaria:** `id`.
 
 **Claves foráneas:**
+
 - `microroute_id` referencia `microroute.id`.
 - `schedule_id` referencia `schedule.id`.
 
 **Relaciones:**
+
 - Muchos a uno (`ManyToOne`) desde `MicrorutaHorario` hacia `Microruta`.
 - Muchos a uno (`ManyToOne`) desde `MicrorutaHorario` hacia `Horario`.
 
@@ -501,11 +508,13 @@ Este conjunto de tablas permite definir horarios operativos y asociarlos con las
 **Clave primaria:** `id`.
 
 **Claves foráneas:**
+
 - `driver_id` referencia `driver.id`.
 - `microroute_schedule_id` referencia `microroute_schedule.id`.
 - `vehicle_id` referencia `vehicle.id`.
 
 **Relaciones:**
+
 - Muchos a uno (`ManyToOne`) desde `Asignacion` hacia `Conductor`.
 - Muchos a uno (`ManyToOne`) desde `Asignacion` hacia `MicrorutaHorario`.
 - Muchos a uno (`ManyToOne`) desde `Asignacion` hacia `Vehiculo`.
@@ -553,9 +562,11 @@ El nombre PostgreSQL es `assignment_status`. El transformer adapta los valores d
 **Clave primaria:** `id`.
 
 **Clave foránea:**
+
 - `assignment_id` referencia `assignment.id`.
 
 **Relación:**
+
 - Muchos a uno (`ManyToOne`) desde `PosicionVehiculo` hacia `Asignacion`.
 
 La relación está declarada como obligatoria (`nullable: false`).

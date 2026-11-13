@@ -164,11 +164,13 @@ Cada integrante debe desarrollar pruebas para los comportamientos principales de
 Se recomienda comprobar:
 
 **Escenarios exitosos:**
+
 - La operación recibe información válida.
 - El servicio procesa correctamente la solicitud.
 - Se devuelve la respuesta esperada.
 
 **Escenarios de error:**
+
 - El recurso solicitado no existe.
 - La información recibida es inválida.
 - El usuario no tiene permisos suficientes.

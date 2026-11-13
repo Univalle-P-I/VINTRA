@@ -1,4 +1,3 @@
-# API_PERSONAL.md
 # Documentación de API – Módulo Personal (Conductores)
 
 ## 1. Descripción general

@@ -487,12 +487,14 @@ npm test -- --runInBand src/seguimiento/seguimiento.service.spec.ts
 ### Escenarios cubiertos
 
 **Consulta (`listar`):**
+
 - Consulta correcta con paginación y orden descendente.
 - Asignación inexistente.
 - Intento de consultar asignación de otro conductor.
 - Intento de consulta por conductor inactivo.
 
 **Creación (`crear`):**
+
 - Geometría inválida.
 - Registro correcto dentro del contexto transaccional.
 - Asignación inexistente.

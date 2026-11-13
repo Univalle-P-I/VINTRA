@@ -73,10 +73,12 @@ Los roles utilizados en el código son:
 **Respuesta esperada:** Lista de tipos de vehículos activos, ordenados alfabéticamente por nombre.
 
 **Reglas de negocio:**
+
 - Solo se incluyen tipos activos.
 - Los resultados se ordenan por nombre ascendente.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: consulta realizada correctamente.
 - `401 Unauthorized`: token ausente o inválido.
 - `403 Forbidden`: rol no autorizado.
@@ -109,11 +111,13 @@ Los roles utilizados en el código son:
 | `isActive` | boolean | No | Si no se envía, se establece en `true`. |
 
 **Reglas de negocio:**
+
 - El código debe ser único.
 - Si no se proporciona `isActive`, el tipo se crea activo.
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `201 Created`: tipo creado.
 - `400 Bad Request`: datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -147,12 +151,14 @@ Los roles utilizados en el código son:
 Todos los campos son opcionales, pero los que se envíen deben cumplir las validaciones definidas para la creación.
 
 **Reglas de negocio:**
+
 - El tipo debe existir.
 - Solo se actualizan los campos enviados.
 - El código debe continuar siendo único.
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: actualización realizada.
 - `400 Bad Request`: UUID o datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -174,11 +180,13 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Parámetros:** No requiere parámetros.
 
 **Reglas de negocio:**
+
 - Solo se consultan vehículos activos.
 - Los resultados se ordenan por placa ascendente.
 - Se incluye la información del tipo de vehículo asociado.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: consulta realizada correctamente.
 - `401 Unauthorized`: token ausente o inválido.
 - `403 Forbidden`: rol no autorizado.
@@ -199,12 +207,14 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 | `id` | UUID | Identificador del vehículo. |
 
 **Reglas de negocio:**
+
 - El identificador debe tener formato UUID.
 - Se incluye la información del tipo de vehículo asociado.
 - Si el vehículo no existe, se genera un error `404 Not Found`.
 - A diferencia del listado, esta consulta no filtra los vehículos inactivos.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: vehículo encontrado.
 - `400 Bad Request`: UUID inválido.
 - `401 Unauthorized`: token ausente o inválido.
@@ -254,6 +264,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 | `out_of_service` | Fuera de servicio |
 
 **Reglas de negocio:**
+
 - El tipo de vehículo debe existir y estar activo.
 - La placa debe ser única.
 - El vehículo se crea activo por defecto.
@@ -261,6 +272,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `201 Created`: vehículo registrado.
 - `400 Bad Request`: datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -296,6 +308,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 Todos los campos son opcionales. Si se envían, deben cumplir las mismas validaciones del registro.
 
 **Reglas de negocio:**
+
 - El vehículo debe existir.
 - Solo se actualizan los campos enviados.
 - Si se cambia el tipo de vehículo, el nuevo tipo debe existir y estar activo.
@@ -303,6 +316,7 @@ Todos los campos son opcionales. Si se envían, deben cumplir las mismas validac
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: actualización realizada.
 - `400 Bad Request`: UUID o datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.

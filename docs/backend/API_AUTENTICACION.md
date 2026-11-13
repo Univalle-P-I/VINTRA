@@ -1,5 +1,3 @@
-# API_AUTENTICACION.md
-
 # API de Autenticación y Control de Acceso – VINTRA
 
 ## 1. Descripción general
@@ -59,6 +57,7 @@ No requiere encabezado Authorization porque es el endpoint público de autentica
 ### 3.4. Validaciones
 
 **Campo email:**
+
 - Es obligatorio.
 - Debe ser una cadena de texto.
 - Debe cumplir el formato de correo electrónico.
@@ -67,6 +66,7 @@ No requiere encabezado Authorization porque es el endpoint público de autentica
 - Se convierte a minúsculas.
 
 **Campo password:**
+
 - Es obligatorio.
 - Debe ser una cadena de texto.
 - Longitud máxima: 128 caracteres.
@@ -311,6 +311,7 @@ Tabla: `password_reset_token`.
 Entidad preparada para representar tokens de recuperación de contraseña.
 
 Incluye:
+
 - Identificador UUID.
 - Cuenta asociada.
 - Hash del token.
@@ -330,6 +331,7 @@ Tabla: `email_validation_token`.
 Entidad preparada para representar tokens de validación de correo electrónico.
 
 Incluye:
+
 - Identificador UUID.
 - Datos del usuario asociados.
 - Correo electrónico.
