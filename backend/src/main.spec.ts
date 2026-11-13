@@ -1,5 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { bootstrap } from './main';
+import { ValidationPipe } from '@nestjs/common';
+import { bootstrap, getCorsOrigins } from './main';
+import { setupSwagger } from './swagger';
+
+jest.mock('./swagger', () => ({
+  setupSwagger: jest.fn(),
+}));
 
 jest.mock('@nestjs/core', () => ({
   NestFactory: {
@@ -9,8 +15,10 @@ jest.mock('@nestjs/core', () => ({
 
 describe('bootstrap', () => {
   const originalPort = process.env.PORT;
+  const originalCorsOrigin = process.env.CORS_ORIGIN;
 
   const mockApp = {
+    useGlobalPipes: jest.fn(),
     enableCors: jest.fn(),
     listen: jest.fn().mockResolvedValue(undefined),
   };
@@ -26,18 +34,40 @@ describe('bootstrap', () => {
     } else {
       process.env.PORT = originalPort;
     }
+
+    if (originalCorsOrigin === undefined) {
+      delete process.env.CORS_ORIGIN;
+    } else {
+      process.env.CORS_ORIGIN = originalCorsOrigin;
+    }
   });
 
   it('configures CORS and uses port 3002 by default', async () => {
     delete process.env.PORT;
+    delete process.env.CORS_ORIGIN;
 
     await bootstrap();
 
     expect(NestFactory.create.mock.calls).toHaveLength(1);
+    expect(mockApp.useGlobalPipes).toHaveBeenCalledWith(
+      expect.any(ValidationPipe),
+    );
     expect(mockApp.enableCors).toHaveBeenCalledWith({
-      origin: 'http://localhost:5173',
+      origin: ['http://localhost:5173'],
     });
+    expect(setupSwagger).toHaveBeenCalledWith(mockApp);
     expect(mockApp.listen.mock.calls).toEqual([[3002]]);
+  });
+
+  it('allows the configured comma-separated frontend origins', async () => {
+    process.env.CORS_ORIGIN =
+      'http://localhost:5173, http://localhost:5174';
+
+    await bootstrap();
+
+    expect(mockApp.enableCors).toHaveBeenCalledWith({
+      origin: ['http://localhost:5173', 'http://localhost:5174'],
+    });
   });
 
   it('uses the PORT environment variable when defined', async () => {
@@ -56,5 +86,9 @@ describe('bootstrap', () => {
     );
 
     expect(mockApp.listen.mock.calls).toHaveLength(0);
+  });
+
+  it('falls back to the development origin when the configured list is empty', () => {
+    expect(getCorsOrigins(' , ')).toEqual(['http://localhost:5173']);
   });
 });

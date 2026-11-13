@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { HealthController } from './health.controller';
 
@@ -7,6 +7,7 @@ describe('HealthController', () => {
   let dataSource: { query: jest.Mock };
 
   beforeEach(() => {
+    jest.spyOn(Logger.prototype, 'warn').mockImplementation();
     dataSource = {
       query: jest.fn(),
     };
@@ -14,6 +15,10 @@ describe('HealthController', () => {
     healthController = new HealthController(
       dataSource as unknown as DataSource,
     );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('GET /health', () => {
@@ -44,7 +49,7 @@ describe('HealthController', () => {
       );
     });
 
-    it('should return HTTP 500 when the database query fails', async () => {
+    it('should return HTTP 503 when the database query fails', async () => {
       dataSource.query.mockRejectedValue(
         new Error('Database connection failed'),
       );
@@ -55,7 +60,7 @@ describe('HealthController', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(HttpException);
         expect((error as HttpException).getStatus()).toBe(
-          HttpStatus.INTERNAL_SERVER_ERROR,
+          HttpStatus.SERVICE_UNAVAILABLE,
         );
         expect((error as HttpException).getResponse()).toEqual({
           status: 'error',

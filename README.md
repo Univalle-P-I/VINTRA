@@ -16,6 +16,8 @@
 
   <p>
     <a href="docs/arquitectura/README.md">Arquitectura</a> ·
+    <a href="backend/README.md">Backend y Swagger</a> ·
+    <a href="docs/API_SPECIFICATION.md">API</a> ·
     <a href="CONTRIBUTING.md">Cómo contribuir</a>
   </p>
 
@@ -94,7 +96,7 @@ El detalle técnico de la arquitectura, el stack y los contratos entre component
 
 ## Tecnologías
 
-El stack definido para esta prueba de integración es React + Vite en frontend, Node.js + NestJS en backend, y PostgreSQL con TypeORM y el driver `pg` para persistencia. El frontend usa Axios para consultar los endpoints de salud.
+El stack utiliza React + Vite, Node.js + NestJS y PostgreSQL/PostGIS con TypeORM y el driver `pg`. PostGIS y el esquema del PR #115 son una referencia provisional; las migraciones no se ejecutan automáticamente. El frontend usa Axios para consultar los endpoints de salud.
 
 | Componente | Tecnología | Responsable |
 | --- | --- | --- |
@@ -105,25 +107,36 @@ El stack definido para esta prueba de integración es React + Vite en frontend, 
 
 ## Ejecutar la prueba de conexión
 
-Requisitos: Docker Compose, Node.js 22 o superior y npm.
+Requisitos: Docker Compose. Para ejecutar el backend localmente, Node.js 24 o superior y npm; el frontend local requiere Node.js 22 o superior.
 
 ### Ejecutar todo con Docker Compose
 
+Primero copia el ejemplo de configuración y genera valores locales aleatorios para la contraseña de PostgreSQL y el secreto JWT:
+
 ```powershell
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+node -e "console.log(require('node:crypto').randomBytes(48).toString('base64url'))"
+```
+
+Usa dos valores generados independientes y configúralos como `POSTGRES_PASSWORD` y `JWT_SECRET` en `.env`. No compartas ni confirmes ese archivo. Después:
+
+```powershell
 docker compose up --build
 ```
 
-Abre `http://localhost:5174`. La tarjeta **Estado del entorno** debe mostrar
-**API backend: Disponible** y **PostgreSQL: Disponible**. Los endpoints que
-comprueba son `http://localhost:3002/health` y `http://localhost:3002/health/db`.
+Abre `http://localhost:5174`. La tarjeta **Estado del entorno** comprueba
+`http://localhost:3002/health` y `http://localhost:3002/health/db`. Swagger UI está en
+`http://localhost:3002/api/docs`; su esquema JSON, en
+`http://localhost:3002/api/docs-json`. Para detener los servicios sin borrar el volumen, usa `docker compose stop`.
+
+Compose publica los servicios solo en `127.0.0.1`: frontend `5174`, backend `3002` y PostgreSQL/PostGIS `5433`. No se ejecutan migraciones ni se crean tablas. La respuesta exitosa de `/health/db` acredita conectividad, no instalación del esquema.
 
 ### Ejecutar frontend y API en modo desarrollo
 
-En la raíz, copia `.env.example` a `.env` y arranca PostgreSQL:
+En la raíz, copia `.env.example` a `.env`, completa los secretos locales y arranca PostgreSQL:
 
 ```powershell
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 docker compose up -d postgres
 ```
 
@@ -141,8 +154,7 @@ npm ci
 npm run dev
 ```
 
-Abre `http://localhost:5173`. Para detener PostgreSQL ejecuta
-`docker compose down`; la base de datos conserva sus datos en el volumen.
+Abre `http://localhost:5173`. Para detener el servicio, detén el proceso de Compose sin eliminar el volumen. El backend local puede consultar PostgreSQL en `localhost:5433`.
 
 ## Equipo
 
@@ -173,12 +185,13 @@ Estructura actual del repositorio:
 │   └── README.md
 ├── backend/                      # API REST con NestJS
 ├── frontend/                     # Aplicación React + Vite
-├── database/                     # Espacio para migraciones y scripts de datos
 ├── infrastructure/               # Documentación y apoyo de despliegue
 ├── docker-compose.yml            # Ejecución conjunta de los servicios
 ├── CONTRIBUTING.md
 └── README.md
 ```
+
+Las migraciones y scripts de base de datos están en el PR #115 abierto y no se integran en esta rama mientras sigan pendientes de revisión.
 
 ## Flujo de trabajo
 
@@ -193,8 +206,8 @@ Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione co
 VINTRA se encuentra en fase de definición. La propuesta general, el problema, los objetivos y la arquitectura resumida ya están establecidos. Falta que cada célula complete la información de su área:
 
 - [ ] **UI/UX** — Diseño de la landing page.
-- [ ] **Base de Datos** — Modelo y diseño de la base de datos.
-- [x] **Backend / Frontend** — Stack tecnológico y prueba base de conexión implementados; los módulos funcionales siguen pendientes.
+- [ ] **Base de Datos** — Revisar y aprobar PR #115; resolver diferencias entre diccionario y DDL antes de habilitar integración funcional.
+- [x] **Backend / Frontend** — API modular provisional, autenticación JWT/Argon2id, endpoints de los módulos registrados, documentación Swagger y prueba base de conexión implementados.
 - [ ] **Scrum** — Historias de usuario.
 - [ ] **GitHub / CI-CD / VPS** — Plantillas de Issues/PR, workflows de CI/CD, estrategia de ramas ya definida, configuración y despliegue en el VPS.
 Este README se irá actualizando a medida que cada célula entregue su información.
