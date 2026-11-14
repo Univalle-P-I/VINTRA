@@ -504,7 +504,6 @@ Los seeders (`database/seeders/`) insertan datos mínimos de ejemplo para las ta
 | 016 | `016_insert_crew_member.sql` | `crew` |
 | 017 | `017_insert_driver.sql` | `user_data`, `crew` |
 
-
 #### 5.4.3. Orden de ejecución de los triggers
 
 Los triggers (`database/triggers`) se ejecutan después de las migraciones `001` a `030` y de los seeders. La función compartida `fn_audit_log()` inserta el registro en la tabla `*_log` correspondiente.
