@@ -44,7 +44,7 @@ export default function Shell({
           </button>
           <span>Consola municipal</span>
         </div>
-        <nav aria-label="Navegación administrativa" className="nav-list">
+        <nav aria-label="Navegación de módulos" className="nav-list">
           {items.map(([id, label]) => {
             return (
               <button
