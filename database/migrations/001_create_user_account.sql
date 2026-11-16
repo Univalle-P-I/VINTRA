@@ -23,6 +23,7 @@ CREATE TABLE user_account (
     document_id CHAR(20) NOT NULL,
     pwd_hash TEXT NOT NULL,
     failed_attempts SMALLINT NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     locked_until TIMESTAMPTZ,
     last_login_at TIMESTAMPTZ,
     password_changed_at TIMESTAMPTZ,
