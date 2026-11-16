@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { HealthController } from './health.controller';
+import { HealthController } from './health/health.controller';
 
 describe('HealthController', () => {
   let healthController: HealthController;
