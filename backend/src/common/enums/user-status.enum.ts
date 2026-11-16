@@ -1,0 +1,6 @@
+export enum userStatus{
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE',
+    LOCKED = 'LOCKED',
+    PENDING_VERIFICATION = 'PENDING_VERIFICATION'
+}
