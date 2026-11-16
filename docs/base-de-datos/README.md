@@ -710,7 +710,7 @@ El modelo registra cada cambio en las entidades auditadas mediante triggers. Est
 | `UPDATE` con `is_active` de `FALSE` a `TRUE` | `RESTORE` | registro anterior | registro con `is_active = TRUE` |
 | `DELETE` físico | `DELETE` | registro anterior | `NULL` |
 
-- El ENUM `audit_action` se define en la [migración `020`](../../database/migrations/020_create_user_account_log.sql) con los cinco valores `CREATE`, `UPDATE`, `SOFT_DELETE`, `DELETE` y `RESTORE`.
+- El ENUM `audit_action` se define en la [migración `020`](../../database/migrations/019_create_user_account_log.sql) con los cinco valores `CREATE`, `UPDATE`, `SOFT_DELETE`, `DELETE` y `RESTORE`.
 - `SOFT_DELETE` y `RESTORE` solo aplican a entidades con columna `is_active`; en las demás, un `UPDATE` se registra como `UPDATE`.
 - `old` y `new` guardan la fila completa en JSON. Solo se excluyen `user_account.pwd_hash` y `user_account.document_id`; el resto, incluidos los datos personales, se registra (clasificación en la [sección 7.1](#71-clasificación)).
 - `actor_id` se toma de la variable de sesión `app.current_user_id` y `request_ip` de `app.request_ip`. Si no están definidas, se guardan como `NULL`.
