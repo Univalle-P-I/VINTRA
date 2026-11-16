@@ -8,6 +8,7 @@ CREATE TABLE user_data_log (
     old JSONB,
     new JSONB,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_user_data_log_user_data FOREIGN KEY (entity_id) REFERENCES user_data (id),
     CONSTRAINT fk_user_data_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)

@@ -8,6 +8,7 @@ CREATE TABLE profile_log (
     old JSONB,
     new JSONB,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_profile_log_profile FOREIGN KEY (entity_id) REFERENCES profile (id),
     CONSTRAINT fk_profile_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)

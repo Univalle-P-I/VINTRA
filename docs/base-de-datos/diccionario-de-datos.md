@@ -4,44 +4,47 @@ Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditor�
 
 ## Índice
 
-1. [user_account](#user_account)
-2. [user_data](#user_data)
-3. [profile](#profile)
-4. [session](#session)
-5. [password_reset_token](#password_reset_token)
-6. [email_validation_token](#email_validation_token)
-7. [vehicle_type](#vehicle_type)
-8. [vehicle](#vehicle)
-9. [macroroute](#macroroute)
-10. [microroute](#microroute)
-11. [btura_neighborhood](#btura_neighborhood)
-12. [schedule](#schedule)
-13. [microroute_schedule](#microroute_schedule)
-14. [microroute_neighborhood](#microroute_neighborhood)
-15. [crew](#crew)
-16. [crew_member](#crew_member)
-17. [driver](#driver)
-18. [assignment](#assignment)
-19. [vehicle_position](#vehicle_position)
-20. [user_account_log](#user_account_log)
-21. [user_data_log](#user_data_log)
-22. [profile_log](#profile_log)
-23. [crew_log](#crew_log)
-24. [crew_member_log](#crew_member_log)
-25. [driver_log](#driver_log)
-26. [macroroute_log](#macroroute_log)
-27. [microroute_log](#microroute_log)
-28. [assignment_log](#assignment_log)
-29. [vehicle_log](#vehicle_log)
-30. [session_log](#session_log)
-31. [password_reset_token_log](#password_reset_token_log)
-32. [email_validation_token_log](#email_validation_token_log)
-33. [vehicle_type_log](#vehicle_type_log)
-34. [btura_neighborhood_log](#btura_neighborhood_log)
-35. [schedule_log](#schedule_log)
-36. [microroute_schedule_log](#microroute_schedule_log)
-37. [microroute_neighborhood_log](#microroute_neighborhood_log)
-38. [vehicle_position_log](#vehicle_position_log)
+- [Diccionario de Datos](#diccionario-de-datos)
+  - [Índice](#índice)
+  - [Reglas de auditoría](#reglas-de-auditoría)
+  - [user\_account](#user_account)
+  - [user\_data](#user_data)
+  - [profile](#profile)
+  - [session](#session)
+  - [password\_reset\_token](#password_reset_token)
+  - [email\_validation\_token](#email_validation_token)
+  - [vehicle\_type](#vehicle_type)
+  - [vehicle](#vehicle)
+  - [macroroute](#macroroute)
+  - [microroute](#microroute)
+  - [btura\_neighborhood](#btura_neighborhood)
+  - [schedule](#schedule)
+  - [microroute\_schedule](#microroute_schedule)
+  - [microroute\_neighborhood](#microroute_neighborhood)
+  - [crew](#crew)
+  - [crew\_member](#crew_member)
+  - [driver](#driver)
+  - [assignment](#assignment)
+  - [vehicle\_position](#vehicle_position)
+  - [user\_account\_log](#user_account_log)
+  - [user\_data\_log](#user_data_log)
+  - [profile\_log](#profile_log)
+  - [crew\_log](#crew_log)
+  - [crew\_member\_log](#crew_member_log)
+  - [driver\_log](#driver_log)
+  - [macroroute\_log](#macroroute_log)
+  - [microroute\_log](#microroute_log)
+  - [assignment\_log](#assignment_log)
+  - [vehicle\_log](#vehicle_log)
+  - [session\_log](#session_log)
+  - [password\_reset\_token\_log](#password_reset_token_log)
+  - [email\_validation\_token\_log](#email_validation_token_log)
+  - [vehicle\_type\_log](#vehicle_type_log)
+  - [btura\_neighborhood\_log](#btura_neighborhood_log)
+  - [schedule\_log](#schedule_log)
+  - [microroute\_schedule\_log](#microroute_schedule_log)
+  - [microroute\_neighborhood\_log](#microroute_neighborhood_log)
+  - [vehicle\_position\_log](#vehicle_position_log)
 
 ## Reglas de auditoría
 
@@ -121,6 +124,7 @@ sesiones abiertas por las cuentas de usuario
 | user_account_id | Cuenta de usuario dueña de la sesión. | UUID | N/A | SI | NO | FK | FK user_account(id) | idx_session_user_account_id (user_account_id) |
 | token_hash | Hash SHA-256 (hexadecimal) del token de sesión. El token en claro nunca se almacena. | CHAR | 64 | SI | SI | N/A | UNIQUE (token_hash) via uq_session_token_hash | uq_session_token_hash (token_hash) |
 | request_ip | Dirección IP desde la que se abrió la sesión. | INET | N/A | SI | NO | N/A | — | — |
+| is_active | Indica si la sesión está disponible (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | revoked_at | Fecha y hora en que la sesión fue revocada (cierre de sesión, cambio de contraseña, bloqueo). NULL si sigue vigente. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | last_used_at | Fecha y hora del último uso de la sesión. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | expires_at | Fecha y hora de vencimiento de la sesión. Pasada esta fecha deja de ser válida. | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_session_expires_at (expires_at) |
@@ -138,6 +142,7 @@ tokens de un solo uso para restablecer la contraseña
 | user_account_id | Cuenta de usuario que solicitó el restablecimiento. | UUID | N/A | SI | NO | FK | FK user_account(id) | idx_password_reset_token_user_account_id (user_account_id) |
 | token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI | N/A | UNIQUE (token_hash) via uq_password_reset_token_hash | uq_password_reset_token_hash (token_hash) |
 | request_ip | Dirección IP desde la que se hizo la solicitud. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si el token_hash está disponible (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | used_at | Fecha y hora en que se usó el token. NULL mientras no se haya usado (un solo uso). | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_password_reset_token_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
@@ -155,6 +160,7 @@ tokens de un solo uso para validar el correo electrónico
 | email | Correo electrónico que se está verificando. | VARCHAR | 254 | SI | NO | N/A | — | — |
 | token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI | N/A | UNIQUE (token_hash) via uq_email_validation_token_hash | uq_email_validation_token_hash (token_hash) |
 | request_ip | Dirección IP desde la que se hizo la solicitud. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si el token_hash está disponible (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | used_at | Fecha y hora en que se usó el token. NULL mientras no se haya usado (un solo uso). | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_email_validation_token_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
@@ -203,6 +209,7 @@ macrorruta; zona o área general que agrupa microrrutas
 | code | Código estable de la macrorruta. | VARCHAR | 30 | SI | SI | N/A | UNIQUE (code) via uq_macroroute_code | uq_macroroute_code (code) |
 | name | Nombre de la macrorruta. | VARCHAR | 120 | SI | NO | N/A | — | — |
 | geom | Trazado geográfico de la macrorruta (PostGIS, multilínea). | MULTILINESTRING | N/A | SI | NO | N/A | NO DOCUMENTADO | idx_macroroute_geom GIST (geom) |
+| is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
@@ -219,6 +226,7 @@ microrruta; trayecto especifico de recolección dentro de una macrorruta
 | code | Código estable de la microrruta. | VARCHAR | 30 | SI | SI | N/A | UNIQUE (code) via uq_microroute_code | uq_microroute_code (code) |
 | name | Nombre de la microrruta. | VARCHAR | 120 | SI | NO | N/A | — | — |
 | geom | Trazado geográfico de la microrruta (PostGIS, multilínea). | MULTILINESTRING | N/A | SI | NO | N/A | NO DOCUMENTADO | idx_microroute_geom GIST (geom) |
+| is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
@@ -234,6 +242,7 @@ barrios de Buenaventura
 | commune | Comuna a la que pertenece el barrio. | VARCHAR | 80 | NO | NO | N/A | — | — |
 | name | Nombre del barrio. | VARCHAR | 120 | SI | SI | N/A | — | idx_btura_neighborhood_name (name) |
 | geom | Límite geográfico del barrio (PostGIS, multipolígono). | MULTIPOLYGON | N/A | SI | NO | N/A | NO DOCUMENTADO | idx_btura_neighborhood_geom GIST (geom) |
+| is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
@@ -282,6 +291,7 @@ barrios que atiende cada microrruta y su orden de visita
 | microroute_id | Microrruta que atiende el barrio. | UUID | N/A | SI | SI | FK | FK microroute(id); UNIQUE (microroute_id, neighborhood_id) via uq_microroute_neighborhood; UNIQUE (microroute_id, order_visit) via uq_microroute_neighborhood_order | idx_microroute_neighborhood_microroute_id (microroute_id); uq_microroute_neighborhood (microroute_id, neighborhood_id); uq_microroute_neighborhood_order (microroute_id, order_visit) |
 | neighborhood_id | Barrio atendido por la microrruta. | UUID | N/A | SI | SI | FK | FK btura_neighborhood(id); UNIQUE (microroute_id, neighborhood_id) via uq_microroute_neighborhood | idx_microroute_neighborhood_neighborhood_id (neighborhood_id); uq_microroute_neighborhood (microroute_id, neighborhood_id) |
 | order_visit | Orden en que la microrruta visita el barrio. No puede repetirse dentro de la misma microrruta. | INTEGER | N/A | SI | SI | N/A | UNIQUE (microroute_id, order_visit) via uq_microroute_neighborhood_order; CHECK (order_visit > 0) | uq_microroute_neighborhood_order (microroute_id, order_visit) |
+| is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 
 - microroute_id referencia microroute(id): una microrruta pasa por muchos barrios; cada registro corresponde a una sola microrruta.
 - neighborhood_id referencia btura_neighborhood(id): un barrio puede ser atendido por muchas microrrutas; cada registro corresponde a un solo barrio.
@@ -365,6 +375,7 @@ posiciones GPS reportadas por el vehículo durante una asignación
 | id | Identificador único del reporte de posición. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | vehicle_position_pkey (id) |
 | assignment_id | Asignación a la que pertenece la posición. Solo se aceptan posiciones de asignaciones en curso (regla de la aplicación). | UUID | N/A | SI | NO | FK | FK assignment(id) | idx_vehicle_position_assignment_recorded (assignment_id, recorded_at) |
 | geom | Ubicación geográfica del vehículo (PostGIS, geometría de tipo punto). | POINT | N/A | SI | NO | N/A | NO DOCUMENTADO | idx_vehicle_position_geom GIST (geom) |
+| is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | recorded_at | Fecha y hora en que el dispositivo registró la posición (distinta de created_at, que es la del servidor). | TIMESTAMPTZ | N/A | SI | NO | N/A | — | idx_vehicle_position_assignment_recorded (assignment_id, recorded_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
@@ -383,6 +394,7 @@ auditoría de cambios en user_account
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas, hashes ni document_id. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas, hashes ni document_id. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_account_log_created_at (created_at) |
 
 - entity_id referencia user_account(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -401,6 +413,7 @@ auditoría de cambios en user_data
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_data_log_created_at (created_at) |
 
 - entity_id referencia user_data(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -419,6 +432,7 @@ auditoría de cambios en profile
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_profile_log_created_at (created_at) |
 
 - entity_id referencia profile(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -437,6 +451,7 @@ auditoría de cambios en crew
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_crew_log_created_at (created_at) |
 
 - entity_id referencia crew(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -455,6 +470,7 @@ auditoría de cambios en crew_member
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_crew_member_log_created_at (created_at) |
 
 - entity_id referencia crew_member(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -473,6 +489,7 @@ auditoría de cambios en driver
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_driver_log_created_at (created_at) |
 
 - entity_id referencia driver(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -491,6 +508,7 @@ auditoría de cambios en macroroute
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_macroroute_log_created_at (created_at) |
 
 - entity_id referencia macroroute(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -509,6 +527,7 @@ auditoría de cambios en microroute
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_log_created_at (created_at) |
 
 - entity_id referencia microroute(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -527,6 +546,7 @@ auditoría de cambios en assignment
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_assignment_log_created_at (created_at) |
 
 - entity_id referencia assignment(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -545,6 +565,7 @@ auditoría de cambios en vehicle
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_log_created_at (created_at) |
 
 - entity_id referencia vehicle(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -563,6 +584,7 @@ auditoría de cambios en session
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_session_log_created_at (created_at) |
 
 - entity_id referencia session(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -581,6 +603,7 @@ auditoría de cambios en password_reset_token
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_password_reset_token_log_created_at (created_at) |
 
 - entity_id referencia password_reset_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -599,6 +622,7 @@ auditoría de cambios en email_validation_token
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_email_validation_token_log_created_at (created_at) |
 
 - entity_id referencia email_validation_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -617,6 +641,7 @@ auditoría de cambios en vehicle_type
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_type_log_created_at (created_at) |
 
 - entity_id referencia vehicle_type(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -635,6 +660,7 @@ auditoría de cambios en btura_neighborhood
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_btura_neighborhood_log_created_at (created_at) |
 
 - entity_id referencia btura_neighborhood(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -653,6 +679,7 @@ auditoría de cambios en schedule
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_schedule_log_created_at (created_at) |
 
 - entity_id referencia schedule(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -671,6 +698,7 @@ auditoría de cambios en microroute_schedule
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_schedule_log_created_at (created_at) |
 
 - entity_id referencia microroute_schedule(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -689,6 +717,7 @@ auditoría de cambios en microroute_neighborhood
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_neighborhood_log_created_at (created_at) |
 
 - entity_id referencia microroute_neighborhood(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
@@ -707,6 +736,7 @@ auditoría de cambios en vehicle_position
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_position_log_created_at (created_at) |
 
 - entity_id referencia vehicle_position(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.

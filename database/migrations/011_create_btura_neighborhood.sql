@@ -5,6 +5,7 @@ CREATE TABLE btura_neighborhood (
     commune VARCHAR(80),
     name VARCHAR(120) NOT NULL,
     geom GEOMETRY(MULTIPOLYGON, 4326) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

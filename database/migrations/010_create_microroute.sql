@@ -6,6 +6,7 @@ CREATE TABLE microroute (
     code VARCHAR(30) NOT NULL,
     name VARCHAR(120) NOT NULL,
     geom GEOMETRY(MULTILINESTRING, 4326) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_microroute_macroroute FOREIGN KEY (macroroute_id) REFERENCES macroroute (id),

@@ -5,6 +5,7 @@ CREATE TABLE microroute_neighborhood (
     microroute_id UUID NOT NULL,
     neighborhood_id UUID NOT NULL,
     order_visit INTEGER NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_microroute_neighborhood_microroute FOREIGN KEY (microroute_id) REFERENCES microroute (id),
     CONSTRAINT fk_microroute_neighborhood_neighborhood FOREIGN KEY (neighborhood_id) REFERENCES btura_neighborhood (id),
     CONSTRAINT uq_microroute_neighborhood UNIQUE (microroute_id, neighborhood_id),

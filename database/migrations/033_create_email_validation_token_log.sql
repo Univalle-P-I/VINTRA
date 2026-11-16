@@ -8,6 +8,7 @@ CREATE TABLE email_validation_token_log (
     old JSONB,
     new JSONB,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_email_validation_token_log_email_validation_token FOREIGN KEY (entity_id) REFERENCES email_validation_token (id),
     CONSTRAINT fk_email_validation_token_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)

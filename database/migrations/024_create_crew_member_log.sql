@@ -8,6 +8,7 @@ CREATE TABLE crew_member_log (
     old JSONB,
     new JSONB,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_crew_member_log_crew_member FOREIGN KEY (entity_id) REFERENCES crew_member (id),
     CONSTRAINT fk_crew_member_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)

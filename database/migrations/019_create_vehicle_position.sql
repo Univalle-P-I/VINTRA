@@ -4,6 +4,7 @@ CREATE TABLE vehicle_position (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     assignment_id UUID NOT NULL,
     geom GEOMETRY(POINT, 4326) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     recorded_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_vehicle_position_assignment FOREIGN KEY (assignment_id) REFERENCES assignment (id)

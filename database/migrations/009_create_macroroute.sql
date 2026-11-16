@@ -5,6 +5,7 @@ CREATE TABLE macroroute (
     code VARCHAR(30) NOT NULL,
     name VARCHAR(120) NOT NULL,
     geom GEOMETRY(MULTILINESTRING, 4326) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_macroroute_code UNIQUE (code)

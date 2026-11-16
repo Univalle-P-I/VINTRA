@@ -5,6 +5,7 @@ CREATE TABLE session (
     user_account_id UUID NOT NULL,
     token_hash CHAR(64) NOT NULL,
     request_ip INET NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     revoked_at TIMESTAMPTZ,
     last_used_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ NOT NULL,

@@ -8,6 +8,7 @@ CREATE TABLE macroroute_log (
     old JSONB,
     new JSONB,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_macroroute_log_macroroute FOREIGN KEY (entity_id) REFERENCES macroroute (id),
     CONSTRAINT fk_macroroute_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)

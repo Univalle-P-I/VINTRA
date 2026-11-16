@@ -8,6 +8,7 @@ CREATE TABLE microroute_neighborhood_log (
     old JSONB,
     new JSONB,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_microroute_neighborhood_log_microroute_neighborhood FOREIGN KEY (entity_id) REFERENCES microroute_neighborhood (id),
     CONSTRAINT fk_microroute_neighborhood_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)

@@ -5,6 +5,7 @@ CREATE TABLE password_reset_token (
     user_account_id UUID NOT NULL,
     token_hash CHAR(64) NOT NULL,
     request_ip INET,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     used_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

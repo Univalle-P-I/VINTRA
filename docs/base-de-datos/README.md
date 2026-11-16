@@ -102,6 +102,7 @@ erDiagram
         UUID user_account_id
         CHAR token_hash
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ revoked_at
         TIMESTAMPTZ last_used_at
         TIMESTAMPTZ expires_at
@@ -113,6 +114,7 @@ erDiagram
         UUID user_account_id
         CHAR token_hash
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ used_at
         TIMESTAMPTZ expires_at
         TIMESTAMPTZ created_at
@@ -124,6 +126,7 @@ erDiagram
         VARCHAR email
         CHAR token_hash
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ used_at
         TIMESTAMPTZ expires_at
         TIMESTAMPTZ created_at
@@ -154,6 +157,7 @@ erDiagram
         VARCHAR code
         VARCHAR name
         MULTILINESTRING geom
+        BOOLEAN is_active
         TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
@@ -164,6 +168,7 @@ erDiagram
         VARCHAR code
         VARCHAR name
         MULTILINESTRING geom
+        BOOLEAN is_active
         TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
@@ -173,6 +178,7 @@ erDiagram
         VARCHAR commune
         VARCHAR name
         MULTIPOLYGON geom
+        BOOLEAN is_active
         TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
@@ -202,6 +208,7 @@ erDiagram
         UUID microroute_id
         UUID neighborhood_id
         INT order_visit
+        BOOLEAN is_active
     }
 
     crew {
@@ -251,6 +258,7 @@ erDiagram
         UUID id
         UUID assignment_id
         POINT geom
+        BOOLEAN is_active
         TIMESTAMPTZ recorded_at
         TIMESTAMPTZ created_at
     }
@@ -263,6 +271,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -274,6 +283,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -285,6 +295,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -296,6 +307,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -307,6 +319,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -318,6 +331,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -329,6 +343,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -340,6 +355,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -351,6 +367,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -362,6 +379,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -373,6 +391,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -384,6 +403,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -395,6 +415,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -406,6 +427,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -417,6 +439,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -428,6 +451,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -439,6 +463,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -450,6 +475,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -461,6 +487,7 @@ erDiagram
         JSONB old
         JSONB new
         INET request_ip
+        BOOLEAN is_active
         TIMESTAMPTZ created_at
     }
 
@@ -682,7 +709,7 @@ El modelo registra cada cambio en las entidades auditadas mediante triggers. Est
 - Hay **19 triggers de auditoría**, uno por entidad auditada, y una función compartida `fn_audit_log()` que escribe en la tabla `<tabla>_log` correspondiente.
 - Se disparan con `AFTER INSERT OR UPDATE OR DELETE`.
 - Todas las tablas `*_log` comparten la misma estructura: `id` (PK), `entity_id` (FK hacia la entidad auditada), `actor_id` (FK hacia `user_account`), `action` (`audit_action`), `old` y `new` (JSONB), `request_ip` (INET) y `created_at` (TIMESTAMPTZ). Tienen índices por `entity_id`, `actor_id` y `created_at`.
-- Cada `*_log` guarda `entity_id` (FK hacia la tabla auditada) y `actor_id` (FK hacia `user_account`), por lo que no se puede borrar directamente una fila auditada (ver [4.3](#43-borrado-lógico)).
+- Cada `*_log` guarda `entity_id` (FK hacia la tabla auditada) y `actor_id` (FK hacia `user_account`), por lo que no se puede borrar de manera física una fila auditada (ver [4.3](#43-borrado-lógico)).
 
 ### 4.2. Funcionamiento
 
@@ -710,9 +737,9 @@ SELECT set_config('app.request_ip', '<ip_del_cliente>', true);
 
 ### 4.3. Borrado Lógico
 
-El borrado operativo es lógico (`is_active = FALSE`) y se audita como `SOFT_DELETE`; la reactivación se audita como `RESTORE`. Las entidades con `is_active` son `user_account`, `profile`, `vehicle_type`, `vehicle`, `schedule`, `microroute_schedule`, `crew`, `crew_member`, `driver` y `assignment`.
+El borrado operativo es lógico (`is_active = FALSE`) y se audita como `SOFT_DELETE`; la reactivación se audita como `RESTORE`. Todas las entidades cuentan operativamente con el atributo `is_active`, menos `user_data` quien está asociada a `user_account`.
 
-No se debería ejecutar `DELETE` físico sobre entidades con historial de auditoría. Además de la pérdida de trazabilidad, la FK de `*_log.entity_id` lo impide.
+No se debería ejecutar `DELETE` físico directamente sobre entidades con historial de auditoría. Además de la pérdida de trazabilidad, la FK de `*_log.entity_id` lo impide.
 
 ### 4.4. Trigger de `updated_at`
 
