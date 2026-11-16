@@ -4,7 +4,7 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 ## Índice
 
-- [Base de Datos](#base-de-datos--)
+- [Base de Datos  ](#base-de-datos--)
   - [Índice](#índice)
   - [Estado](#estado)
   - [1. Motor y Versión Soportada](#1-motor-y-versión-soportada)
@@ -512,13 +512,13 @@ erDiagram
 | Cuadrilla de recolección | `crew`, `crew_member` | La cuadrilla agrupa integrantes y conductores |
 | Conductor | `driver` | Vincula los datos personales del conductor con su cuadrilla |
 | Vehículo recolector | `vehicle`, `vehicle_type` | El estado se almacena como ENUM `vehicle_status` |
-| Macrorruta (zona) | `macroroute` | Trazado geográfico (multilínea) |
-| Microrruta (recorrido) | `microroute` | Trazado (multilínea) dentro de una macrorruta |
+| Macrorruta (zona general) | `macroroute` | Trazado geográfico (multilínea) |
+| Microrruta (zona específica) | `microroute` | Trazado (multilínea) dentro de una macrorruta |
 | Barrio | `btura_neighborhood` | Límites de los barrios de Buenaventura |
 | Horario de recolección | `schedule`, `microroute_schedule` | Franja horaria por microruta y día de la semana |
-| Asignación operativa | `assignment` | Conductor, programación de microruta y vehículo |
+| Recorridos | `assignment` | Conductor, programación de microruta y vehículo |
 | Seguimiento en tiempo real | `vehicle_position` | Puntos GPS de una asignación |
-| Trazabilidad | `*_log` | Ver [sección 4](#4-auditoría-y-trazabilidad) |
+| Auditoría | `*_log` | Ver [sección 4](#4-auditoría-y-trazabilidad) |
 | Autenticación | `session`, `password_reset_token`, `email_validation_token` | Solo se almacenan hashes de los tokens (ver [sección 7.2](#72-reglas-de-tratamiento)) |
 
 ### 2.3. Relaciones y Reglas
@@ -542,7 +542,7 @@ El resto de relaciones (`crew` → `driver`, `crew` → `crew_member`, `driver` 
 
 ### 2.4. Diccionario de Datos
 
-El [Diccionario de Datos](diccionario-de-datos.md) (Ver [`docs/base-de-datos`](diccionario-de-datos.md)) contiene la descripción de cada atributo de las tablas, incluyendo las restricciones (`PK`, `FK`, `UNIQUE`, `CHECK`) y la relación doble de las tablas `*_log`.
+El [Diccionario de Datos](diccionario-de-datos.md) (Ver [`docs/base-de-datos/diccionario-de-datos.md`](diccionario-de-datos.md)) contiene la descripción de cada atributo de las tablas, incluyendo las restricciones (`PK`, `FK`, `UNIQUE`, `CHECK`) y la relación doble de las tablas `*_log`.
 
 ## 3. Migraciones, Seeders y Orden de Ejecución
 
@@ -554,7 +554,7 @@ Las [migraciones](../../database/migrations/) crean las tablas, los [seeders](..
 | --- | --- | --- | --- |
 | Migración | `database/migrations/` | `NNN_create_<tabla>.sql` | `001_create_user_account.sql` |
 | Inserción | `database/seeders/` | `NNN_insert_<tabla>.sql` | `001_insert_user_account.sql` |
-| Trigger | `database/triggers/` | `NNN_trigger_<tabla>.sql` | `001_trigger_user_account.sql` |
+| Disparador | `database/triggers/` | `NNN_trigger_<tabla>.sql` | `001_trigger_user_account.sql` |
 
 - `NNN` es un número de tres dígitos que indica el orden de ejecución. En los triggers de auditoría coincide con el número de la migración de la tabla auditada; el archivo `100_function_updated_at.sql` es especial.
 - `create`: crea una tabla u objeto de base de datos. `insert`: inserta datos iniciales. `function`: crea una función compartida. `trigger`: crea disparadores sobre una tabla.
@@ -566,9 +566,7 @@ Archivos especiales (no corresponden a una tabla):
 | --- | --- |
 | `000_create_extensions.sql` | Habilita las extensiones `postgis` y `pgcrypto` |
 | `000_function_audit_log.sql` | Crea la función compartida `fn_audit_log()` ([sección 4.2](#42-funcionamiento)) |
-| `100_function_updated_at.sql` | Crea `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at` ([sección 4.4](#44-trigger-de-updated_at)); se ejecuta con los triggers, no con las migraciones |
-
-> La migración `030` se retiró: la función y los triggers de `updated_at` viven ahora en [`database/triggers/100_function_updated_at.sql`](../../database/triggers/100_function_updated_at.sql).
+| `100_function_updated_at.sql` | Crea `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at` ([sección 4.4](#44-trigger-de-updated_at)); se ejecuta con los triggers |
 
 ### 3.2. Orden de Ejecución
 
@@ -881,7 +879,7 @@ Define cómo se tratan los datos sensibles identificados en el [diccionario de d
 | --- | --- |
 | Contraseña | Solo se almacena el hash Argon2id (incluye sal y parámetros) |
 | Tokens (sesión, restablecimiento, validación de correo) | Solo se almacena el hash SHA-256; el token en claro nunca se guarda |
-| `*_log.old` / `*_log.new` | Nunca deben contener contraseñas, hashes ni `document_id`; el trigger excluye `pwd_hash` y `document_id` ([sección 4.2](#42-funcionamiento)) |
+| `*_log.old` / `*_log.new` | Nunca deben contener contraseñas, hashes ni `document_id`; el trigger excluye `pwd_hash`, `document_id`, y `token_hash` de las tablas de autenticación ([sección 4.2](#42-funcionamiento)) |
 | `document_id` | Se muestra enmascarado y no se escribe en logs |
 | Datos personales | No se usan datos reales en desarrollo ni pruebas; los seeders contienen datos ficticios ([sección 3.3](#33-reglas-de-migraciones-y-seeders)) |
 | Posiciones GPS | Solo de asignaciones en curso (regla de la aplicación) |
