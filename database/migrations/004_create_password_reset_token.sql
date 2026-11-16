@@ -9,7 +9,7 @@ CREATE TABLE password_reset_token (
     used_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_password_reset_token_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id),
+    CONSTRAINT fk_password_reset_token_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id) ON DELETE CASCADE,
     CONSTRAINT uq_password_reset_token_hash UNIQUE (token_hash),
     CONSTRAINT ck_password_reset_token_expires_at CHECK (expires_at > created_at)
 );

@@ -10,8 +10,8 @@ CREATE TABLE password_reset_token_log (
     request_ip INET,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_password_reset_token_log_password_reset_token FOREIGN KEY (entity_id) REFERENCES password_reset_token (id),
-    CONSTRAINT fk_password_reset_token_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)
+    CONSTRAINT fk_password_reset_token_log_password_reset_token FOREIGN KEY (entity_id) REFERENCES password_reset_token (id) ON DELETE CASCADE,
+    CONSTRAINT fk_password_reset_token_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_password_reset_token_log_entity_id ON password_reset_token_log (entity_id);

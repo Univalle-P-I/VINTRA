@@ -7,7 +7,7 @@ CREATE TABLE crew_member (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_crew_member_crew FOREIGN KEY (crew_id) REFERENCES crew (id)
+    CONSTRAINT fk_crew_member_crew FOREIGN KEY (crew_id) REFERENCES crew (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_crew_member_crew_id ON crew_member (crew_id);

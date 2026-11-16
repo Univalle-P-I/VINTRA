@@ -10,7 +10,7 @@ CREATE TABLE email_validation_token (
     used_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_email_validation_token_user_data FOREIGN KEY (user_account_id) REFERENCES user_account (id),
+    CONSTRAINT fk_email_validation_token_user_data FOREIGN KEY (user_account_id) REFERENCES user_account (id) ON DELETE CASCADE,
     CONSTRAINT uq_email_validation_token_hash UNIQUE (token_hash),
     CONSTRAINT ck_email_validation_token_expires_at CHECK (expires_at > created_at)
 );

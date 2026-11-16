@@ -10,7 +10,7 @@ CREATE TABLE session (
     last_used_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_session_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id),
+    CONSTRAINT fk_session_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id) ON DELETE CASCADE,
     CONSTRAINT uq_session_token_hash UNIQUE (token_hash),
     CONSTRAINT ck_session_expires_at CHECK (expires_at > created_at)
 );

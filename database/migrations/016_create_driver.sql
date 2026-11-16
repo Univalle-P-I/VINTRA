@@ -9,8 +9,8 @@ CREATE TABLE driver (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_driver_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id),
-    CONSTRAINT fk_driver_crew FOREIGN KEY (crew_id) REFERENCES crew (id),
+    CONSTRAINT fk_driver_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id) ON DELETE CASCADE,
+    CONSTRAINT fk_driver_crew FOREIGN KEY (crew_id) REFERENCES crew (id) ON DELETE CASCADE,
     CONSTRAINT ck_driver_dates CHECK (ended_at IS NULL OR ended_at >= started_at)
 );
 

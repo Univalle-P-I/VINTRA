@@ -10,8 +10,8 @@ CREATE TABLE profile_log (
     request_ip INET,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_profile_log_profile FOREIGN KEY (entity_id) REFERENCES profile (id),
-    CONSTRAINT fk_profile_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)
+    CONSTRAINT fk_profile_log_profile FOREIGN KEY (entity_id) REFERENCES profile (id) ON DELETE CASCADE,
+    CONSTRAINT fk_profile_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_profile_log_entity_id ON profile_log (entity_id);

@@ -10,8 +10,8 @@ CREATE TABLE crew_member_log (
     request_ip INET,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_crew_member_log_crew_member FOREIGN KEY (entity_id) REFERENCES crew_member (id),
-    CONSTRAINT fk_crew_member_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)
+    CONSTRAINT fk_crew_member_log_crew_member FOREIGN KEY (entity_id) REFERENCES crew_member (id) ON DELETE CASCADE,
+    CONSTRAINT fk_crew_member_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_crew_member_log_entity_id ON crew_member_log (entity_id);

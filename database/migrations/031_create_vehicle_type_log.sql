@@ -10,8 +10,8 @@ CREATE TABLE vehicle_type_log (
     request_ip INET,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_vehicle_type_log_vehicle_type FOREIGN KEY (entity_id) REFERENCES vehicle_type (id),
-    CONSTRAINT fk_vehicle_type_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)
+    CONSTRAINT fk_vehicle_type_log_vehicle_type FOREIGN KEY (entity_id) REFERENCES vehicle_type (id) ON DELETE CASCADE,
+    CONSTRAINT fk_vehicle_type_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_vehicle_type_log_entity_id ON vehicle_type_log (entity_id);

@@ -21,9 +21,9 @@ CREATE TABLE assignment (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_assignment_driver FOREIGN KEY (driver_id) REFERENCES driver (id),
-    CONSTRAINT fk_assignment_microroute_schedule FOREIGN KEY (microroute_schedule_id) REFERENCES microroute_schedule (id),
-    CONSTRAINT fk_assignment_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id),
+    CONSTRAINT fk_assignment_driver FOREIGN KEY (driver_id) REFERENCES driver (id) ON DELETE CASCADE,
+    CONSTRAINT fk_assignment_microroute_schedule FOREIGN KEY (microroute_schedule_id) REFERENCES microroute_schedule (id) ON DELETE CASCADE,
+    CONSTRAINT fk_assignment_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) ON DELETE CASCADE,
     CONSTRAINT uq_assignment_schedule_start UNIQUE (microroute_schedule_id, scheduled_start_at),
     CONSTRAINT ck_assignment_scheduled_range CHECK (scheduled_end_at >= scheduled_start_at),
     CONSTRAINT ck_assignment_actual_range CHECK (ended_at IS NULL OR (started_at IS NOT NULL AND ended_at >= started_at))

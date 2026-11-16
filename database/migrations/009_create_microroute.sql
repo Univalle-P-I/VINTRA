@@ -9,7 +9,7 @@ CREATE TABLE microroute (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_microroute_macroroute FOREIGN KEY (macroroute_id) REFERENCES macroroute (id),
+    CONSTRAINT fk_microroute_macroroute FOREIGN KEY (macroroute_id) REFERENCES macroroute (id) ON DELETE CASCADE,
     CONSTRAINT uq_microroute_code UNIQUE (code)
 );
 

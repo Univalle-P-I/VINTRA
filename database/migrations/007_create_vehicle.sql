@@ -18,7 +18,7 @@ CREATE TABLE vehicle (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_vehicle_vehicle_type FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_type (id),
+    CONSTRAINT fk_vehicle_vehicle_type FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_type (id) ON DELETE CASCADE,
     CONSTRAINT uq_vehicle_plate UNIQUE (plate),
     CONSTRAINT ck_vehicle_capacity_kg CHECK (capacity_kg >= 0),
     CONSTRAINT ck_vehicle_capacity_yd3 CHECK (capacity_yd3 >= 0)

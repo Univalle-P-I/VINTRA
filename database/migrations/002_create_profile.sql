@@ -14,7 +14,7 @@ CREATE TABLE profile (
     user_role user_role NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_profile_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id),
+    CONSTRAINT fk_profile_user_account FOREIGN KEY (user_account_id) REFERENCES user_account (id) ON DELETE CASCADE,
     CONSTRAINT uq_profile_account_role UNIQUE (user_account_id, user_role)
 );
 

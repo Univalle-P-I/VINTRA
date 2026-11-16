@@ -8,8 +8,8 @@ CREATE TABLE microroute_schedule (
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_microroute_schedule_microroute FOREIGN KEY (microroute_id) REFERENCES microroute (id),
-    CONSTRAINT fk_microroute_schedule_schedule FOREIGN KEY (schedule_id) REFERENCES schedule (id),
+    CONSTRAINT fk_microroute_schedule_microroute FOREIGN KEY (microroute_id) REFERENCES microroute (id) ON DELETE CASCADE,
+    CONSTRAINT fk_microroute_schedule_schedule FOREIGN KEY (schedule_id) REFERENCES schedule (id) ON DELETE CASCADE,
     CONSTRAINT uq_microroute_schedule UNIQUE (microroute_id, schedule_id, day_of_week),
     CONSTRAINT ck_microroute_schedule_day_of_week CHECK (day_of_week BETWEEN 1 AND 7)
 );

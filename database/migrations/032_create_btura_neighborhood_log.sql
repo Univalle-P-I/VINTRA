@@ -10,8 +10,8 @@ CREATE TABLE btura_neighborhood_log (
     request_ip INET,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_btura_neighborhood_log_btura_neighborhood FOREIGN KEY (entity_id) REFERENCES btura_neighborhood (id),
-    CONSTRAINT fk_btura_neighborhood_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id)
+    CONSTRAINT fk_btura_neighborhood_log_btura_neighborhood FOREIGN KEY (entity_id) REFERENCES btura_neighborhood (id) ON DELETE CASCADE,
+    CONSTRAINT fk_btura_neighborhood_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_btura_neighborhood_log_entity_id ON btura_neighborhood_log (entity_id);
