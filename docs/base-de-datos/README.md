@@ -1,10 +1,11 @@
-# Base de Datos ![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=fff&style=for-the-badge) ![PostGIS Badge](https://img.shields.io/badge/PostGIS-5B8C85?logo=postgresql&logoColor=fff&style=for-the-badge)
+# Base de Datos 
+![PostgreSQL Badge](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=fff&style=for-the-badge) ![PostGIS Badge](https://img.shields.io/badge/PostGIS-5B8C85?logo=postgresql&logoColor=fff&style=for-the-badge)
 
 En esta guía se expone la documentación de la base de datos de VINTRA, su arquitectura y evolución.
 
 ## Índice
 
-- [Base de Datos  ](#base-de-datos--)
+- [Base de Datos](#base-de-datos)
   - [Índice](#índice)
   - [Estado](#estado)
   - [1. Motor y Versión Soportada](#1-motor-y-versión-soportada)
