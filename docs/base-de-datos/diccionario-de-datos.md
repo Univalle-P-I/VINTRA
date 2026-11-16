@@ -1,6 +1,6 @@
 # Diccionario de Datos
 
-Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditoría `*_log`. No se incluye la tabla de sistema `spatial_ref_sys` de PostGIS.
+Documentación de las 36 tablas: 18 entidades del modelo y 18 tablas de auditoría `*_log`. No se incluye la tabla de sistema `spatial_ref_sys` de PostGIS.
 
 ## Índice
 
@@ -8,7 +8,6 @@ Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditor�
   - [Índice](#índice)
   - [Reglas de auditoría](#reglas-de-auditoría)
   - [user\_account](#user_account)
-  - [user\_data](#user_data)
   - [profile](#profile)
   - [session](#session)
   - [password\_reset\_token](#password_reset_token)
@@ -27,7 +26,6 @@ Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditor�
   - [assignment](#assignment)
   - [vehicle\_position](#vehicle_position)
   - [user\_account\_log](#user_account_log)
-  - [user\_data\_log](#user_data_log)
   - [profile\_log](#profile_log)
   - [crew\_log](#crew_log)
   - [crew\_member\_log](#crew_member_log)
@@ -48,7 +46,7 @@ Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditor�
 
 ## Reglas de auditoría
 
-- Hay 19 tablas `*_log`, una por cada entidad auditada. Cada entidad tiene un trigger `AFTER INSERT OR UPDATE OR DELETE` que escribe automáticamente en su `*_log`.
+- Hay 18 tablas `*_log`, una por cada entidad auditada. Cada entidad tiene un trigger `AFTER INSERT OR UPDATE OR DELETE` que escribe automáticamente en su `*_log`.
 - Todas las tablas `*_log` comparten la misma estructura: `id`, `entity_id`, `actor_id`, `action`, `old`, `new`, `request_ip` y `created_at`, con FKs hacia la entidad auditada y hacia `user_account`, e índices por `entity_id`, `actor_id` y `created_at`.
 - Un `INSERT` se registra como `CREATE`.
 - Un `UPDATE` normal se registra como `UPDATE`.
@@ -64,7 +62,7 @@ Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditor�
 
 ## user_account
 
-cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles)
+cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles e información personal)
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -73,32 +71,20 @@ cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles)
 | document_type | Tipo de documento de identidad del titular de la cuenta. | ENUM | N/A | SI | SI | N/A | ENUM: CC; UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
 | document_id | Número de documento de identidad del titular. Dato personal sensible. No puede repetirse junto con document_type. | CHAR | 20 | SI | SI | N/A | UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
 | pwd_hash | Hash de la contraseña (Argon2id; incluye sal y parámetros). | TEXT | N/A | SI | NO | N/A | — | — |
+| first_name | Nombres de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
+| last_name | Apellidos de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
+| email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | SI | N/A | UNIQUE (email) via uq_user_data_email | uq_user_data_email (email) |
+| phone | Número de teléfono de contacto. Dato personal. | VARCHAR | 20 | NO | NO | N/A | NULL permitido | — |
 | failed_attempts | Intentos fallidos consecutivos de inicio de sesión. Se reinicia al autenticarse con éxito. Por defecto 0. | SMALLINT | N/A | SI | NO | N/A | DEFAULT 0; CHECK (failed_attempts >= 0) | — |
 | is_active | Estado operativo de la cuenta. Si es FALSE, la cuenta está dada de baja y no debe iniciar sesión; tiene prioridad sobre user_status. Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | locked_until | Fecha hasta la cual la cuenta está bloqueada temporalmente por intentos fallidos. NULL si no está bloqueada. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | last_login_at | Fecha y hora del último inicio de sesión exitoso. NULL si nunca ha ingresado. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
+| email_verified_at | Fecha y hora de verificación del correo electrónico. NULL si aún no se ha verificado. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | password_changed_at | Fecha y hora del último cambio de contraseña. NULL si no se ha cambiado desde la creación. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
 - (No tiene llaves foráneas)
-
-## user_data
-
-datos personales de la cuenta (relación 1 a 1 con user_account)
-
-| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de los datos personales. Es el mismo id de user_account (relación 1 a 1). | UUID | N/A | SI | SI | PK, FK | PK; FK user_account(id) | user_data_pkey (id) |
-| first_name | Nombres de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
-| last_name | Apellidos de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
-| email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | SI | N/A | UNIQUE (email) via uq_user_data_email | uq_user_data_email (email) |
-| phone | Número de teléfono de contacto. Dato personal. | VARCHAR | 20 | NO | NO | N/A | NULL permitido | — |
-| email_verified_at | Fecha y hora de verificación del correo electrónico. NULL si aún no se ha verificado. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
-| updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
-| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
-
-- id referencia user_account(id): relación 1 a 1; cada cuenta tiene exactamente un registro de datos personales y viceversa.
 
 ## profile
 
@@ -156,7 +142,7 @@ tokens de un solo uso para validar el correo electrónico
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único de la solicitud de validación de correo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | email_validation_token_pkey (id) |
-| user_data_id | Datos personales de la persona que solicitó la validación del correo. | UUID | N/A | SI | NO | FK | FK user_data(id) | idx_email_validation_token_user_data_id (user_data_id) |
+| user_account_id | Cuenta de usuario de quien solicitó la validación del correo. | UUID | N/A | SI | NO | FK | FK user_account(id) | idx_email_validation_token_user_account_id (user_account_id) |
 | email | Correo electrónico que se está verificando. | VARCHAR | 254 | SI | NO | N/A | — | — |
 | token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI | N/A | UNIQUE (token_hash) via uq_email_validation_token_hash | uq_email_validation_token_hash (token_hash) |
 | request_ip | Dirección IP desde la que se hizo la solicitud. | INET | N/A | NO | NO | N/A | NULL permitido | — |
@@ -165,7 +151,7 @@ tokens de un solo uso para validar el correo electrónico
 | expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_email_validation_token_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-- user_data_id referencia user_data(id): unos datos personales pueden tener muchas solicitudes de validación; cada token pertenece a un solo registro de datos personales.
+- user_account_id referencia user_account(id): una cuenta de usuario puede tener muchas solicitudes de validación; cada token pertenece a un solo registro de cuenta de usuario.
 
 ## vehicle_type
 
@@ -332,7 +318,7 @@ conductor asignado a una cuadrilla
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único del conductor. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | driver_pkey (id) |
-| user_data_id | Datos personales del conductor. | UUID | N/A | SI | NO | FK | FK user_data(id) | idx_driver_user_data_id (user_data_id) |
+| user_account_id | Cuenta de usuario del conductor. | UUID | N/A | SI | NO | FK | FK user_data(id) | idx_driver_user_account_id (user_account_id) |
 | crew_id | Cuadrilla a la que está asignado el conductor. | UUID | N/A | NO | NO | FK | FK crew(id) | idx_driver_crew_id (crew_id) |
 | started_at | Fecha y hora desde la que el conductor está asignado a la cuadrilla. Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | ended_at | Fecha y hora en que terminó la asignación a la cuadrilla. NULL si sigue vigente. | TIMESTAMPTZ | N/A | NO | NO | N/A | CHECK (ended_at IS NULL OR ended_at >= started_at) | — |
@@ -340,7 +326,7 @@ conductor asignado a una cuadrilla
 | updated_at | Fecha y hora de la última modificación del registro (UTC). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
-- user_data_id referencia user_data(id): unos datos personales pueden corresponder a varios registros de conductor; cada registro de conductor pertenece a unos datos personales.
+- user_account_id referencia user_account(id): una cuenta de usuario puede corresponder a varios registros de conductor; cada registro de conductor pertenece a una cuenta de usuario.
 - crew_id referencia crew(id): una cuadrilla puede tener varios conductores; cada registro de conductor pertenece a una sola cuadrilla.
 
 ## assignment
@@ -398,25 +384,6 @@ auditoría de cambios en user_account
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_account_log_created_at (created_at) |
 
 - entity_id referencia user_account(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
-- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
-
-## user_data_log
-
-auditoría de cambios en user_data
-
-| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del evento de auditoría sobre un registro de datos personales. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | user_data_log_pkey (id) |
-| entity_id | Identificador del registro de un registro de datos personales afectado. | UUID | N/A | SI | NO | FK | FK user_data(id) | idx_user_data_log_entity_id (entity_id) |
-| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_user_data_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
-| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
-| is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
-| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_data_log_created_at (created_at) |
-
-- entity_id referencia user_data(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## profile_log

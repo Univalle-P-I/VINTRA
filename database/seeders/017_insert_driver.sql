@@ -1,6 +1,6 @@
 BEGIN;
 
-INSERT INTO driver (id, user_data_id, crew_id) VALUES
+INSERT INTO driver (id, user_account_id, crew_id) VALUES
     (
         '00000000-0000-4000-8000-000000000d02',
         '00000000-0000-4000-8000-000000000003',

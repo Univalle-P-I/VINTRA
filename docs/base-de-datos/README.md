@@ -67,24 +67,18 @@ erDiagram
         UUID id
         ENUM user_status
         ENUM document_type
-        CHAR document_id
+        VARCHAR document_id
         TEXT pwd_hash
-        SMALLINT failed_attempts
-        BOOLEAN is_active
-        TIMESTAMPTZ locked_until
-        TIMESTAMPTZ last_login_at
-        TIMESTAMPTZ password_changed_at
-        TIMESTAMPTZ updated_at
-        TIMESTAMPTZ created_at
-    }
-
-    user_data {
-        UUID id
         VARCHAR first_name
         VARCHAR last_name
         VARCHAR email
         VARCHAR phone
+        SMALLINT failed_attempts
+        BOOLEAN is_active
+        TIMESTAMPTZ locked_until
+        TIMESTAMPTZ last_login_at
         TIMESTAMPTZ email_verified_at
+        TIMESTAMPTZ password_changed_at
         TIMESTAMPTZ updated_at
         TIMESTAMPTZ created_at
     }
@@ -491,12 +485,11 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
-    user_account ||--o| user_data : "tiene"
     user_account ||--o{ profile : "tiene"
     user_account ||--o{ session : "abre"
     user_account ||--o{ password_reset_token : "genera"
-    user_data ||--o{ email_validation_token : "genera"
-    user_data ||--o{ driver : "pertenece"
+    user_account ||--o{ email_validation_token : "genera"
+    user_account ||--o{ driver : "pertenece"
     crew ||--o{ driver : "tiene"
     crew ||--o{ crew_member : "tiene"
     driver ||--o{ assignment : "realiza"
@@ -510,7 +503,6 @@ erDiagram
     microroute ||--o{ microroute_neighborhood : "pasa por"
     vehicle_type ||--o{ vehicle : "tiene"
     user_account ||--o{ user_account_log : "genera"
-    user_data ||--o{ user_data_log : "genera"
     profile ||--o{ profile_log : "genera"
     session ||--o{ session_log : "genera"
     password_reset_token ||--o{ password_reset_token_log : "genera"
@@ -534,7 +526,7 @@ erDiagram
 
 | Concepto de dominio | Tabla | Observaciones |
 | --- | --- | --- |
-| Usuario del sistema | `user_account`, `user_data` | Credenciales y datos personales separados (1 a 1, mismo `id`) |
+| Usuario del sistema | `user_account` | Credenciales y datos personales |
 | Rol del perfil | `profile.user_role` | Se almacena como ENUM; una cuenta no puede repetir el mismo rol |
 | Cuadrilla de recolección | `crew`, `crew_member` | La cuadrilla agrupa integrantes y conductores |
 | Conductor | `driver` | Vincula los datos personales del conductor con su cuadrilla |
@@ -554,12 +546,11 @@ La cardinalidad de todas las relaciones se lee directamente en el [DER](#21-diag
 
 | Relación | Cardinalidad | Regla |
 | --- | --- | --- |
-| `user_account` → `user_data` | 1 a 1 | `user_data.id` = `user_account.id` |
 | `user_account` → `profile` | 1 a N | El par (`user_account_id`, `user_role`) es único |
 | `user_account` → `session` | 1 a N | Sesión revocable y con vencimiento |
 | `user_account` → `password_reset_token` | 1 a N | Token de un solo uso |
-| `user_data` → `email_validation_token` | 1 a N | Token de validación del correo |
-| `user_data` → `driver` | 1 a N | Un conductor corresponde a unos datos personales |
+| `user_account` → `email_validation_token` | 1 a N | Token de validación del correo |
+| `user_account` → `driver` | 1 a N | Un conductor corresponde a unos datos personales |
 | `microroute_schedule` → `assignment` | 1 a N | Una programación de microruta se asigna a varias ejecuciones |
 | `schedule` → `microroute_schedule` | 1 a N | Un horario se reutiliza en varias microrrutas |
 | `btura_neighborhood` ↔ `microroute` (vía `microroute_neighborhood`) | N a M | Un barrio puede ser atendido por varias microrrutas y una microrruta pasa por varios barrios; `order_visit` define el orden |
@@ -607,11 +598,10 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 | --- | --- | --- |
 | 000 | `000_create_extensions.sql` | PostgreSQL 16 |
 | 001 | `001_create_user_account.sql` | — |
-| 002 | `002_create_user_data.sql` | `user_account` |
 | 003 | `003_create_profile.sql` | `user_account` |
 | 004 | `004_create_session.sql` | `user_account` |
 | 005 | `005_create_password_reset_token.sql` | `user_account` |
-| 006 | `006_create_email_validation_token.sql` | `user_data` |
+| 006 | `006_create_email_validation_token.sql` | `user_account` |
 | 007 | `007_create_vehicle_type.sql` | — |
 | 008 | `008_create_vehicle.sql` | `vehicle_type` |
 | 009 | `009_create_macroroute.sql` | PostGIS 3.6 |
@@ -622,11 +612,10 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 | 014 | `014_create_microroute_neighborhood.sql` | `microroute`, `btura_neighborhood` |
 | 015 | `015_create_crew.sql` | — |
 | 016 | `016_create_crew_member.sql` | `crew` |
-| 017 | `017_create_driver.sql` | `user_data`, `crew` |
+| 017 | `017_create_driver.sql` | `user_account`, `crew` |
 | 018 | `018_create_assignment.sql` | `driver`, `microroute_schedule`, `vehicle` |
 | 019 | `019_create_vehicle_position.sql` | `assignment`, PostGIS 3.6 |
 | 020 | `020_create_user_account_log.sql` | `user_account` (doble relación, ver [diccionario](diccionario-de-datos.md)) |
-| 021 | `021_create_user_data_log.sql` | `user_data`, `user_account` |
 | 022 | `022_create_profile_log.sql` | `profile`, `user_account` |
 | 023 | `023_create_crew_log.sql` | `crew`, `user_account` |
 | 024 | `024_create_crew_member_log.sql` | `crew_member`, `user_account` |
@@ -650,7 +639,6 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 | # | Inserción | Dependencia |
 | --- | --- | --- |
 | 001 | `001_insert_user_account.sql` | — |
-| 002 | `002_insert_user_data.sql` | `user_account` |
 | 003 | `003_insert_profile.sql` | `user_account` |
 | 007 | `007_insert_vehicle_type.sql` | — |
 | 015 | `015_insert_crew.sql` | — |
@@ -665,7 +653,6 @@ Se ejecutan después de las migraciones `000` a `039` y de los seeders. Como se 
 | --- | --- | --- |
 | 000 | `000_function_audit_log.sql` | — (función compartida `fn_audit_log()`) |
 | 001 | `001_trigger_user_account.sql` | `user_account` |
-| 002 | `002_trigger_user_data.sql` | `user_data` |
 | 003 | `003_trigger_profile.sql` | `profile` |
 | 004 | `004_trigger_session.sql` | `session` |
 | 005 | `005_trigger_password_reset_token.sql` | `password_reset_token` |
@@ -897,7 +884,7 @@ Define cómo se tratan los datos sensibles identificados en el [diccionario de d
 | Clasificación | Datos |
 | --- | --- |
 | Secreto (nunca se expone ni se registra) | `user_account.pwd_hash`, `session.token_hash`, `password_reset_token.token_hash`, `email_validation_token.token_hash` |
-| Personal | `user_account.document_id`, `user_data.first_name`, `user_data.last_name`, `user_data.email`, `user_data.phone`, `crew_member.full_name`, `email_validation_token.email`, `*_log.old` y `*_log.new` |
+| Personal | `user_account.document_id`, `user_account.first_name`, `user_account.last_name`, `user_account.email`, `user_account.phone`, `crew_member.full_name`, `email_validation_token.email`, `*_log.old` y `*_log.new` |
 | Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_validation_token`, `*_log`), `*_log.actor_id`, `vehicle_position` (`geom`, `recorded_at`) |
 
 ### 7.2. Reglas de Tratamiento

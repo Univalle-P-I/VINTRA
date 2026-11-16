@@ -15,7 +15,9 @@ BEGIN
     v_action := CASE TG_OP
         WHEN 'INSERT' THEN 'CREATE'::audit_action
         WHEN 'UPDATE' THEN 'UPDATE'::audit_action
+        WHEN 'SOFT_DELETE' THEN 'SOFT_DELETE'::audit_action
         WHEN 'DELETE' THEN 'DELETE'::audit_action
+        WHEN 'RESTORE' THEN 'RESTORE'::audit_action
     END;
 
     IF TG_OP = 'UPDATE' THEN
@@ -43,8 +45,8 @@ BEGIN
     END IF;
 
     IF TG_TABLE_NAME = 'user_account' THEN
-        v_old := v_old - 'pwd_hash' - 'document_id';
-        v_new := v_new - 'pwd_hash' - 'document_id';
+        v_old := v_old - 'pwd_hash' - 'document_id' - 'email';
+        v_new := v_new - 'pwd_hash' - 'document_id' - 'email';
     ELSIF TG_TABLE_NAME IN ('session', 'password_reset_token', 'email_validation_token') THEN
         v_old := v_old - 'token_hash';
         v_new := v_new - 'token_hash';
