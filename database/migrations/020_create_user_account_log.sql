@@ -2,7 +2,7 @@ BEGIN;
 
 DO $$
 BEGIN
-    CREATE TYPE audit_action AS ENUM ('CREATE', 'UPDATE', 'DELETE');
+    CREATE TYPE audit_action AS ENUM ('CREATE', 'UPDATE', 'SOFT_DELETE', 'DELETE', 'RESTORE');
 EXCEPTION
     WHEN duplicate_object THEN NULL;
 END;

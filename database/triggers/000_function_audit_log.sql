@@ -15,13 +15,19 @@ BEGIN
     v_action := CASE TG_OP
         WHEN 'INSERT' THEN 'CREATE'::audit_action
         WHEN 'UPDATE' THEN 'UPDATE'::audit_action
+        WHEN 'SOFT_DELETE' THEN 'SOFT_DELETE'::audit_action
         WHEN 'DELETE' THEN 'DELETE'::audit_action
+        WHEN 'RESTORE' THEN 'RESTORE'::audit_action
     END;
 
-    IF TG_OP = 'UPDATE'
-        AND (to_jsonb(OLD) ->> 'is_active')::boolean IS DISTINCT FROM (to_jsonb(NEW) ->> 'is_active')::boolean
-        AND (to_jsonb(NEW) ->> 'is_active')::boolean IS FALSE THEN
-        v_action := 'DELETE'::audit_action;
+    IF TG_OP = 'UPDATE' THEN
+        IF (to_jsonb(OLD) ->> 'is_active')::boolean IS TRUE
+            AND (to_jsonb(NEW) ->> 'is_active')::boolean IS FALSE THEN
+            v_action := 'SOFT_DELETE'::audit_action;
+        ELSIF (to_jsonb(OLD) ->> 'is_active')::boolean IS FALSE
+            AND (to_jsonb(NEW) ->> 'is_active')::boolean IS TRUE THEN
+            v_action := 'RESTORE'::audit_action;
+        END IF;
     END IF;
 
     IF TG_OP = 'DELETE' THEN
