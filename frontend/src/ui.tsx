@@ -131,23 +131,13 @@ export function Section({
 }
 
 export function Footer() {
-  return <footer>VINTRA · Vista administrativa · Información de ejemplo</footer>
+  return <footer>VINTRA · Vista administrativa</footer>
 }
 
 export function SchematicMap() {
   return (
-    <div className="map">
-      <span className="map-title">LA FLORESTA · SECTOR NORTE</span>
-      {Array.from({ length: 8 }, (_, index) => (
-        <span className={`block block-${index + 1}`} key={index} />
-      ))}
-      <img alt="" className="route" src="/assets/4e004.svg" />
-      <img alt="" className="stop stop-a" src="/assets/32a05.svg" />
-      <img alt="" className="stop stop-b" src="/assets/32a05.svg" />
-      <img alt="" className="stop stop-c" src="/assets/32a05.svg" />
-      <span className="vehicle-marker">V-018</span>
-      <span className="map-start">● Inicio</span>
-      <span className="map-end">◉ Fin</span>
+    <div className="map-placeholder" role="status">
+      Cartografía no disponible. La vista se habilitará al conectar datos geográficos reales.
     </div>
   )
 }

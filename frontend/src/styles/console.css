@@ -1,0 +1,30 @@
+/* Capa administrativa sobre los estilos globales y módulos existentes. */
+@import "./base.css";
+@import "./tables-forms.css";
+
+.map-placeholder {
+  align-items: center;
+  background: #f3f8f5;
+  border: 1px solid #dce9e1;
+  border-radius: 6px;
+  color: #64766c;
+  display: flex;
+  justify-content: center;
+  min-height: 180px;
+  padding: 24px;
+  text-align: center;
+}
+
+.admin-metrics .metric:last-child {
+  background: #fff;
+  border-color: #dbe8e0;
+}
+
+.admin-metrics .metric:last-child strong {
+  color: #174f38;
+}
+
+@media (max-width: 800px) {
+  .mobile-nav { flex-wrap: wrap; }
+  .mobile-nav-item { flex: 1 1 auto; }
+}
