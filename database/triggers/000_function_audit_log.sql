@@ -15,9 +15,7 @@ BEGIN
     v_action := CASE TG_OP
         WHEN 'INSERT' THEN 'CREATE'::audit_action
         WHEN 'UPDATE' THEN 'UPDATE'::audit_action
-        WHEN 'SOFT_DELETE' THEN 'SOFT_DELETE'::audit_action
         WHEN 'DELETE' THEN 'DELETE'::audit_action
-        WHEN 'RESTORE' THEN 'RESTORE'::audit_action
     END;
 
     IF TG_OP = 'UPDATE' THEN
