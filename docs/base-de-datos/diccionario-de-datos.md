@@ -1,6 +1,6 @@
 # Diccionario de Datos
 
-Documentación de las 29 tablas.
+Documentación de las 38 tablas: 19 entidades del modelo y 19 tablas de auditoría `*_log`. No se incluye la tabla de sistema `spatial_ref_sys` de PostGIS.
 
 ## Índice
 
@@ -28,22 +28,36 @@ Documentación de las 29 tablas.
 22. [profile_log](#profile_log)
 23. [crew_log](#crew_log)
 24. [crew_member_log](#crew_member_log)
-25. [macroroute_log](#macroroute_log)
-26. [microroute_log](#microroute_log)
-27. [driver_log](#driver_log)
-28. [vehicle_log](#vehicle_log)
-29. [assignment_log](#assignment_log)
+25. [driver_log](#driver_log)
+26. [macroroute_log](#macroroute_log)
+27. [microroute_log](#microroute_log)
+28. [assignment_log](#assignment_log)
+29. [vehicle_log](#vehicle_log)
+30. [session_log](#session_log)
+31. [password_reset_token_log](#password_reset_token_log)
+32. [email_validation_token_log](#email_validation_token_log)
+33. [vehicle_type_log](#vehicle_type_log)
+34. [btura_neighborhood_log](#btura_neighborhood_log)
+35. [schedule_log](#schedule_log)
+36. [microroute_schedule_log](#microroute_schedule_log)
+37. [microroute_neighborhood_log](#microroute_neighborhood_log)
+38. [vehicle_position_log](#vehicle_position_log)
 
 ## Reglas de auditoría
 
+- Hay 19 tablas `*_log`, una por cada entidad auditada. Cada entidad tiene un trigger `AFTER INSERT OR UPDATE OR DELETE` que escribe automáticamente en su `*_log`.
+- Todas las tablas `*_log` comparten la misma estructura: `id`, `entity_id`, `actor_id`, `action`, `old`, `new`, `request_ip` y `created_at`, con FKs hacia la entidad auditada y hacia `user_account`, e índices por `entity_id`, `actor_id` y `created_at`.
 - Un `INSERT` se registra como `CREATE`.
-- `UPDATE` se registra como `UPDATE`.
-- Un `UPDATE` que cambia `is_active` a `FALSE` se registra como `DELETE` (borrado lógico)
-- Un `DELETE` real se registra como `DELETE`.
-- `old` contiene el registro anterior en `UPDATE` y `DELETE`.
-- `new` contiene el registro nuevo en hechos en un `INSERT` ó `UPDATE`; cuando es `DELETE` real, toma valor de  `NULL`.
-- El borrado operativo es lógico (`is_active = FALSE`); no se debe ejecutar `DELETE` físico sobre entidades con historial de auditoría.
-- `user_account.pwd_hash` y `user_account.document_id` son excluidos de `old` y `new` (no se registran hashes de contraseñas ni números de documento como valores en `old` ó `new`)
+- Un `UPDATE` normal se registra como `UPDATE`.
+- Un `UPDATE` que cambia `is_active` de `TRUE` a `FALSE` se registra como `SOFT_DELETE` (borrado lógico).
+- Un `UPDATE` que cambia `is_active` de `FALSE` a `TRUE` se registra como `RESTORE`.
+- Un `DELETE` físico se registra como `DELETE`.
+- `SOFT_DELETE` y `RESTORE` solo aplican a entidades con columna `is_active`; en las demás, el cambio se registra como `UPDATE`.
+- `old` contiene el registro anterior en `UPDATE`, `SOFT_DELETE`, `RESTORE` y `DELETE`; es `NULL` en `CREATE`.
+- `new` contiene el registro nuevo en `CREATE`, `UPDATE`, `SOFT_DELETE` y `RESTORE`; es `NULL` en `DELETE` físico.
+- El borrado operativo es lógico (`is_active = FALSE`) y se audita como `SOFT_DELETE`; no se debe ejecutar `DELETE` físico sobre entidades con historial de auditoría.
+- El `DELETE` físico no es viable mientras `*_log.entity_id` tenga FK hacia la entidad auditada; para habilitarlo hay que eliminar o hacer diferible esa FK.
+- `user_account.pwd_hash` y `user_account.document_id` son excluidos de `old` y `new` (no se registran hashes de contraseñas ni números de documento como valores en `old` ó `new`).
 
 ## user_account
 
@@ -52,11 +66,12 @@ cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles)
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único de la cuenta de usuario. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | user_account_pkey (id) |
-| user_status | Estado administrativo de la cuenta. Determina si puede iniciar sesión. | ENUM | N/A | SI | NO | N/A | ENUM: ACTIVE, INACTIVE, LOCKED, PENDING_VERIFICATION | — |
+| user_status | Estado administrativo de la cuenta. Se conserva como estado secundario; `is_active` es el estado operativo prioritario para el inicio de sesión. | ENUM | N/A | SI | NO | N/A | ENUM: ACTIVE, INACTIVE, LOCKED, PENDING_VERIFICATION | — |
 | document_type | Tipo de documento de identidad del titular de la cuenta. | ENUM | N/A | SI | SI | N/A | ENUM: CC; UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
 | document_id | Número de documento de identidad del titular. Dato personal sensible. No puede repetirse junto con document_type. | CHAR | 20 | SI | SI | N/A | UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
 | pwd_hash | Hash de la contraseña (Argon2id; incluye sal y parámetros). | TEXT | N/A | SI | NO | N/A | — | — |
 | failed_attempts | Intentos fallidos consecutivos de inicio de sesión. Se reinicia al autenticarse con éxito. Por defecto 0. | SMALLINT | N/A | SI | NO | N/A | DEFAULT 0; CHECK (failed_attempts >= 0) | — |
+| is_active | Estado operativo de la cuenta. Si es FALSE, la cuenta está dada de baja y no debe iniciar sesión; tiene prioridad sobre user_status. Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | locked_until | Fecha hasta la cual la cuenta está bloqueada temporalmente por intentos fallidos. NULL si no está bloqueada. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | last_login_at | Fecha y hora del último inicio de sesión exitoso. NULL si nunca ha ingresado. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
 | password_changed_at | Fecha y hora del último cambio de contraseña. NULL si no se ha cambiado desde la creación. | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
@@ -364,9 +379,9 @@ auditoría de cambios en user_account
 | id | Identificador único del evento de auditoría sobre una cuenta de usuario. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | user_account_log_pkey (id) |
 | entity_id | Identificador del registro de una cuenta de usuario afectado. | UUID | N/A | SI | NO | FK | FK user_account(id) | idx_user_account_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_user_account_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas, hashes ni document_id. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas, hashes ni document_id. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas, hashes ni document_id. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_account_log_created_at (created_at) |
 
@@ -382,9 +397,9 @@ auditoría de cambios en user_data
 | id | Identificador único del evento de auditoría sobre un registro de datos personales. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | user_data_log_pkey (id) |
 | entity_id | Identificador del registro de un registro de datos personales afectado. | UUID | N/A | SI | NO | FK | FK user_data(id) | idx_user_data_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_user_data_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_user_data_log_created_at (created_at) |
 
@@ -400,9 +415,9 @@ auditoría de cambios en profile
 | id | Identificador único del evento de auditoría sobre un perfil. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | profile_log_pkey (id) |
 | entity_id | Identificador del registro de un perfil afectado. | UUID | N/A | SI | NO | FK | FK profile(id) | idx_profile_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_profile_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_profile_log_created_at (created_at) |
 
@@ -418,9 +433,9 @@ auditoría de cambios en crew
 | id | Identificador único del evento de auditoría sobre una cuadrilla. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | crew_log_pkey (id) |
 | entity_id | Identificador del registro de una cuadrilla afectado. | UUID | N/A | SI | NO | FK | FK crew(id) | idx_crew_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_crew_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_crew_log_created_at (created_at) |
 
@@ -436,9 +451,9 @@ auditoría de cambios en crew_member
 | id | Identificador único del evento de auditoría sobre un integrante de cuadrilla. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | crew_member_log_pkey (id) |
 | entity_id | Identificador del registro de un integrante de cuadrilla afectado. | UUID | N/A | SI | NO | FK | FK crew_member(id) | idx_crew_member_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_crew_member_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_crew_member_log_created_at (created_at) |
 
@@ -454,9 +469,9 @@ auditoría de cambios en driver
 | id | Identificador único del evento de auditoría sobre un conductor. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | driver_log_pkey (id) |
 | entity_id | Identificador del registro de un conductor afectado. | UUID | N/A | SI | NO | FK | FK driver(id) | idx_driver_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_driver_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_driver_log_created_at (created_at) |
 
@@ -472,9 +487,9 @@ auditoría de cambios en macroroute
 | id | Identificador único del evento de auditoría sobre una macrorruta. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | macroroute_log_pkey (id) |
 | entity_id | Identificador del registro de una macrorruta afectado. | UUID | N/A | SI | NO | FK | FK macroroute(id) | idx_macroroute_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_macroroute_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_macroroute_log_created_at (created_at) |
 
@@ -490,9 +505,9 @@ auditoría de cambios en microroute
 | id | Identificador único del evento de auditoría sobre una microrruta. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | microroute_log_pkey (id) |
 | entity_id | Identificador del registro de una microrruta afectado. | UUID | N/A | SI | NO | FK | FK microroute(id) | idx_microroute_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_microroute_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_log_created_at (created_at) |
 
@@ -508,9 +523,9 @@ auditoría de cambios en assignment
 | id | Identificador único del evento de auditoría sobre una asignación. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | assignment_log_pkey (id) |
 | entity_id | Identificador del registro de una asignación afectado. | UUID | N/A | SI | NO | FK | FK assignment(id) | idx_assignment_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_assignment_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_assignment_log_created_at (created_at) |
 
@@ -526,11 +541,173 @@ auditoría de cambios en vehicle
 | id | Identificador único del evento de auditoría sobre un vehículo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | vehicle_log_pkey (id) |
 | entity_id | Identificador del registro de un vehículo afectado. | UUID | N/A | SI | NO | FK | FK vehicle(id) | idx_vehicle_log_entity_id (entity_id) |
 | actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_vehicle_log_actor_id(actor_id) |
-| action | Acción registrada: CREATE, UPDATE o DELETE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, DELETE | — |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
-| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en DELETE lógico conserva el registro con is_active = FALSE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_log_created_at (created_at) |
 
 - entity_id referencia vehicle(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## session_log
+
+auditoría de cambios en session
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre una sesión. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | session_log_pkey (id) |
+| entity_id | Identificador del registro de una sesión afectado. | UUID | N/A | SI | NO | FK | FK session(id) | idx_session_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_session_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_session_log_created_at (created_at) |
+
+- entity_id referencia session(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## password_reset_token_log
+
+auditoría de cambios en password_reset_token
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre un token de restablecimiento de contraseña. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | password_reset_token_log_pkey (id) |
+| entity_id | Identificador del registro de un token de restablecimiento de contraseña afectado. | UUID | N/A | SI | NO | FK | FK password_reset_token(id) | idx_password_reset_token_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_password_reset_token_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_password_reset_token_log_created_at (created_at) |
+
+- entity_id referencia password_reset_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## email_validation_token_log
+
+auditoría de cambios en email_validation_token
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre un token de validación de correo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | email_validation_token_log_pkey (id) |
+| entity_id | Identificador del registro de un token de validación de correo afectado. | UUID | N/A | SI | NO | FK | FK email_validation_token(id) | idx_email_validation_token_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_email_validation_token_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_email_validation_token_log_created_at (created_at) |
+
+- entity_id referencia email_validation_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## vehicle_type_log
+
+auditoría de cambios en vehicle_type
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre un tipo de vehículo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | vehicle_type_log_pkey (id) |
+| entity_id | Identificador del registro de un tipo de vehículo afectado. | UUID | N/A | SI | NO | FK | FK vehicle_type(id) | idx_vehicle_type_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_vehicle_type_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_type_log_created_at (created_at) |
+
+- entity_id referencia vehicle_type(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## btura_neighborhood_log
+
+auditoría de cambios en btura_neighborhood
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre un barrio. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | btura_neighborhood_log_pkey (id) |
+| entity_id | Identificador del registro de un barrio afectado. | UUID | N/A | SI | NO | FK | FK btura_neighborhood(id) | idx_btura_neighborhood_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_btura_neighborhood_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_btura_neighborhood_log_created_at (created_at) |
+
+- entity_id referencia btura_neighborhood(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## schedule_log
+
+auditoría de cambios en schedule
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre un horario. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | schedule_log_pkey (id) |
+| entity_id | Identificador del registro de un horario afectado. | UUID | N/A | SI | NO | FK | FK schedule(id) | idx_schedule_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_schedule_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_schedule_log_created_at (created_at) |
+
+- entity_id referencia schedule(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## microroute_schedule_log
+
+auditoría de cambios en microroute_schedule
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre una programación de microrruta. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | microroute_schedule_log_pkey (id) |
+| entity_id | Identificador del registro de una programación de microrruta afectado. | UUID | N/A | SI | NO | FK | FK microroute_schedule(id) | idx_microroute_schedule_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_microroute_schedule_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_schedule_log_created_at (created_at) |
+
+- entity_id referencia microroute_schedule(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## microroute_neighborhood_log
+
+auditoría de cambios en microroute_neighborhood
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre una relación microrruta-barrio. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | microroute_neighborhood_log_pkey (id) |
+| entity_id | Identificador del registro de una relación microrruta-barrio afectado. | UUID | N/A | SI | NO | FK | FK microroute_neighborhood(id) | idx_microroute_neighborhood_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_microroute_neighborhood_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_microroute_neighborhood_log_created_at (created_at) |
+
+- entity_id referencia microroute_neighborhood(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
+
+## vehicle_position_log
+
+auditoría de cambios en vehicle_position
+
+| Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| id | Identificador único del evento de auditoría sobre una posición de vehículo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | vehicle_position_log_pkey (id) |
+| entity_id | Identificador del registro de una posición de vehículo afectado. | UUID | N/A | SI | NO | FK | FK vehicle_position(id) | idx_vehicle_position_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id) | idx_vehicle_position_log_actor_id(actor_id) |
+| action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
+| old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
+| request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_vehicle_position_log_created_at (created_at) |
+
+- entity_id referencia vehicle_position(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
