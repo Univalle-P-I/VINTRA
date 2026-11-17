@@ -17,8 +17,12 @@ rutas/
 ├── rutas.module.spec.ts
 ├── macrorutas/   controller, service, entities/macroruta, dto/
 ├── microrutas/   controller, service, entities/microruta + microruta-barrio, dto/
-└── barrios/      controller, service, entities/barrio, dto/
+└── barrios/      controller, service, entities/barrios, dto/
+```
 
+## Dependencias entre componentes
+
+```mermaid
 flowchart TD
   App[AppModule] --> Rutas[RutasModule]
   Rutas --> TO["TypeOrmModule.forFeature"]
@@ -30,23 +34,40 @@ flowchart TD
   Mi -->|N a 1| Ma
   MB -->|N a 1| Mi
   MB -->|N a 1| Ba
+```
 
-  Componente	Depende de
-MacrorutasController	MacrorutasService
-MicrorutasController	MicrorutasService
-BarriosController	BarriosService
-MacrorutasService	Repositorio de Macroruta
-MicrorutasService	Repositorios de Microruta y MicrorutaBarrio
-BarriosService	Repositorio de Barrio
+| Componente | Depende de |
+| --- | --- |
+| `MacrorutasController` | `MacrorutasService` |
+| `MicrorutasController` | `MicrorutasService` |
+| `BarriosController` | `BarriosService` |
+| `MacrorutasService` | Repositorio de `Macroruta` |
+| `MicrorutasService` | Repositorios de `Microruta` y `MicrorutaBarrio` |
+| `BarriosService` | Repositorio de `Barrio` |
+
 Reglas del diseño:
 
-Cada servicio inyecta solo sus propios repositorios; no hay dependencias entre servicios, así se evitan ciclos.
-Relaciones: Macroruta 1 — N Microruta; Microruta N — M Barrio mediante MicrorutaBarrio (con order_visit).
-RutasModule exporta los tres servicios; no exporta TypeOrmModule.
-AppModule carga las entidades con autoLoadEntities: true y synchronize: false: este módulo no crea tablas.
-Correspondencia con el diccionario de BD
-Entidad	Tabla
-Macroruta	macroroute
-Microruta	microroute
-Barrio	btura_neighborhood
-MicrorutaBarrio	microroute_neighborhood
+- Cada servicio inyecta solo sus propios repositorios; no hay dependencias
+  entre servicios, así se evitan ciclos.
+- Relaciones: `Macroruta 1 — N Microruta`; `Microruta N — M Barrio` mediante
+  `MicrorutaBarrio` (con `order_visit`).
+- `RutasModule` exporta los tres servicios; no exporta `TypeOrmModule`.
+- `AppModule` carga las entidades con `autoLoadEntities: true` y
+  `synchronize: false`: este módulo no crea tablas.
+
+## Correspondencia con el diccionario de BD
+
+| Entidad | Tabla |
+| --- | --- |
+| `Macroruta` | `macroroute` |
+| `Microruta` | `microroute` |
+| `Barrio` | `btura_neighborhood` |
+| `MicrorutaBarrio` | `microroute_neighborhood` |
+
+## Pendientes
+
+- Aprobar PR #115 y ajustar entidades (nombres, unicidades, tipos).
+- Decidir prefijo HTTP de los controladores (#66/#79).
+- Decidir PostGIS y geometrías (#54).
+- Agregar validación en DTO cuando `class-validator` sea dependencia (#79).
+- Horarios (`schedule`, `microroute_schedule`) quedan fuera de este alcance.
