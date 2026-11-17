@@ -73,7 +73,7 @@ cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles e 
 | pwd_hash | Hash de la contraseña (Argon2id; incluye sal y parámetros). | TEXT | N/A | SI | NO | N/A | — | — |
 | first_name | Nombres de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
 | last_name | Apellidos de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
-| email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | SI | N/A | UNIQUE (email) via uq_user_data_email | uq_user_data_email (email) |
+| email | Correo electrónico de la persona. Dato personal. | VARCHAR | 254 | SI | SI | N/A | UNIQUE (email) via uq_user_account_email | uq_user_account_email (email) |
 | phone | Número de teléfono de contacto. Dato personal. | VARCHAR | 20 | NO | NO | N/A | NULL permitido | — |
 | failed_attempts | Intentos fallidos consecutivos de inicio de sesión. Se reinicia al autenticarse con éxito. Por defecto 0. | SMALLINT | N/A | SI | NO | N/A | DEFAULT 0; CHECK (failed_attempts >= 0) | — |
 | is_active | Estado operativo de la cuenta. Si es FALSE, la cuenta está dada de baja y no debe iniciar sesión; tiene prioridad sobre user_status. Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
@@ -318,7 +318,7 @@ conductor asignado a una cuadrilla
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único del conductor. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | driver_pkey (id) |
-| user_account_id | Cuenta de usuario del conductor. | UUID | N/A | SI | NO | FK | FK user_data(id); ON DELETE CASCADE | idx_driver_user_account_id (user_account_id) |
+| user_account_id | Cuenta de usuario del conductor. | UUID | N/A | SI | NO | FK | FK user_account(id); ON DELETE CASCADE | idx_driver_user_account_id (user_account_id) |
 | crew_id | Cuadrilla a la que está asignado el conductor. | UUID | N/A | NO | NO | FK | FK crew(id); ON DELETE CASCADE | idx_driver_crew_id (crew_id) |
 | started_at | Fecha y hora desde la que el conductor está asignado a la cuadrilla. Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 | ended_at | Fecha y hora en que terminó la asignación a la cuadrilla. NULL si sigue vigente. | TIMESTAMPTZ | N/A | NO | NO | N/A | CHECK (ended_at IS NULL OR ended_at >= started_at) | — |

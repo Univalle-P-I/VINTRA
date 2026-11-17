@@ -118,7 +118,7 @@ erDiagram
 
     email_validation_token {
         UUID id
-        UUID user_data_id
+        UUID user_account_id
         VARCHAR email
         CHAR token_hash
         INET request_ip
@@ -226,7 +226,7 @@ erDiagram
 
     driver {
         UUID id
-        UUID user_data_id
+        UUID user_account_id
         UUID crew_id
         TIMESTAMPTZ started_at
         TIMESTAMPTZ ended_at
@@ -260,18 +260,6 @@ erDiagram
     }
 
     user_account_log {
-        UUID id
-        UUID entity_id
-        UUID actor_id
-        ENUM action
-        JSONB old
-        JSONB new
-        INET request_ip
-        BOOLEAN is_active
-        TIMESTAMPTZ created_at
-    }
-
-    user_data_log {
         UUID id
         UUID entity_id
         UUID actor_id
@@ -645,7 +633,7 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 | 007 | `007_insert_vehicle_type.sql` | — |
 | 015 | `015_insert_crew.sql` | — |
 | 016 | `016_insert_crew_member.sql` | `crew` |
-| 017 | `017_insert_driver.sql` | `user_data`, `crew` |
+| 017 | `017_insert_driver.sql` | `user_account`, `crew` |
 
 #### 3.2.3. Triggers
 
@@ -679,7 +667,7 @@ Los triggers `001` a `019` son de auditoría; el archivo `100` instala los trigg
 ### 3.3. Reglas de Migraciones y Seeders
 
 - Las migraciones crean cada tabla con sus restricciones (`PK`, `FK`, `UNIQUE`, `CHECK`) y los [índices mínimos](#34-índices-mínimos).
-- Los seeders insertan datos mínimos y ficticios (`user_account`, `user_data`, `vehicle_type`, entre otras tablas). Usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
+- Los seeders insertan datos mínimos y ficticios (`user_account`, `vehicle_type`, entre otras tablas). Usan `ON CONFLICT DO NOTHING` para poder ejecutarse más de una vez sin duplicar registros.
 - Los seeders solo se ejecutan en desarrollo y pruebas; nunca en producción, porque incluyen cuentas de usuario de ejemplo (ver [sección 7.2](#72-reglas-de-tratamiento)).
 
 ### 3.4. Índices Mínimos
@@ -726,13 +714,13 @@ SELECT set_config('app.request_ip', '<ip_del_cliente>', true);
 
 ### 4.3. Borrado Lógico
 
-El borrado operativo es lógico (`is_active = FALSE`) y se audita como `SOFT_DELETE`; la reactivación se audita como `RESTORE`. Todas las entidades cuentan operativamente con el atributo `is_active`, menos `user_data` quien está asociada a `user_account`.
+El borrado operativo es lógico (`is_active = FALSE`) y se audita como `SOFT_DELETE`; la reactivación se audita como `RESTORE`. Todas las entidades cuentan operativamente con el atributo `is_active`.
 
 No se debería ejecutar `DELETE` físico directamente sobre entidades con historial de auditoría. Además de la pérdida de trazabilidad, la FK de `*_log.entity_id` lo impide.
 
 ### 4.4. Trigger de `updated_at`
 
-Aparte de la auditoría, [`database/triggers/100_function_updated_at.sql`](../../database/triggers/100_function_updated_at.sql) crea `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at` (`BEFORE UPDATE`), que actualizan `updated_at` en cada `UPDATE` de las 12 tablas que tienen esa columna: `user_account`, `user_data`, `vehicle`, `macroroute`, `microroute`, `btura_neighborhood`, `schedule`, `microroute_schedule`, `crew`, `crew_member`, `driver` y `assignment`.
+Aparte de la auditoría, [`database/triggers/100_function_updated_at.sql`](../../database/triggers/100_function_updated_at.sql) crea `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at` (`BEFORE UPDATE`), que actualizan `updated_at` en cada `UPDATE` de las 12 tablas que tienen esa columna: `user_account`, `vehicle`, `macroroute`, `microroute`, `btura_neighborhood`, `schedule`, `microroute_schedule`, `crew`, `crew_member`, `driver` y `assignment`.
 
 ## 5. Configuración Local
 
@@ -908,5 +896,5 @@ Define cómo se tratan los datos sensibles identificados en el [diccionario de d
 | `session` | Eliminar las vencidas o revocadas con más de 30 días |
 | `password_reset_token`, `email_validation_token` | Eliminar las usadas o vencidas con más de 30 días |
 | `vehicle_position` | Definir un periodo de conservación (es la tabla de mayor crecimiento) |
-| Cuentas dadas de baja | Deshabilitar con `user_account.is_active = FALSE` (estado operativo prioritario); `user_status` conserva el estado administrativo. Anonimizar `user_data` si se requiere |
+| Cuentas dadas de baja | Deshabilitar con `user_account.is_active = FALSE` (estado operativo prioritario); `user_status` conserva el estado administrativo. |
 | Tablas `*_log` | Definir un periodo de retención de auditoría; no eliminar sin aprobación |
