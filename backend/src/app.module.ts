@@ -10,6 +10,7 @@ import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { RolesGuard } from './common/guards/roles.guard.js';
+import { UsersModule } from './users/users.module.js';
 
 export function createDatabaseOptions(
   config: ConfigService,
@@ -33,6 +34,7 @@ export function createDatabaseOptions(
       envFilePath: '../.env',
     }),
     AuthModule,
+    UsersModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { EmailValidationToken } from './email-validation-token.entity.js';
 import { PasswordResetToken } from './pwd-reset.entity.js';
-import { Profile } from '../../profiles/entities/profile.entity.js';
+import { Profile } from './profile.entity.js';
 import { Session } from './session.entity.js';
 import { userStatus } from '../../common/enums/user-status.enum.js';
 import { documentType } from '../../common/enums/document-type.enum.js';

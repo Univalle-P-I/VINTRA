@@ -1,21 +1,15 @@
-import {ConflictException,Injectable,UnauthorizedException,} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import {LoginDto} from ".dto/login.dto";
-import {TokensDto} from '.dto/tokens.dto';
-import {ForgotDto} from  '.dto/forgot-pwd.ts';
-import {ResetPwdDto} from  '.dto/reset-pwd.ts';
+import { Injectable} from '@nestjs/common';
+import { LoginDto } from './dto/login.dto.js';
+import { ForgotPwdDto } from './dto/forgot-pwd.js';
+import { ResetPwdDto } from './dto/reset-pwd.dto.js';
 
 
 @Injectable()
 export class AuthService {
     constructor(
-
     ) {}
   
-    async authenticate(LoginDto: LoginDto): Promise<TokensDto>{
+    async authenticate(LoginDto: LoginDto) {
     // Funcion de autenticacion, obtiee el email y la contraseña del usuario y retorna el refreshtoken 
     // y accessToken
     }
@@ -24,7 +18,7 @@ export class AuthService {
         //Revoca el RefreshToken al momento de cerrar sesion
     }
 
-    async forgotPassword(ForgotDto: ForgotDto){
+    async forgotPassword(ForgotDto: ForgotPwdDto){
     }    // Envia un correo con un email template y token unico para restablecer la contraseña
 
     

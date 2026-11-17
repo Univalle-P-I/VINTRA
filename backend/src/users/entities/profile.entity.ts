@@ -7,7 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserAccount } from '../../users/entities/user-account.entity.js';
+import { UserAccount } from './user-account.entity.js';
 import { roles } from '../../common/enums/roles.enum.js';
 
 @Entity({ name: 'profile' })
