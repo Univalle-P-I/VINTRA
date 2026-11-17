@@ -6,11 +6,15 @@ import FleetPanel from './FleetPanel'
 import PeoplePanel from './PeoplePanel'
 import RoutePanel from './RoutePanel'
 import OperationsPanel from './OperationsPanel'
+import AdminPanel from './AdminPanel'
+import Shell from './Shell'
 import ConnectionStatus from './ConnectionStatus'
 import './App.css'
+import './styles/console.css'
 
 function App() {
   const [screen, setScreen] = useState('landing')
+  const [page, setPage] = useState('panel')
 
   const goToHome = () => {
     setScreen('landing')
@@ -22,28 +26,15 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const goToPeople = () => {
-    setScreen('people')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const goToRoutes = () => {
-    setScreen('routes')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const goToOperations = () => {
-    setScreen('operations')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const goToFleet = () => {
-    setScreen('fleet')
+  const navigate = (nextPage) => {
+    setPage(nextPage)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleLogin = () => {
-    goToPeople()
+    setPage('panel')
+    setScreen('app')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -56,48 +47,22 @@ function App() {
         <LoginPage onHome={goToHome} onLogin={handleLogin} />
       )}
 
-      {['people', 'routes', 'operations', 'fleet'].includes(screen) && (
-        <nav aria-label="Navegación de módulos" className="module-navigation">
-          <button
-            aria-current={screen === 'fleet' ? 'page' : undefined}
-            className="module-nav-item"
-            onClick={goToFleet}
-            type="button"
-          >
-            Gestión de flota
-          </button>
-          <button
-            aria-current={screen === 'people' ? 'page' : undefined}
-            className="module-nav-item"
-            onClick={goToPeople}
-            type="button"
-          >
-            Gestión de personal
-          </button>
-          <button
-            aria-current={screen === 'routes' ? 'page' : undefined}
-            className="module-nav-item"
-            onClick={goToRoutes}
-            type="button"
-          >
-            Gestión de rutas
-          </button>
-          <button
-            aria-current={screen === 'operations' ? 'page' : undefined}
-            className="module-nav-item"
-            onClick={goToOperations}
-            type="button"
-          >
-            Gestión de operación
-          </button>
-        </nav>
+      {screen === 'app' && (
+        <Shell page={page} setPage={navigate} onHome={goToHome}>
+          {page === 'panel' && (
+            <AdminPanel
+              goToFleet={() => navigate('fleet')}
+              goToPeople={() => navigate('people')}
+              goToRoutes={() => navigate('routes')}
+              goToOperations={() => navigate('operations')}
+            />
+          )}
+          {page === 'fleet' && <FleetPanel />}
+          {page === 'people' && <PeoplePanel />}
+          {page === 'routes' && <RoutePanel />}
+          {page === 'operations' && <OperationsPanel />}
+        </Shell>
       )}
-
-      {screen === 'people' && <PeoplePanel />}
-      {screen === 'routes' && <RoutePanel />}
-      {screen === 'operations' && <OperationsPanel />}
-      {screen === 'fleet' && <FleetPanel />}
-
       <ConnectionStatus />
     </>
   )
