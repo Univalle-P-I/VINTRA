@@ -5,8 +5,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { Public } from '../auth/decorators/public.decorator.js';
 
 @Controller('health')
+@Public()
 export class HealthController {
   constructor(private readonly dataSource: DataSource) {}
 

@@ -21,7 +21,7 @@ export class EmailValidationToken {
   @ManyToOne(
     () => UserAccount,
     (userAccount) => userAccount.emailValidationTokens,
-    { nullable: false, onDelete: 'CASCADE' },
+    { nullable: false},
   )
   @JoinColumn({ name: 'user_account_id' })
   userAccount: UserAccount;

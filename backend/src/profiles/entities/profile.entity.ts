@@ -7,13 +7,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserAccount } from './user-account.entity.js';
+import { UserAccount } from '../../users/entities/user-account.entity.js';
 import { roles } from '../../common/enums/roles.enum.js';
 
 @Entity({ name: 'profile' })
-@Index('UQ_profile_user_account_role', ['userAccountId', 'userRole'], {
-  unique: true,
-})
 export class Profile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -23,7 +20,6 @@ export class Profile {
 
   @ManyToOne(() => UserAccount, (userAccount) => userAccount.profiles, {
     nullable: false,
-    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_account_id' })
   userAccount: UserAccount;

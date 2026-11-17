@@ -9,6 +9,6 @@ export class TokensDto {
   @IsString()
   @IsNotEmpty()
   acessToken!: string;
-
+  
 }
 

@@ -19,9 +19,7 @@ export class Session {
   userAccountId: string;
 
   @ManyToOne(() => UserAccount, (userAccount) => userAccount.sessions, {
-    nullable: false,
-    onDelete: 'CASCADE',
-  })
+    nullable: false})
   @JoinColumn({ name: 'user_account_id' })
   userAccount: UserAccount;
 

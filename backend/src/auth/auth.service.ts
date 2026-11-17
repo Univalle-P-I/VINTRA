@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {LoginDto} from '.dto/login.dto';
+import {LoginDto} from ".dto/login.dto";
 import {TokensDto} from '.dto/tokens.dto';
 import {ForgotDto} from  '.dto/forgot-pwd.ts';
 import {ResetPwdDto} from  '.dto/reset-pwd.ts';
@@ -13,8 +13,6 @@ import {ResetPwdDto} from  '.dto/reset-pwd.ts';
 export class AuthService {
     constructor(
 
-    private readonly jwtService: JwtService,
-    private readonly config: ConfigService,
     ) {}
   
     async authenticate(LoginDto: LoginDto): Promise<TokensDto>{
