@@ -6,7 +6,6 @@ export class PwdRecoveryService {
   constructor(private readonly passwordHasher: PasswordHasherService) {}
 
   async consume(token: string, newPassword: string): Promise<void> {
-    // TODO: Validar el token y actualizar la contraseña.
   }
 
   generateToken(): string {

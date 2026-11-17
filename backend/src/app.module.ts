@@ -7,10 +7,10 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './health/health.controller';
-import { AuthModule } from './auth/auth.module.js';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
-import { RolesGuard } from './common/guards/roles.guard.js';
-import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { RolesGuard } from './common/guards/roles.guard';
+import { UsersModule } from './users/users.module';
 
 export function createDatabaseOptions(
   config: ConfigService,
