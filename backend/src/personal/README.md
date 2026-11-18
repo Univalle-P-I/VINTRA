@@ -76,11 +76,13 @@ Incluye:
 
 - Módulo, controlador, servicio, entidades y DTO registrados.
 - Prueba de carga del módulo y de correspondencia con las tablas.
+
 No incluye (queda para VIN-024, #76):
 
 - CRUD de conductores y miembros.
 - Validaciones de los DTO.
 - Composición de cuadrillas y disponibilidad.
+
 ## Verificación
 
 Desde la carpeta `backend`:
