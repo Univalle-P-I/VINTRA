@@ -9,10 +9,17 @@ import { UserAccount } from './entities/user-account.entity';
 import { Session } from './entities/session.entity';
 import { PasswordResetToken } from './entities/pwd-reset.entity';
 import { Profile } from '../profiles/entities/profile.entity';
+import { EmailValidationToken } from './entities/email-validation-token.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserAccount, Profile, Session, PasswordResetToken]),
+    TypeOrmModule.forFeature([
+  UserAccount,
+  Profile,
+  Session,
+  PasswordResetToken,
+  EmailValidationToken,
+]),
   ],
   controllers: [UsersController],
   providers: [UserService, SessionService, PwdRecoveryService, PasswordHasherService],
