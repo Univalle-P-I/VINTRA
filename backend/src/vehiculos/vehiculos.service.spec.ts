@@ -691,4 +691,114 @@ describe('VehiculosService', () => {
       });
     });
   });
+
+  describe('actualizarEstado', () => {
+    it('actualiza el estado cuando el vehículo está activo y la transición es válida', async () => {
+      const vehicle = {
+        id: 'vehicle-id',
+        tipoVehiculo: { id: 'type-id', nombre: 'Camión' },
+        estado: EstadoVehiculo.DISPONIBLE,
+        placa: 'ABC123',
+        activo: true,
+      };
+      const vehiculoRepository = {
+        findOne: jest.fn().mockResolvedValue(vehicle),
+        save: jest.fn(async (value) => value),
+      };
+      const { service, contextoAuditoria } = createHarness(
+        {},
+        vehiculoRepository,
+      );
+
+      await expect(
+        service.actualizarEstado(
+          'vehicle-id',
+          { vehicleStatus: EstadoVehiculo.MANTENIMIENTO },
+          ACTOR_ID,
+          REQUEST_IP,
+        ),
+      ).resolves.toEqual({
+        ...vehicle,
+        estado: EstadoVehiculo.MANTENIMIENTO,
+      });
+
+      expect(contextoAuditoria.ejecutar).toHaveBeenCalledWith(
+        ACTOR_ID,
+        REQUEST_IP,
+        expect.any(Function),
+      );
+      expect(vehiculoRepository.save).toHaveBeenCalledWith(vehicle);
+    });
+
+    it('lanza ConflictException si la transición de estado no está permitida', async () => {
+      const vehicle = {
+        id: 'vehicle-id',
+        tipoVehiculo: { id: 'type-id', nombre: 'Camión' },
+        estado: EstadoVehiculo.MANTENIMIENTO,
+        placa: 'ABC123',
+        activo: true,
+      };
+      const vehiculoRepository = {
+        findOne: jest.fn().mockResolvedValue(vehicle),
+        save: jest.fn(),
+      };
+      const { service } = createHarness({}, vehiculoRepository);
+
+      await expect(
+        service.actualizarEstado(
+          'vehicle-id',
+          { vehicleStatus: EstadoVehiculo.EN_SERVICIO },
+          ACTOR_ID,
+          REQUEST_IP,
+        ),
+      ).rejects.toThrow(ConflictException);
+
+      expect(vehiculoRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('lanza ConflictException si el vehículo está inactivo', async () => {
+      const vehicle = {
+        id: 'vehicle-id',
+        tipoVehiculo: { id: 'type-id', nombre: 'Camión' },
+        estado: EstadoVehiculo.DISPONIBLE,
+        placa: 'ABC123',
+        activo: false,
+      };
+      const vehiculoRepository = {
+        findOne: jest.fn().mockResolvedValue(vehicle),
+        save: jest.fn(),
+      };
+      const { service } = createHarness({}, vehiculoRepository);
+
+      await expect(
+        service.actualizarEstado(
+          'vehicle-id',
+          { vehicleStatus: EstadoVehiculo.MANTENIMIENTO },
+          ACTOR_ID,
+          REQUEST_IP,
+        ),
+      ).rejects.toThrow(ConflictException);
+
+      expect(vehiculoRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('lanza NotFoundException cuando el vehículo no existe', async () => {
+      const vehiculoRepository = {
+        findOne: jest.fn().mockResolvedValue(null),
+        save: jest.fn(),
+      };
+      const { service } = createHarness({}, vehiculoRepository);
+
+      await expect(
+        service.actualizarEstado(
+          'missing-id',
+          { vehicleStatus: EstadoVehiculo.MANTENIMIENTO },
+          ACTOR_ID,
+          REQUEST_IP,
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(vehiculoRepository.save).not.toHaveBeenCalled();
+    });
+  });
 });

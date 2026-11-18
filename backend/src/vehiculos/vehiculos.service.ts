@@ -7,13 +7,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import type { FindOptionsWhere, Repository } from 'typeorm';
 
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
+import { ActualizarEstadoVehiculoDto } from './dto/actualizar-estado-vehiculo.dto';
 import { ActualizarTipoVehiculoDto } from './dto/actualizar-tipo-vehiculo.dto';
 import { ActualizarVehiculoDto } from './dto/actualizar-vehiculo.dto';
 import { ConsultarVehiculosDto } from './dto/consultar-vehiculos.dto';
 import { CrearTipoVehiculoDto } from './dto/crear-tipo-vehiculo.dto';
 import { CrearVehiculoDto } from './dto/crear-vehiculo.dto';
 import { TipoVehiculo } from './entidades/tipo-vehiculo.entity';
-import { Vehiculo } from './entidades/vehiculo.entity';
+import {
+  esTransicionEstadoVehiculoValida,
+  Vehiculo,
+} from './entidades/vehiculo.entity';
 
 @Injectable()
 export class VehiculosService {
@@ -200,6 +204,46 @@ export class VehiculosService {
       this.throwIfUniqueViolation(error, 'Ya existe un vehículo con esa placa.');
       throw error;
     }
+  }
+
+  async actualizarEstado(
+    id: string,
+    dto: ActualizarEstadoVehiculoDto,
+    actorId: string,
+    requestIp: string,
+  ): Promise<Vehiculo> {
+    return this.contextoAuditoria.ejecutar(
+      actorId,
+      requestIp,
+      async (manager) => {
+        const repository = manager.getRepository(Vehiculo);
+        const vehicle = await repository.findOne({
+          where: { id },
+          relations: { tipoVehiculo: true },
+        });
+        if (!vehicle) {
+          throw new NotFoundException('El vehículo no existe.');
+        }
+        if (!vehicle.activo) {
+          throw new ConflictException(
+            'No se puede cambiar el estado operativo de un vehículo inactivo.',
+          );
+        }
+        if (
+          !esTransicionEstadoVehiculoValida(
+            vehicle.estado,
+            dto.vehicleStatus,
+          )
+        ) {
+          throw new ConflictException(
+            `Transición de estado no permitida: '${vehicle.estado}' -> '${dto.vehicleStatus}'.`,
+          );
+        }
+
+        vehicle.estado = dto.vehicleStatus;
+        return repository.save(vehicle);
+      },
+    );
   }
 
   private throwIfUniqueViolation(error: unknown, message: string): void {

@@ -19,6 +19,45 @@ export enum EstadoVehiculo {
   FUERA_DE_SERVICIO = 'out_of_service',
 }
 
+export const ESTADOS_VEHICULO_ASIGNABLES: ReadonlySet<EstadoVehiculo> = new Set([
+  EstadoVehiculo.DISPONIBLE,
+]);
+
+export const ESTADOS_VEHICULO_INHABILITADOS: ReadonlySet<EstadoVehiculo> =
+  new Set([EstadoVehiculo.MANTENIMIENTO, EstadoVehiculo.FUERA_DE_SERVICIO]);
+
+export const TRANSICIONES_ESTADO_VEHICULO: Record<
+  EstadoVehiculo,
+  readonly EstadoVehiculo[]
+> = {
+  [EstadoVehiculo.DISPONIBLE]: [
+    EstadoVehiculo.EN_SERVICIO,
+    EstadoVehiculo.MANTENIMIENTO,
+    EstadoVehiculo.FUERA_DE_SERVICIO,
+  ],
+  [EstadoVehiculo.EN_SERVICIO]: [
+    EstadoVehiculo.DISPONIBLE,
+    EstadoVehiculo.MANTENIMIENTO,
+    EstadoVehiculo.FUERA_DE_SERVICIO,
+  ],
+  [EstadoVehiculo.MANTENIMIENTO]: [
+    EstadoVehiculo.DISPONIBLE,
+    EstadoVehiculo.FUERA_DE_SERVICIO,
+  ],
+  [EstadoVehiculo.FUERA_DE_SERVICIO]: [
+    EstadoVehiculo.MANTENIMIENTO,
+    EstadoVehiculo.DISPONIBLE,
+  ],
+};
+
+export function esTransicionEstadoVehiculoValida(
+  actual: EstadoVehiculo,
+  siguiente: EstadoVehiculo,
+): boolean {
+  if (actual === siguiente) return true;
+  return TRANSICIONES_ESTADO_VEHICULO[actual].includes(siguiente);
+}
+
 const estadoVehiculoTransformer: ValueTransformer = {
   to: (value: EstadoVehiculo) =>
     ({

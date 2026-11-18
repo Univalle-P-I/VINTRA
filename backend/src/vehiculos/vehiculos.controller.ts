@@ -25,6 +25,7 @@ import { RolesGuard } from '../autenticacion/roles.guard';
 import { UsuarioAutenticado } from '../autenticacion/usuario-autenticado.decorator';
 import type { AuthenticatedUser } from '../autenticacion/authenticated-user';
 import { RolUsuario } from '../perfiles/entidades/perfil.entity';
+import { ActualizarEstadoVehiculoDto } from './dto/actualizar-estado-vehiculo.dto';
 import { ActualizarTipoVehiculoDto } from './dto/actualizar-tipo-vehiculo.dto';
 import { ActualizarVehiculoDto } from './dto/actualizar-vehiculo.dto';
 import { ConsultarVehiculosDto } from './dto/consultar-vehiculos.dto';
@@ -153,5 +154,23 @@ export class VehiculosController {
     @Ip() ip: string,
   ) {
     return this.vehiculosService.actualizar(id, dto, actor.userId, ip);
+  }
+
+  @Patch('vehicles/:id/status')
+  @Roles(RolUsuario.ADMIN, RolUsuario.OPERATIONS_MANAGER)
+  @ApiParam({ name: 'id', format: 'uuid', description: 'ID del vehículo.' })
+  @ApiEndpoint({
+    summary: 'Cambiar el estado operativo de un vehículo',
+    responseDescription: 'Estado operativo del vehículo actualizado.',
+    roles: [RolUsuario.ADMIN, RolUsuario.OPERATIONS_MANAGER],
+    errors: [400, 404, 409],
+  })
+  actualizarEstado(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ActualizarEstadoVehiculoDto,
+    @UsuarioAutenticado() actor: AuthenticatedUser,
+    @Ip() ip: string,
+  ) {
+    return this.vehiculosService.actualizarEstado(id, dto, actor.userId, ip);
   }
 }
