@@ -21,8 +21,10 @@ export class AuthService {
     async forgotPassword(ForgotDto: ForgotPwdDto){
     }    // Envia un correo con un email template y token unico para restablecer la contraseña
 
-    async resetPassword(resetPwdDto: ResetPwdDto){
 
+
+    async resetPassword(resetPwdDto: ResetPwdDto){
+    
     }
 
 }

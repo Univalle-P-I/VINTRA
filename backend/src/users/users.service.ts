@@ -28,15 +28,12 @@ export class UserService {
     }  
 
     async createNewUser(ForgotDto: CreateUserDto) {
-        throw new Error("Method not implemented.");
     } 
 
     async changePassword(ChangePwdDto: ChangePwdDto) {
-        throw new Error("Method not implemented.");
     }
 
     async disableUser(idUserAccount: UUID){
-        throw new Error("Method not implemented.")
     }
 
 }
