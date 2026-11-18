@@ -7,13 +7,15 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { PasswordHasherService } from "../common/security/password-hasher.service";
-
+import { Profile } from "../profiles/entities/profile.entity";
 
 @Injectable()
 export class UserService {
      constructor(
       @InjectRepository(UserAccount)
       private readonly userAccountRepo: Repository<UserAccount>,
+      @InjectRepository(Profile)
+      private readonly profileRepo: Repository<Profile>,
       private readonly passwordHasher: PasswordHasherService
     ) {}
     
