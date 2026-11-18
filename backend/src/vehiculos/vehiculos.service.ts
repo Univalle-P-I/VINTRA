@@ -4,11 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import type { Repository } from 'typeorm';
+import type { FindOptionsWhere, Repository } from 'typeorm';
 
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { ActualizarTipoVehiculoDto } from './dto/actualizar-tipo-vehiculo.dto';
 import { ActualizarVehiculoDto } from './dto/actualizar-vehiculo.dto';
+import { ConsultarVehiculosDto } from './dto/consultar-vehiculos.dto';
 import { CrearTipoVehiculoDto } from './dto/crear-tipo-vehiculo.dto';
 import { CrearVehiculoDto } from './dto/crear-vehiculo.dto';
 import { TipoVehiculo } from './entidades/tipo-vehiculo.entity';
@@ -85,11 +86,20 @@ export class VehiculosService {
     }
   }
 
-  listar(): Promise<Vehiculo[]> {
+  listar(filtros: ConsultarVehiculosDto = {}): Promise<Vehiculo[]> {
+    const { vehicleTypeId, vehicleStatus, plate, isActive, page, limit } =
+      filtros;
+
+    const where: FindOptionsWhere<Vehiculo> = { activo: isActive ?? true };
+    if (vehicleTypeId) where.tipoVehiculo = { id: vehicleTypeId };
+    if (vehicleStatus) where.estado = vehicleStatus;
+    if (plate) where.placa = plate;
+
     return this.vehiculoRepository.find({
-      where: { activo: true },
+      where,
       relations: { tipoVehiculo: true },
       order: { placa: 'ASC' },
+      ...(limit ? { take: limit, skip: ((page ?? 1) - 1) * limit } : {}),
     });
   }
 

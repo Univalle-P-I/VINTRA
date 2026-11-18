@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -26,6 +27,7 @@ import type { AuthenticatedUser } from '../autenticacion/authenticated-user';
 import { RolUsuario } from '../perfiles/entidades/perfil.entity';
 import { ActualizarTipoVehiculoDto } from './dto/actualizar-tipo-vehiculo.dto';
 import { ActualizarVehiculoDto } from './dto/actualizar-vehiculo.dto';
+import { ConsultarVehiculosDto } from './dto/consultar-vehiculos.dto';
 import { CrearTipoVehiculoDto } from './dto/crear-tipo-vehiculo.dto';
 import { CrearVehiculoDto } from './dto/crear-vehiculo.dto';
 import { VehiculosService } from './vehiculos.service';
@@ -99,9 +101,10 @@ export class VehiculosController {
     responseDescription: 'Vehículos registrados.',
     responseShape: 'array',
     roles: [RolUsuario.ADMIN, RolUsuario.OPERATIONS_MANAGER, RolUsuario.DRIVER],
+    errors: [400],
   })
-  listar() {
-    return this.vehiculosService.listar();
+  listar(@Query() filtros: ConsultarVehiculosDto) {
+    return this.vehiculosService.listar(filtros);
   }
 
   @Get('vehicles/:id')

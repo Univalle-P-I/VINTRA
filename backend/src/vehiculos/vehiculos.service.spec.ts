@@ -604,6 +604,40 @@ describe('VehiculosService', () => {
         order: { placa: 'ASC' },
       });
     });
+
+    it('aplica filtros y paginación cuando se proporcionan', async () => {
+      const vehiculoRepository = {
+        find: jest.fn().mockResolvedValue([]),
+      };
+
+      const service = new VehiculosService(
+        {} as Repository<TipoVehiculo>,
+        vehiculoRepository as unknown as Repository<Vehiculo>,
+        {} as ContextoAuditoriaService,
+      );
+
+      await service.listar({
+        vehicleTypeId: 'type-id',
+        vehicleStatus: EstadoVehiculo.MANTENIMIENTO,
+        plate: 'ABC123',
+        isActive: false,
+        page: 2,
+        limit: 10,
+      });
+
+      expect(vehiculoRepository.find).toHaveBeenCalledWith({
+        where: {
+          activo: false,
+          tipoVehiculo: { id: 'type-id' },
+          estado: EstadoVehiculo.MANTENIMIENTO,
+          placa: 'ABC123',
+        },
+        relations: { tipoVehiculo: true },
+        order: { placa: 'ASC' },
+        take: 10,
+        skip: 10,
+      });
+    });
   });
 
   describe('obtener', () => {
