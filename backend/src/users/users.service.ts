@@ -12,24 +12,24 @@ import { Profile } from "../profiles/entities/profile.entity";
 @Injectable()
 export class UserService {
      constructor(
-        
+
       @InjectRepository(UserAccount)
       private readonly userAccountRepo: Repository<UserAccount>,
       @InjectRepository(Profile)
       private readonly profileRepo: Repository<Profile>,
       private readonly passwordHasher: PasswordHasherService
     ) {}
-    
+
     async findUserAccount(Email: String): Promise<UserAccount> {
         throw new Error("Method not implemented.");
     }
 
     async findUserInfo(idUserAccount: UUID): Promise<UserInfoDto> {
         throw new Error("Method not implemented.");
-    }  
+    }
 
     async createNewUser(ForgotDto: CreateUserDto) {
-    } 
+    }
 
     async changePassword(ChangePwdDto: ChangePwdDto) {
     }

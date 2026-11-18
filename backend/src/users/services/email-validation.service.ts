@@ -11,11 +11,19 @@ export class EmailValidationService {
       private readonly emailValidationToken: Repository<EmailValidationToken>,
     ) {}
 
-    async validateToken(hashEmailToken: string): Promise<Boolean>{
-        throw new Error("")
+    async validateEmailToken(hashEmailToken: string): Promise<Boolean>{
+        return true;
     }
 
     async generateEmailToken(): Promise<String>{
       return randomBytes(32).toString("hex");
     }
+
+    async hashEmailToken(emailToken: string): Promise<String>{
+        return "";
+    }
+
+    async saveHashEmailToken(){
+    }
+
 }
