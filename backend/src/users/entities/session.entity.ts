@@ -10,7 +10,7 @@ import {
 import { UserAccount } from './user-account.entity.js';
 
 @Entity({ name: 'session' })
-@Index('IDX_session_token_hash', ['tokenHash'], { unique: true })
+
 export class Session {
   @PrimaryGeneratedColumn('uuid')
   id: string;
