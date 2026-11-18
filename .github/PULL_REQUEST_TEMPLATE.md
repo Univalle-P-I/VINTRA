@@ -3,7 +3,8 @@
 
 ## Tarjeta de Trello
 
-- **Enlace:** [Buenaventura Limpia UV](https://trello.com/b/KuIPJAME/buenaventuralimpiauv)
+- **Tarjeta:** <!-- Identificador, nombre y enlace directo a la tarjeta correspondiente -->
+- **Tablero:** [Buenaventura Limpia UV](https://trello.com/b/KuIPJAME/buenaventuralimpiauv)
 
 ## Qué cambió
 <!-- Resumen del cambio en 1-3 líneas -->

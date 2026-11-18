@@ -77,6 +77,19 @@ describe('App connection smoke test', () => {
     expect(axios.get).not.toHaveBeenCalled()
   })
 
+  it('loads the landing preview from the configured deployment base', () => {
+    vi.stubEnv('BASE_URL', '/staging/')
+    axios.get.mockReturnValue(new Promise(() => {}))
+
+    render(<App />)
+
+    expect(
+      screen.getByRole('img', {
+        name: 'Vista cartográfica ilustrativa de vehículos, rutas e incidencias',
+      })
+    ).toHaveAttribute('src', '/staging/assets/landing/764ea.png')
+  })
+
   it('allows returning from the login screen to the landing page', async () => {
     axios.get.mockReturnValue(new Promise(() => {}))
 
