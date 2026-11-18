@@ -9,10 +9,9 @@ import { UserService } from '../users/users.service';
 export class AuthService {
     constructor(
         private readonly userService: UserService
-    ) { }
-
+    ) {}
+ 
     async authenticate(LoginDto: LoginDto) {}
-
     // Funcion de autenticacion, obtiee el email y la contraseña del usuario y retorna el refreshtoken
     // y accessToken
 
@@ -24,7 +23,5 @@ export class AuthService {
 
     // Envia un correo con un email template y token unico para restablecer la contraseña
     async resetPassword(resetPwdDto: ResetPwdDto){}
-
-    }
-
+    
 }
