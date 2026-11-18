@@ -21,7 +21,7 @@ El módulo permite:
 - Consultar los tipos de vehículos activos.
 - Crear tipos de vehículos.
 - Actualizar tipos de vehículos.
-- Consultar los vehículos activos.
+- Consultar los vehículos, con filtros opcionales.
 - Consultar un vehículo por su identificador.
 - Registrar vehículos.
 - Actualizar vehículos.
@@ -174,20 +174,30 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Ruta:** `/api/v1/vehicles`
 **Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`, `DRIVER`
+**Descripción:** Consulta los vehículos registrados en el sistema, incluyendo la relación con su tipo de vehículo. Por defecto devuelve solo los activos.
 
-**Descripción:** Consulta los vehículos activos registrados en el sistema, incluyendo la relación con su tipo de vehículo.
+**Parámetros de consulta (todos opcionales):**
 
-**Parámetros:** No requiere parámetros.
+| Parámetro | Tipo | Descripción |
+|---|---|---|
+| `vehicleTypeId` | UUID | Filtra por tipo de vehículo. |
+| `vehicleStatus` | enum | `available`, `in_service`, `maintenance` o `out_of_service`. |
+| `plate` | string | Placa exacta de 6 caracteres; se convierte a mayúsculas. |
+| `isActive` | boolean | `true` por defecto. Con `false` se consultan los inactivos. |
+| `page` | entero ≥ 1 | Página. Solo se aplica si se envía `limit`. |
+| `limit` | entero ≥ 1 | Cantidad de resultados por página. |
 
 **Reglas de negocio:**
 
-- Solo se consultan vehículos activos.
+- Sin filtros, se devuelven solo los vehículos activos.
 - Los resultados se ordenan por placa ascendente.
 - Se incluye la información del tipo de vehículo asociado.
+- Un valor inválido en cualquier parámetro devuelve `400 Bad Request`.
 
 **Posibles códigos HTTP:**
 
 - `200 OK`: consulta realizada correctamente.
+- `400 Bad Request`: parámetros de consulta inválidos.
 - `401 Unauthorized`: token ausente o inválido.
 - `403 Forbidden`: rol no autorizado.
 
