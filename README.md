@@ -2,22 +2,23 @@
 
 <div align="center">
 
-<h1> VINTRA </h1>
+  <img src="docs/assets/logo-vintra.png" alt="VINTRA" width="260">
 
-<p><strong>Sistema de coordinación y seguimiento de rutas de recolección de residuos sólidos.</strong></p>
+  <p><strong>Coordinación de rutas e información clara para la recolección de residuos.</strong></p>
+  <p>Proyecto piloto para Buenaventura, Colombia</p>
 
-<p>
-  <a href="#estado-del-proyecto"><img src="https://img.shields.io/badge/Estado-Desarrollo-yellow?style=for-the-badge" alt="Estado: desarrollo"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Universidad%20del%20Valle%20Buenaventura-blue?style=for-the-badge" alt="Universidad del Valle, Sede Buenaventura">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Licencia-Apache%202.0-green?style=for-the-badge" alt="Licencia Apache 2.0"></a>
-</p>
+  <p>
+    <img src="https://img.shields.io/badge/Estado-En%20desarrollo-2f7d3b?style=for-the-badge" alt="Estado: en desarrollo">
+    <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-149eca?style=for-the-badge&amp;logo=react&amp;logoColor=white" alt="Frontend: React y Vite">
+    <img src="https://img.shields.io/badge/Backend-NestJS-E0234E?style=for-the-badge&amp;logo=nestjs&amp;logoColor=white" alt="Backend: NestJS">
+    <img src="https://img.shields.io/badge/Base%20de%20datos-PostgreSQL-4169e1?style=for-the-badge&amp;logo=postgresql&amp;logoColor=white" alt="Base de datos: PostgreSQL">
+  </p>
 
-<p>
-  <a href="docs/README.md">Documentación</a> ·
-  <a href="docs/arquitectura/README.md">Arquitectura</a> ·
-  <a href="VINTRA.pdf">Propuesta VINTRA</a> ·
-  <a href="CONTRIBUTING.md">Contribuir</a>
-</p>
+  <p>
+    <a href="docs/README.md">Documentación</a> ·
+    <a href="docs/arquitectura/README.md">Arquitectura</a> ·
+    <a href="CONTRIBUTING.md">Cómo contribuir</a>
+  </p>
 
 </div>
 
@@ -49,7 +50,6 @@ VINTRA convierte un servicio operado de forma dispersa y poco visible en un sist
 | --- | --- |
 | Planificación y asignación de rutas | Consulta de horarios y recorridos |
 | Seguimiento en tiempo real de vehículos | Aviso de proximidad del vehículo |
-| Optimización de recorridos minuciosos | mayor facilidad para dejar la basura |
 | Registro de novedades e incumplimientos | Reporte de acumulación de residuos |
 | Indicadores de cumplimiento del servicio | Visibilidad del estado de sus reportes |
 
@@ -91,95 +91,65 @@ flowchart TD
     I -.integración y despliegue.-> DEVOPS
 ```
 
-## Roles y Accesibilidad
-
-La plataforma se adapta a cada perfil de forma segura para garantizar flujos de trabajo claros e interactivos.
-
-### Administrador
-
-- Crear rutas estratégicas
-- Asignar conductores a flotas
-- Gestioner y auditar vehículos
-- Consultar y resolver incidencias
-
-### Conductor
-- Iniciar recorrido asignado
-- Registrar ubicación GPS activa
-- Visualizar estado vial de rutas
-- Finalizar recorrido y reportar novedades
-
-### Ciudadano
-
-- Consultar horario de recolección
-- Consultar trayecto de ruta local
-- Reportar residuos no recogidos
-- Consultar el estado del reporte
-
-## Beneficios de VINTRA
-
-### Mayor eficiencia operativa
-
-Optimización de recursos financieros, camiones y tiempos de recolección inteligente.
-
-### Información en tiempo real
-
-Datos actualizados al minuto tanto los coordinadores como para el vecindario.
-
-### Menos acumulación de basura
-
-Atención inmediata a puntos críticos reporttados directamente por el ciudadano.
-
-### Participación ciudadana
-
-Canal bidireccional directo para el envío ágil de reportes, reclamos y consultas.
-
-
-## Modulos según tipo de usuario
-
-```mermaid
-flowchart TD
-    ADMIN[ADMIN]
-
-    ADMIN --> CU[Crear usuarios]
-    ADMIN --> CR[Crear rutas]
-    ADMIN --> AC[Asignar conductor]
-    ADMIN --> AP[Asignar pasajeros]
-
-    AC --> RUTA[RUTA]
-    AP --> RUTA
-
-    RUTA --> DRIVER[DRIVER]
-    DRIVER --> IR[Iniciar recorrido]
-    IR --> GPS[Enviar ubicación GPS]
-    GPS --> TRACK[Guardar en Tracking]
-
-    TRACK --> ESTADO[Actualizar estado<br/>recogido / no recogido]
-    TRACK --> FINALIZADA[Ruta finalizada]
-
-    ESTADO --> NOTIF[Enviar notificaciones]
-    NOTIF --> PASSENGER[PASSENGER / USER]
-    PASSENGER --> AVISO[Recibir aviso]
-    AVISO --> CONFIRMAR[Confirmar recogida]
-    CONFIRMAR --> CONSULTAR[Consultar estado]
-
-    FINALIZADA --> RATING[RouteRating]
-    RATING --> CALIFICAR[Calificar conductor]
-```
- 
-
-
-La documentación técnica está separada por área en [`docs/README.md`](docs/README.md). La arquitectura general, los contratos, el modelo de datos y las decisiones compartidas tienen una ubicación propia para evitar duplicar información.
+El detalle técnico de la arquitectura, el stack y los contratos entre componentes se documenta en [`docs/arquitectura/README.md`](docs/arquitectura/README.md).
 
 ## Tecnologías
 
-Pendiente de definición por el grupo responsable de Backend/Frontend/Base de Datos. Esta sección se completará una vez esos equipos definan el stack (lenguaje de backend, framework de frontend y motor de base de datos), para que el grupo de GitHub-CI-CD-VPS pueda ajustar los workflows de CI/CD y la configuración del VPS en consecuencia.
+El stack definido para esta prueba de integración es React + Vite en frontend, Node.js + NestJS en backend, y PostgreSQL con TypeORM y el driver `pg` para persistencia. El frontend usa Axios para consultar los endpoints de salud.
 
 | Componente | Tecnología | Responsable |
 | --- | --- | --- |
-| Frontend | *Por definir* | Célula Backend / Frontend |
-| Backend | *Por definir* | Célula Backend / Frontend |
-| Base de datos | PostgreSQL | Célula Base de Datos |
+| Frontend | React + Vite | Célula Backend / Frontend |
+| Backend | Node.js + NestJS | Célula Backend / Frontend |
+| Base de datos | PostgreSQL + TypeORM (`pg`) | Célula Base de Datos |
 | Infraestructura y despliegue | *Por definir* | Célula GitHub / CI-CD / VPS |
+
+## Ejecutar la prueba de conexión
+
+Requisitos: Docker Compose, Node.js 24.15 o superior y npm.
+
+### Ejecutar todo con Docker Compose
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+Abre `http://localhost:5174`. La tarjeta **Estado del entorno** debe mostrar
+**API backend: Disponible** y **PostgreSQL: Disponible**. Los endpoints que
+comprueba son `http://localhost:3002/health` y `http://localhost:3002/health/db`.
+
+### Ejecutar frontend y API en modo desarrollo
+
+En la raíz, copia `.env.example` a `.env` y arranca PostgreSQL:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d postgres
+```
+
+En dos terminales, inicia API y frontend:
+
+```powershell
+cd backend
+npm ci
+$env:CORS_ORIGIN = 'http://localhost:5173'
+npm run start:dev
+```
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Abre `http://localhost:5173`. Para detener PostgreSQL ejecuta
+`docker compose down`; la base de datos conserva sus datos en el volumen.
+
+El ejemplo de `.env` configura el origen de Docker (`http://localhost:5174`).
+En desarrollo local, el comando anterior cambia `CORS_ORIGIN` solo para la
+terminal de la API, de modo que acepte el frontend de Vite en el puerto 5173.
+En Bash, usa `CORS_ORIGIN=http://localhost:5173 npm run start:dev`.
 
 ## Equipo
 
@@ -193,31 +163,35 @@ Pendiente de definición por el grupo responsable de Backend/Frontend/Base de Da
 
 ## Estructura del repositorio
 
-Estructura objetivo, a cargo del grupo GitHub-CI-CD-VPS:
+Estructura actual del repositorio:
 
-```
+```text
 .
 ├── .github/          # Plantillas de Issues/PR y workflows de CI/CD
-├── docs/              # Índice y documentación segmentada por área
-│   ├── arquitectura/  # Componentes y decisiones compartidas
-│   ├── frontend/      # Aplicación, pantallas e integración
-│   ├── backend/       # API y reglas de negocio
-│   ├── base-de-datos/ # Persistencia, migraciones y diccionario
-│   ├── modelado/      # Requisitos, historias y modelo de dominio
-│   ├── ui-ux/         # Flujos, prototipos y accesibilidad
-│   ├── infraestructura/ # CI/CD, VPS y operación
-│   └── scrum/         # Planificación y acuerdos funcionales
-├── backend/           # API REST
-├── frontend/          # Dashboard y aplicación de cara a la ciudadanía
-├── database/          # Modelo de datos, migraciones y scripts
-├── infrastructure/    # Configuración de despliegue y VPS
+├── docs/                         # Documentación organizada por área
+│   ├── arquitectura/
+│   ├── backend/
+│   ├── base-de-datos/
+│   ├── frontend/
+│   ├── gestion-github/
+│   ├── infraestructura/
+│   ├── modelado/
+│   ├── scrum/
+│   ├── ui-ux/
+│   └── README.md
+├── backend/                      # API REST con NestJS
+├── frontend/                     # Aplicación React + Vite
+├── database/                     # Espacio para migraciones y scripts de datos
+├── infrastructure/               # Documentación y apoyo de despliegue
+├── docker-compose.yml            # Ejecución conjunta de los servicios
+├── CONTRIBUTING.md
 └── README.md
 ```
 
 ## Flujo de trabajo
 
-- **Estrategia de ramas:** `main` → `develop` → `feature/` · `fix/` · `task/`
-- **Workflows de CI/CD:** `ci.yml`, `backend.yml`, `frontend.yml` *(pendientes de implementación)*
+- **Estrategia de ramas:** `main` → `develop` → `feat/` · `fix/` · `docs/`
+- **Workflows de CI:** `ci.yml` valida whitespace, Markdown y enlaces, y ejecuta los workflows reutilizables de backend y frontend en PR hacia `develop` y `main`.
 - **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
 Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.
@@ -228,14 +202,14 @@ VINTRA se encuentra en fase de definición. La propuesta general, el problema, l
 
 - [ ] **UI/UX** — Diseño de la landing page.
 - [ ] **Base de Datos** — Modelo y diseño de la base de datos.
-- [ ] **Backend / Frontend** — Definición del stack tecnológico y configuración del entorno (PostgreSQL).
+- [x] **Backend / Frontend** — Stack tecnológico y prueba base de conexión implementados; los módulos funcionales siguen pendientes.
 - [ ] **Scrum** — Historias de usuario.
 - [ ] **GitHub / CI-CD / VPS** — Plantillas de Issues/PR, workflows de CI/CD, estrategia de ramas ya definida, configuración y despliegue en el VPS.
 Este README se irá actualizando a medida que cada célula entregue su información.
 
 ## Cómo contribuir
 
-*(Guía de flujo de trabajo para el equipo del proyecto. Aplica a todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
+*(Guía de flujo de trabajo para el equipo del proyecto. Aplica para todas las célu­las, disponible en[`CONTRIBUTING.md`](CONTRIBUTING.md).)*
 
 ## Licencia
 

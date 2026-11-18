@@ -2,7 +2,9 @@
 <!-- Contexto o motivo del cambio -->
 
 ## Tarjeta de Trello
-- **Enlace:** [Inserta el enlace aquí](https://trello.com...)
+
+- **Tarjeta:** <!-- Identificador, nombre y enlace directo a la tarjeta correspondiente -->
+- **Tablero:** [Buenaventura Limpia UV](https://trello.com/b/KuIPJAME/buenaventuralimpiauv)
 
 ## Qué cambió
 <!-- Resumen del cambio en 1-3 líneas -->
