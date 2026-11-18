@@ -8,21 +8,17 @@ import { DataSource } from 'typeorm';
 import { Public } from '../common/decorators/public.decorator';
 
 @Controller('health')
-
-
 export class HealthController {
   constructor(private readonly dataSource: DataSource) {}
 
   @Public()
   @Get()
-  
   check() {
     return {
       status: 'ok',
       service: 'vintra-backend',
     };
   }
-
 
   @Public()
   @Get('db')
