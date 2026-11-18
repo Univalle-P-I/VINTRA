@@ -12,8 +12,10 @@ import { Public } from '../common/decorators/public.decorator';
 
 export class HealthController {
   constructor(private readonly dataSource: DataSource) {}
-  
+
+  @Public()
   @Get()
+  
   check() {
     return {
       status: 'ok',
@@ -21,6 +23,8 @@ export class HealthController {
     };
   }
 
+
+  @Public()
   @Get('db')
   async checkDatabase() {
     try {
