@@ -3,15 +3,20 @@ import { UserAccount } from "./entities/user-account.entity";
 import { UserInfoDto } from "./dto/user-info.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { ChangePwdDto } from "./dto/change-pwd.dto";
-import { Profile } from "../profiles/entities/profile.entity";
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { PasswordHasherService } from "../common/security/password-hasher.service";
 
 
 @Injectable()
 export class UserService {
-    constructor(
+     constructor(
+      @InjectRepository(UserAccount)
+      private readonly userAccountRepo: Repository<UserAccount>,
+      private readonly passwordHasher: PasswordHasherService
     ) {}
-  
+    
     async findUserAccount(Email: String): Promise<UserAccount> {
         throw new Error("Method not implemented.");
     }
@@ -30,10 +35,6 @@ export class UserService {
 
     async disableUser(idUserAccount: UUID){
         throw new Error("Method not implemented.")
-    }
-
-    async findActiveProfiles(idUserAccount: UUID): Promise<Profile[]> {
-        return [];
     }
 
 }

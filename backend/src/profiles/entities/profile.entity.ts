@@ -11,7 +11,7 @@ import { UserAccount } from '../../users/entities/user-account.entity.js';
 
 @Entity({ name: 'profile' })
 export class Profile {
-
+  // PK y FK a la vez: es el mismo id de user_account (relación 1 a 1)
   @PrimaryColumn('uuid')
   id: string;
 

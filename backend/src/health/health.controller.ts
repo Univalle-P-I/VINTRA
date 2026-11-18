@@ -5,7 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { Public } from '../auth/decorators/public.decorator.js';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('health')
 @Public()

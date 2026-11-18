@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from '../../auth/decorators/public.decorator.js';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 /** Rechaza una solicitud con un token no valido.. */
 @Injectable()

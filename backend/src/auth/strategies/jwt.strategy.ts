@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { roles } from '../../common/enums/roles.enum.js';
-import type { AuthenticatedUser } from '../interfaces/authenticated-user.interface.js';
-import type { JwtPayload } from '../interfaces/jwt-payload.interface.js';
+import { roles } from '../../common/enums/roles.enum';
+import type { AuthenticatedUser } from '../interfaces/authenticated-user.interface';
+import type { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 const KNOWN_ROLES = new Set<string>(Object.values(roles));
 
