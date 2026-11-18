@@ -29,3 +29,6 @@ TestResults/
 Thumbs.db
 # Archivos de compilación de TypeScript
 *.tsbuildinfo
+
+# Directorios locales de Git
+/.worktrees/

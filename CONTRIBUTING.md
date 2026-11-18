@@ -11,6 +11,12 @@ cd VINTRA
 
 Configura `user.name` y `user.email` una sola vez si Git aún no conoce tu identidad.
 
+## Estrategia de ramas
+
+- `main` conserva la versión estable destinada a producción.
+- `develop` integra el trabajo en curso y se promueve a `main` mediante Pull Request.
+- Las ramas `feat/`, `fix/`, `docs/` o `task/` nacen de `develop` y regresan a ella mediante Pull Request.
+
 ## Flujo de trabajo
 
 1. Actualiza `develop` y crea una rama de trabajo desde esa base.
@@ -58,6 +64,15 @@ El backend usa NestJS y estos scripts están definidos en `backend/package.json`
 - Adjunta captura para cambios visuales. Para backend, datos o CI, usa resultados/logs sanitizados; para documentación, el diff revisado es evidencia suficiente.
 - Solicita revisión a alguien distinto del autor. No fusiones con checks fallidos o criterios pendientes.
 
+## Revisión y aprobación
+
+- Se requiere al menos una aprobación antes de integrar un PR hacia `develop` o `main`.
+- Si se agregan commits después de una aprobación, solicita una nueva revisión.
+- Mantén el identificador y el enlace de la tarjeta de Trello durante todo el desarrollo.
+- Atiende los defectos y problemas de integración antes del merge; acuerda las mejoras menores pendientes con el equipo.
+- No elimines la rama ni uses force-push mientras su PR siga abierto.
+- Marca la tarea como terminada después de la aprobación, la integración y la validación de sus criterios.
+
 ## Automatizaciones disponibles
 
-El workflow `ci.yml` verifica espacios en blanco, lint de Markdown, enlaces del README y llama a los workflows reutilizables de backend y frontend. Verifica el estado de cada job en el PR: que el workflow exista no demuestra por sí solo que el backend se haya compilado o probado.
+El workflow `ci.yml` verifica espacios en blanco, lint de Markdown, enlaces del README y llama a los workflows reutilizables de backend y frontend en PR hacia `develop` y `main`. Verifica el estado de cada job en el PR: que el workflow exista no demuestra por sí solo que el backend se haya compilado o probado.

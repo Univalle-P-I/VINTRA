@@ -24,3 +24,24 @@ La documentación está separada por tema para que cada equipo encuentre y actua
 - [Diseño de base de datos](DATABASE_DESIGN.md)
 - [Diseño de seguridad](SECURITY_DESIGN.md)
 - [Configuración de SonarQube](SONARQUBE.md)
+
+## Regla de publicación
+
+Actualiza la documentación afectada cuando cambie un contrato, una decisión técnica, un comando, una configuración o el comportamiento visible del sistema. Si una decisión pertenece a varias áreas, mantenla en `arquitectura/` y enlázala desde las áreas involucradas.
+
+Cada documento debe indicar, cuando aplique:
+
+- fecha de actualización y responsable;
+- estado: `Borrador`, `En revisión`, `Aprobado` u `Obsoleto`;
+- alcance y supuestos;
+- enlaces a código, issues, decisiones o documentos relacionados;
+- instrucciones para validar la información.
+
+Mantén una sola fuente para cada contrato o decisión. Los documentos de referencia del índice anterior conservan sus rutas y deben enlazarse desde el área correspondiente.
+
+## Convenciones
+
+- Los documentos nuevos usan nombres en minúsculas y guiones, por ejemplo `contrato-rutas.md`.
+- Guarda los diagramas editables junto a su exportación cuando sea necesaria para revisarlos.
+- Registra las decisiones con fecha, alternativas y razón de la selección.
+- Sigue las reglas de colaboración y trazabilidad de [CONTRIBUTING.md](../CONTRIBUTING.md).
