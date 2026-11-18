@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PersonalService } from '../personal/personal.service';
-import { Cuadrilla } from './entities/cuadrilla.entity';
+import { Crew } from './entities/crew.entity';
 
 /**
  * Estructura inicial (#127): sin lógica de negocio.
@@ -11,8 +11,8 @@ import { Cuadrilla } from './entities/cuadrilla.entity';
 @Injectable()
 export class CuadrillasService {
   constructor(
-    @InjectRepository(Cuadrilla)
-    protected readonly cuadrillasRepository: Repository<Cuadrilla>,
+    @InjectRepository(Crew)
+    protected readonly crewRepository: Repository<Crew>,
     // Dependencia de Cuadrillas respecto al personal operativo.
     protected readonly personalService: PersonalService,
   ) {}

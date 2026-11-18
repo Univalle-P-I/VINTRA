@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonalModule } from '../personal/personal.module';
 import { CuadrillasController } from './cuadrillas.controller';
 import { CuadrillasService } from './cuadrillas.service';
-import { Cuadrilla } from './entities/cuadrilla.entity';
+import { Crew } from './entities/crew.entity';
 
 @Module({
-  imports: [PersonalModule, TypeOrmModule.forFeature([Cuadrilla])],
+  imports: [PersonalModule, TypeOrmModule.forFeature([Crew])],
   controllers: [CuadrillasController],
   providers: [CuadrillasService],
   exports: [CuadrillasService],

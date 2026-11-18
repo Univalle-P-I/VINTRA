@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Personal } from './entities/personal.entity';
+import { CrewMember } from './entities/crew-member.entity';
+import { Driver } from './entities/driver.entity';
 
 /**
  * Estructura inicial (#127): sin lógica de negocio.
@@ -10,7 +11,9 @@ import { Personal } from './entities/personal.entity';
 @Injectable()
 export class PersonalService {
   constructor(
-    @InjectRepository(Personal)
-    protected readonly personalRepository: Repository<Personal>,
+    @InjectRepository(Driver)
+    protected readonly driverRepository: Repository<Driver>,
+    @InjectRepository(CrewMember)
+    protected readonly crewMemberRepository: Repository<CrewMember>,
   ) {}
 }
