@@ -8,10 +8,11 @@ import { DataSource } from 'typeorm';
 import { Public } from '../common/decorators/public.decorator';
 
 @Controller('health')
-@Public()
+
+
 export class HealthController {
   constructor(private readonly dataSource: DataSource) {}
-
+  
   @Get()
   check() {
     return {
