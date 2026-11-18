@@ -3,7 +3,6 @@ import type { Request } from 'express';
 import type { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 
 type AuthenticatedRequest = Request & { user?: AuthenticatedUser };
-
 /** Reads the identity attached by JwtAuthGuard: `@CurrentUser() user`. */
 export const CurrentUser = createParamDecorator(
   (_data: unknown, context: ExecutionContext): AuthenticatedUser | undefined =>
