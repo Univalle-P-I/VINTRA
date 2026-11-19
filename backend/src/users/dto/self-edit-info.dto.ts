@@ -11,8 +11,4 @@ export class selfEditInfo{
   @MaxLength(254)
   email?: string;
 
-  @IsString()
-  @MaxLength(20)
-  phone?: string;
-
 }

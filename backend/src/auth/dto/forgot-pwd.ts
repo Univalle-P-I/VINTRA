@@ -9,6 +9,6 @@ export class ForgotPwdDto {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(254)
   emailUser!: string;
 }
