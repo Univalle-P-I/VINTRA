@@ -5,6 +5,8 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './health.controller';
+import { CuadrillasModule } from './cuadrillas/cuadrillas.module';
+import { PersonalModule } from './personal/personal.module';
 import { RutasModule } from './rutas/rutas.module';
 
 export function createDatabaseOptions(
@@ -33,6 +35,8 @@ export function createDatabaseOptions(
       inject: [ConfigService],
       useFactory: createDatabaseOptions,
     }),
+    PersonalModule,
+    CuadrillasModule,
     RutasModule,
   ],
   controllers: [AppController, HealthController],
