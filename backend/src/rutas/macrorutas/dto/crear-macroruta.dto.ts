@@ -1,8 +1,10 @@
-/**
- * PROVISIONAL: sin decoradores de validación.
- * `class-validator` / `class-transformer` no son dependencias del backend aún.
- * La validación y el uso real de este DTO corresponden a #79.
- */
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+
 export class CrearMacrorutaDto {
+  @ApiProperty({ maxLength: 100 })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
   nombre: string;
 }
