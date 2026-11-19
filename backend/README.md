@@ -10,6 +10,7 @@ Desde la raíz del repositorio, copia `.env.example` a `.env` y arranca PostgreS
 docker compose up -d postgres
 cd backend
 npm ci
+$env:CORS_ORIGIN = 'http://localhost:5173'
 npm run start:dev
 ```
 

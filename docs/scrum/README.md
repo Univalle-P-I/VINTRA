@@ -38,7 +38,7 @@ Su finalidad es facilitar la coordinación del equipo, mantener acuerdos verific
 La documentación de VINTRA se organiza por áreas para facilitar la colaboración entre las células de trabajo y evitar duplicar información.
 
 | Documento o directorio | Propósito |
-|---|---|
+| --- | --- |
 | [`../modelado/README.md`](../modelado/README.md) | Alcance funcional, actores, procesos, historias de usuario y reglas de negocio. |
 | [`../arquitectura/`](../arquitectura/) | Arquitectura y organización de los componentes del sistema. |
 | [`../frontend/`](../frontend/) | Documentación de la aplicación frontend. |
@@ -60,7 +60,7 @@ Las historias y sus criterios de aceptación deberán mantenerse en una ubicaci�
 La siguiente tabla representa la planificación inicial del proyecto. La distribución definitiva deberá confirmarse con el equipo.
 
 | ID | Historia de usuario | Prioridad | Sprint previsto |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | HU1 | Acceso según rol | Alta | Sprint 1 |
 | HU2 | Gestionar vehículos | Alta | Sprint 1 |
 | HU3 | Gestionar estado de vehículos | Alta | Sprint 1 |
@@ -170,7 +170,7 @@ Los temas que todavía no tengan una decisión definitiva deberán registrarse c
 El trabajo planificado deberá mantener trazabilidad entre la necesidad funcional, la tarea registrada en las herramientas del equipo y el resultado obtenido.
 
 | Elemento | Información que debe relacionarse |
-|---|---|
+| --- | --- |
 | Historia de usuario | Identificador, descripción y criterios de aceptación. |
 | Tarjeta de planificación | Enlace, responsable, prioridad y estado. |
 | Issue de GitHub | Referencia al trabajo, cuando se utilice. |
@@ -206,7 +206,7 @@ Las convenciones de ramas, commits, revisión e integración se consultarán en 
 Las decisiones que puedan afectar el alcance, la planificación, las reglas de negocio o los criterios de aceptación deberán registrarse con una persona responsable y una fecha de revisión.
 
 | Decisión o actividad | Responsable | Fecha de revisión | Estado |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Validar los criterios de aceptación de HU1–HU12 | Célula Scrum y responsables funcionales | Por acordar | Pendiente |
 | Revisar y aprobar la Definition of Done | Equipo del proyecto | Por acordar | Pendiente |
 | Confirmar los objetivos y la capacidad de cada sprint | Equipo del proyecto | Por acordar | Pendiente |
@@ -222,7 +222,7 @@ Los responsables y las fechas deberán completarse con los acuerdos reales del e
 </p>
 
 | Campo | Descripción |
-|---|---|
+| --- | --- |
 | **Responsable** | Célula Scrum |
 | **Última actualización** | Por registrar |
 | **Estado** | Borrador para revisión del equipo |

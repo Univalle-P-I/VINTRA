@@ -1,0 +1,218 @@
+/* Avisos, tablas, filtros, campos, formularios, estados vacíos y footer */
+
+.notice {
+  background: #f4f0e7;
+  border: 1px solid #d8ddd9;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+}
+
+.notice strong,
+.detail-title {
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.notice span,
+.body-copy {
+  color: #27332d;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.notice span {
+  color: #66716b;
+}
+
+.data-table {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table-row {
+  align-items: center;
+  border-bottom: 1px solid #d8ddd9;
+  display: grid;
+  font-size: 13px;
+  gap: 10px;
+  line-height: 1.5;
+  min-width: 700px;
+  padding: 10px;
+}
+
+.activity-table .table-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.vehicle-table .table-row {
+  grid-template-columns: repeat(5, minmax(105px, 1fr)) 192px;
+}
+
+.people-table .table-row {
+  grid-template-columns: repeat(6, minmax(105px, 1fr)) 192px;
+}
+
+.roles-table .table-row {
+  grid-template-columns: repeat(3, minmax(150px, 1fr)) 192px;
+}
+
+.table-head {
+  background: #ecefec;
+  border: 0;
+  color: #66716b;
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.semibold {
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-weight: 600;
+}
+
+.pagination {
+  color: #66716b;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  min-width: 700px;
+  padding-top: 12px;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.row-actions button {
+  background: transparent;
+  border: 0;
+  color: #2e6a50;
+  cursor: pointer;
+  font-family: "Inter:Regular", Arial, sans-serif;
+  font-size: 12px;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.row-actions button:focus-visible {
+  outline: 2px solid #2e6a50;
+  outline-offset: 2px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filters .field {
+  width: 230px;
+}
+
+.people-filters .field {
+  width: 230px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > span {
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.field input,
+.field select {
+  background: #fff;
+  border: 1px solid #d8ddd9;
+  border-radius: 4px;
+  color: #27332d;
+  font-family: "Inter:Regular", Arial, sans-serif;
+  font-size: 14px;
+  min-height: 42px;
+  padding: 10px;
+  width: 100%;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #2e6a50;
+  outline: 2px solid #e7efe9;
+}
+
+.filter-actions {
+  margin-top: -4px;
+}
+
+.stack-form,
+.form-grid + .notice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+}
+
+.driver-form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  margin-bottom: 16px;
+}
+
+.unique-notice {
+  margin: 16px 0;
+}
+
+.form-message {
+  color: #2e6a50;
+  font-family: "Inter:Semi Bold", Arial, sans-serif;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.empty-state {
+  color: #66716b;
+  font-size: 13px;
+  margin: 0;
+  padding: 16px 10px;
+}
+
+.scroll-target {
+  scroll-margin-top: 16px;
+}
+
+.reference-anchor {
+  height: 0;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 0;
+}
+
+footer {
+  border-top: 1px solid #d8ddd9;
+  color: #66716b;
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 16px 0 8px;
+}

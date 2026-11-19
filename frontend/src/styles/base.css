@@ -1,0 +1,4 @@
+/* Shell administrativo. La base global y el tema VINTRA ya viven en index.css. */
+.workspace { min-width: 0; width: 100%; }
+.topbar { justify-content: flex-start; }
+.mobile-header .identity { display: flex; }

@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
@@ -40,6 +39,7 @@ export function createDatabaseOptions(
       inject: [ConfigService],
       useFactory: createDatabaseOptions,
     }),
+    RutasModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import App from './App'
@@ -77,6 +77,19 @@ describe('App connection smoke test', () => {
     expect(axios.get).not.toHaveBeenCalled()
   })
 
+  it('loads the landing preview from the configured deployment base', () => {
+    vi.stubEnv('BASE_URL', '/staging/')
+    axios.get.mockReturnValue(new Promise(() => {}))
+
+    render(<App />)
+
+    expect(
+      screen.getByRole('img', {
+        name: 'Vista cartográfica ilustrativa de vehículos, rutas e incidencias',
+      })
+    ).toHaveAttribute('src', '/staging/assets/landing/764ea.png')
+  })
+
   it('allows returning from the login screen to the landing page', async () => {
     axios.get.mockReturnValue(new Promise(() => {}))
 
@@ -94,5 +107,28 @@ describe('App connection smoke test', () => {
     await user.click(
       screen.getByRole('button', { name: /volver|inicio|regresar/i })
     )
+  })
+
+  it('opens fleet from the module navigation after login', async () => {
+    axios.get.mockReturnValue(new Promise(() => {}))
+
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(
+      await screen.findByRole('button', {
+        name: /iniciar sesión|iniciar sesion|ingresar|acceder|login/i,
+      })
+    )
+    await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+    await user.click(
+      within(
+        screen.getByRole('navigation', { name: 'Navegación de módulos' })
+      ).getByRole('button', { name: 'Gestión de flota' })
+    )
+
+    expect(
+      screen.getByText('Gestión de flota', { selector: '.page-title' })
+    ).toBeInTheDocument()
   })
 })

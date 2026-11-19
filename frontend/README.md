@@ -13,6 +13,7 @@ npm run dev
 ```
 
 Abre `http://localhost:5173`. La API debe estar disponible en la URL indicada por `VITE_API_URL`.
+Para este modo, inicia la API con `CORS_ORIGIN=http://localhost:5173`, como indica la [guía del backend](../backend/README.md#ejecución-local).
 
 ## Validación
 

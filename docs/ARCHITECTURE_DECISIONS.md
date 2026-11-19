@@ -2,7 +2,7 @@
 
 ## Cómo usar este registro
 
-Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equipo o evidencia del repositorio. `Propuesta` orienta el diseño pero no autoriza implementación. `Pendiente` requiere resolver el issue asociado. Las PR #47/#49/#50 se consideran integraciones futuras condicionadas a correcciones/merge; no son baseline actual de `develop`.
+Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equipo o evidencia del repositorio. `Propuesta` orienta el diseño pero no autoriza implementación. `Pendiente` requiere resolver el issue asociado. Este registro conserva el contexto de las propuestas #47/#49/#50; la implementación actual ya incluye NestJS, TypeORM, health checks y CI. Su existencia no da por aprobadas las decisiones funcionales pendientes.
 
 ## ADR-001 — Organizar backend como monolito modular
 
@@ -14,11 +14,11 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 
 ## ADR-002 — Framework backend: NestJS
 
-- **Estado:** Decisión del usuario; integración en `develop` pendiente de merge de PR #47.
+- **Estado:** NestJS integrado en `backend/`; las decisiones de dominio siguen pendientes de aprobación.
 - **Contexto:** El usuario confirmó NestJS como framework recomendado por documentación, frente a una tarjeta que mencionaba Express. PR #47 propone reemplazar backend .NET.
 - **Decisión:** Diseñar backend nuevo sobre NestJS. No mantener dos backends paralelos como arquitectura objetivo.
 - **Consecuencias:** Actualizar documentación/comandos CI/quality analysis de .NET a Node/Nest; conservar el historial de migración. Confirmar versiones soportadas y estructura final al fusionar PR.
-- **Pendiente:** Revisar PR #47 y #49; remover referencias .NET/Django obsoletas una vez confirmado cambio.
+- **Seguimiento:** Mantener las guías de ejecución y CI alineadas con NestJS; las referencias a .NET describen el contexto histórico de la migración.
 
 ## ADR-003 — Base relacional PostgreSQL
 
@@ -73,16 +73,16 @@ Una decisión marcada `Aceptada` debe estar respaldada por aprobación del equip
 
 ## ADR-010 — SonarQube como control de calidad complementario
 
-- **Estado:** SonarQube ya está configurado en el proyecto; adaptación Nest propuesta por PR #47 sigue pendiente de integración.
-- **Contexto:** `docs/SONARQUBE.md` aún describe el análisis .NET, mientras #47 cambia a scan Node. El workflow backend en `develop` es placeholder según revisión actual y issue #69 pide CI.
+- **Estado:** SonarQube analiza NestJS desde `.github/workflows/sonarqube.yml` e importa la cobertura de Jest.
+- **Contexto:** CI instala dependencias, ejecuta lint, pruebas unitarias, e2e con PostgreSQL y compilación. La [guía de SonarQube](SONARQUBE.md) documenta el método y las restricciones del plan.
 - **Decisión:** Mantener el servicio/configuración existentes y actualizarlo al código backend finalmente integrado; cubrir compilación, lint, pruebas y reporte de cobertura en CI. Hacer que quality gate requerido bloquee PR según política configurada.
 - **Consecuencias:** Sonar no sustituye pruebas o revisión de seguridad. Verificar project key/base directory, exclusiones, cobertura importada y secreto de token antes de merge.
 
 ## ADR-011 — Despliegue y VPS
 
-- **Estado:** No confirmado para backend; issue #90.
-- **Contexto:** Workflows existentes publican frontend por SSH/SCP. La guía VPS declara servidores y puertos, pero tiene campos pendientes y requiere comprobar entorno real.
-- **Decisión:** Conservar compatibilidad con el mecanismo SSH/SCP solicitado mientras se valida staging backend; no reemplazar infraestructura por Docker/Kubernetes o cloud sin justificación aprobada.
+- **Estado:** Workflows de staging y producción definidos; la configuración real del VPS se valida en issue #90.
+- **Contexto:** Los workflows se conectan por SSH y ejecutan Docker Compose con proyectos separados, `vintra-dev` y `vintra-main`. Las rutas de trabajo, variables y puertos publicados deben corresponder al entorno.
+- **Decisión:** Mantener los secretos fuera del repositorio y la configuración independiente en cada directorio del VPS. Los dos entornos deben usar puertos de host diferentes; el nombre de proyecto de Compose separa redes y volúmenes, pero no reserva puertos distintos automáticamente.
 - **Consecuencias:** Antes de declarar staging listo, verificar acceso, dominio, TLS, env, PostgreSQL privado, migraciones, backups, health y rollback. No copiar valores sensibles al repo.
 
 ## Insumo recibido del equipo de Base de Datos
