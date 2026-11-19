@@ -2,7 +2,7 @@
 
 ## Estado y convenciones
 
-Contrato propuesto para discutir con frontend y backend. El issue #66 pide cerrar rutas, JSON, errores, validaciones, permisos y OpenAPI. No se debe presentar como API ya implementada. Las PR #47/#49/#50 aún están abiertas; #47 propone NestJS y health checks; deben alinearse sus nombres/rutas con el contrato aprobado.
+Contrato propuesto para discutir con frontend y backend. El issue #66 pide cerrar rutas, JSON, errores, validaciones, permisos y OpenAPI. Los endpoints de salud descritos abajo están implementados en [`HealthController`](../backend/src/health.controller.ts); los endpoints de negocio siguen siendo propuestas.
 
 - Prefijo sugerido: `/api/v1`; publicar OpenAPI desde la aplicación y versionar cambios incompatibles.
 - JSON UTF-8. Fechas en ISO 8601 con zona/offset explícito; la zona operativa debe aprobarse. IDs opacos y estables, sin exponer detalles de base.
@@ -34,17 +34,17 @@ Comprueba que el proceso responde. No requiere autenticación si el entorno nece
 Respuesta `200`:
 
 ```json
-{"status":"ok"}
+{"status":"ok","service":"vintra-backend"}
 ```
 
 ### `GET /health/db`
 
 Comprueba disponibilidad de la conexión PostgreSQL para readiness. No muestra host, nombre de base, usuario ni error técnico.
 
-Respuesta `200`: `{"status":"ok","dependencies":{"database":"ok"}}`.
-Respuesta `503`: `{"status":"error","dependencies":{"database":"unavailable"},"requestId":"..."}`.
+Respuesta `200`: `{"status":"ok","database":"connected","time":"fecha-ISO-8601"}`.
+Respuesta `500`: `{"status":"error","database":"disconnected"}`.
 
-La PR #47 propone ambos chequeos. Confirmar la ruta exacta con #66 y mantener el chequeo de DB separado del liveness.
+Estos formatos corresponden al controlador y sus pruebas actuales. Una futura respuesta de readiness `503` o un formato común de dependencias requiere actualizar contrato, implementación y consumidores en el mismo cambio (#66). El chequeo de DB se mantiene separado del liveness.
 
 ## Autenticación
 

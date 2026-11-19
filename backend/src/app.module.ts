@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +7,7 @@ import { AppService } from './app.service';
 import { HealthController } from './health.controller';
 import { CuadrillasModule } from './cuadrillas/cuadrillas.module';
 import { PersonalModule } from './personal/personal.module';
+import { RutasModule } from './rutas/rutas.module';
 
 export function createDatabaseOptions(
   config: ConfigService,
@@ -37,6 +37,7 @@ export function createDatabaseOptions(
     }),
     PersonalModule,
     CuadrillasModule,
+    RutasModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

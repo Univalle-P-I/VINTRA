@@ -1,52 +1,71 @@
 # Frontend
 
-Guía para documentar la aplicación que usan el operador, el administrador, el conductor y la ciudadanía.
+Guía de la aplicación web de VINTRA y de su integración con el backend.
 
-## Framework, versión y requisitos de ejecución
+## Stack y requisitos
 
-- **Framework:** React
-- **Herramienta de construcción (Bundler):** Vite
-- **Versión de Node.js:** Node.js v18.x o superior recomendado.
-- **Gestor de paquetes:** npm o npx.
+- React con Vite y componentes en JavaScript/TypeScript.
+- Axios para consultar la API.
+- Node.js 22.13 o superior; CI usa Node.js 22 y el Dockerfile usa Node.js 22 Alpine.
+- npm con las versiones fijadas en [frontend/package-lock.json](../../frontend/package-lock.json).
 
-## Estructura de carpetas y criterio para organizar componentes
-
-La aplicación se organiza bajo una arquitectura modular orientada a componentes dentro de `src/`:
+## Estructura actual
 
 ```text
-vintra/
-├── frontend/
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── index.html
-│   ├── Dockerfile.frontend
-│   └── src/
-│       ├── components/    # Componentes reutilizables globales (botones, modales, tarjetas)
-│       ├── views/         # Vistas o pantallas principales por rol
-│       ├── context/       # Manejo de estado global (Autenticación, Sesión)
-│       ├── services/      # Configuración de Axios y llamadas a la API REST
-│       ├── main.jsx       # Punto de entrada de la aplicación
-│       └── App.jsx        # Componente principal y enrutador
+frontend/
+├── Dockerfile
+├── index.html
+├── package.json
+├── vite.config.js
+├── public/                 # Recursos estáticos
+└── src/
+    ├── main.jsx            # Punto de entrada
+    ├── App.jsx             # Navegación entre landing, acceso y consola
+    ├── LandingPage.tsx
+    ├── LoginPage.tsx
+    ├── Shell.tsx           # Navegación administrativa
+    ├── AdminPanel.tsx
+    ├── FleetPanel.tsx
+    ├── PeoplePanel.tsx
+    ├── RoutePanel.tsx
+    ├── OperationsPanel.tsx
+    ├── ConnectionStatus.jsx
+    ├── ui.tsx              # Componentes compartidos
+    ├── styles/
+    └── test/
 ```
 
-## Comunicación con el backend
+La separación en carpetas `components/`, `views/`, `context/` y `services/` es una posible evolución; esas carpetas todavía no existen en esta versión.
 
-El frontend consume la API REST del backend (Node.js + NestJS) mediante **Axios**. La configuración base (URL de la API, cabeceras comunes e interceptores de autenticación) se centraliza en `src/services/`.
+## Integración y alcance
 
-```mermaid
-flowchart LR
-    UI[Vistas React] -->|eventos| SVC[Servicios / Axios]
-    SVC -->|"HTTP + JSON"| API[API REST - Backend NestJS]
-    API --> DB[(PostgreSQL)]
-```
+[ConnectionStatus.jsx](../../frontend/src/ConnectionStatus.jsx) lee `VITE_API_URL` y consulta `GET /health` y `GET /health/db` mediante Axios. Los contratos implementados se describen en la [guía de ejecución del backend](../../backend/README.md). Las propuestas de endpoints adicionales se mantienen en la [documentación del backend](../backend/README.md).
 
-## Comandos para instalar, ejecutar y probar
+El acceso de la consola es una simulación visual: todavía no autentica contra la API. Los registros de flota, personal, rutas y recorridos se mantienen en el estado local de cada pantalla y no tienen persistencia. El mapa, el seguimiento y las notificaciones requieren integración posterior.
 
-Desde la carpeta `frontend/`:
+## Ejecución y validación
+
+Sigue el [README raíz](../../README.md#ejecutar-frontend-y-api-en-modo-desarrollo) para preparar `.env`, PostgreSQL y el origen CORS de desarrollo. Desde `frontend/`:
 
 ```bash
-npm install       # instala dependencias
-npm run dev       # levanta el servidor de desarrollo de Vite
-npm run build     # genera la versión de producción
-npm run preview   # previsualiza el build de producción
+npm ci
+npm run dev
 ```
+
+Para validar y compilar:
+
+```bash
+npm run lint
+npm test
+npm run build
+npm run preview
+```
+
+Vite genera la salida de producción en `frontend/dist/`. `VITE_API_URL` y `VITE_BASE_PATH` se fijan durante la compilación; cambia esos valores antes de construir la imagen para cada entorno.
+
+## Responsabilidad documental
+
+- Estado: `En revisión`.
+- Responsable: Célula Backend / Frontend, con aportes de UI/UX.
+- Mantén aquí las rutas, pantallas, roles visibles, estados de error y criterios de accesibilidad.
+- Enlaza las decisiones compartidas desde [arquitectura](../arquitectura/README.md) y los flujos desde [UI/UX](../ui-ux/README.md).

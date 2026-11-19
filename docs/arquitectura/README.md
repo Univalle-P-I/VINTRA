@@ -47,7 +47,7 @@ La arquitectura lógica separa la interfaz de usuario, la API y la persistencia 
 ![Stack tecnológico](https://skillicons.dev/icons?i=nodejs,nestjs,ts,postgres,react,vite,git&theme=light)
 
 | Componente | Tecnología | Responsabilidad | Estado documental |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Base de datos | PostgreSQL | Almacenar y organizar la información del sistema. | Definido; instalación pendiente. |
 | Runtime backend | Node.js | Proporcionar el entorno de ejecución del servidor. | Definido; versión pendiente. |
 | Framework backend | NestJS | Organizar módulos, controladores, servicios y API REST. | Definido; configuración pendiente. |
