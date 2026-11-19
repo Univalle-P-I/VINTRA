@@ -11,7 +11,11 @@ import type { Repository } from 'typeorm';
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { Conductor } from '../personal/entidades/conductor.entity';
 import { MicrorutaHorario } from '../turnos/entidades/microruta-horario.entity';
-import { Vehiculo } from '../vehiculos/entidades/vehiculo.entity';
+import {
+  ESTADOS_VEHICULO_ASIGNABLES,
+  ESTADOS_VEHICULO_INHABILITADOS,
+  Vehiculo,
+} from '../vehiculos/entidades/vehiculo.entity';
 import { ActualizarAsignacionDto } from './dto/actualizar-asignacion.dto';
 import { ConsultarAsignacionesDto } from './dto/consultar-asignaciones.dto';
 import { CrearAsignacionDto } from './dto/crear-asignacion.dto';
@@ -99,6 +103,7 @@ export class AsignacionesService {
       if (!vehicle) {
         throw new NotFoundException('El vehículo no existe o está inactivo.');
       }
+      this.validarVehiculoDisponibleParaAsignacion(vehicle);
 
       const repository = manager.getRepository(Asignacion);
       try {
@@ -163,6 +168,7 @@ export class AsignacionesService {
         if (!vehicle) {
           throw new NotFoundException('El vehículo no existe o está inactivo.');
         }
+        this.validarVehiculoDisponibleParaAsignacion(vehicle);
         item.vehiculo = vehicle;
       }
       if (dto.assignmentStatus !== undefined) {
@@ -196,6 +202,17 @@ export class AsignacionesService {
         throw error;
       }
     });
+  }
+
+  private validarVehiculoDisponibleParaAsignacion(vehicle: Vehiculo): void {
+    if (
+      ESTADOS_VEHICULO_INHABILITADOS.has(vehicle.estado) ||
+      !ESTADOS_VEHICULO_ASIGNABLES.has(vehicle.estado)
+    ) {
+      throw new ConflictException(
+        'El vehículo no está disponible para asignación debido a su estado operativo actual.',
+      );
+    }
   }
 
   private queryWithRelations() {

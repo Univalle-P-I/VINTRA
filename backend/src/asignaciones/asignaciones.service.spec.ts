@@ -13,7 +13,10 @@ import {
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
 import { Conductor } from '../personal/entidades/conductor.entity';
 import { MicrorutaHorario } from '../turnos/entidades/microruta-horario.entity';
-import { Vehiculo } from '../vehiculos/entidades/vehiculo.entity';
+import {
+  EstadoVehiculo,
+  Vehiculo,
+} from '../vehiculos/entidades/vehiculo.entity';
 import { Asignacion } from './entidades/asignacion.entity';
 import { EstadoAsignacion } from './entidades/asignacion.entity';
 import { AsignacionesService } from './asignaciones.service';
@@ -94,7 +97,7 @@ describe('AsignacionesService', () => {
         id: SCHEDULE_ID,
         horario: { activo: true },
       },
-      vehiculo: { id: VEHICLE_ID, activo: true },
+      vehiculo: { id: VEHICLE_ID, activo: true, estado: EstadoVehiculo.DISPONIBLE },
       estado: EstadoAsignacion.PROGRAMADA,
       inicioProgramado: new Date('2026-11-12T10:00:00.000Z'),
       finProgramado: new Date('2026-11-12T12:00:00.000Z'),
@@ -257,7 +260,7 @@ describe('AsignacionesService', () => {
           activo: true,
           horario: { activo: true },
         };
-        const vehicle = { id: VEHICLE_ID, activo: true };
+        const vehicle = { id: VEHICLE_ID, activo: true, estado: EstadoVehiculo.DISPONIBLE };
         const assignment = {
           ...createAssignment(),
           conductor: driver,
@@ -422,6 +425,26 @@ describe('AsignacionesService', () => {
         expect(assignmentRepository.save).not.toHaveBeenCalled();
       });
 
+      it.each([
+        EstadoVehiculo.MANTENIMIENTO,
+        EstadoVehiculo.FUERA_DE_SERVICIO,
+        EstadoVehiculo.EN_SERVICIO,
+      ])('rejects creating an assignment when vehicle state is %s', async (estado) => {
+        const conductorRepository = { findOne: jest.fn().mockResolvedValue({ id: DRIVER_ID, activo: true }) };
+        const scheduleRepository = { findOne: jest.fn().mockResolvedValue({ id: SCHEDULE_ID, horario: { activo: true } }) };
+        const vehicleRepository = { findOne: jest.fn().mockResolvedValue({ id: VEHICLE_ID, activo: true, estado }) };
+        const assignmentRepository = { create: jest.fn(), save: jest.fn() };
+        const manager = createManager(new Map<Function, object>([
+          [Conductor, conductorRepository],
+          [MicrorutaHorario, scheduleRepository],
+          [Vehiculo, vehicleRepository],
+          [Asignacion, assignmentRepository],
+        ]));
+        const service = new AsignacionesService({} as Repository<Asignacion>, {} as Repository<Conductor>, createAuditContext(manager) as unknown as ContextoAuditoriaService);
+        await expect(service.crear(dto, ACTOR_ID, REQUEST_IP)).rejects.toThrow(ConflictException);
+        expect(assignmentRepository.save).not.toHaveBeenCalled();
+      });
+
       it('translates a PostgreSQL unique violation to ConflictException', async () => {
         const conductorRepository = {
           findOne: jest.fn().mockResolvedValue({ id: DRIVER_ID, activo: true }),
@@ -435,7 +458,7 @@ describe('AsignacionesService', () => {
         const vehicleRepository = {
           findOne: jest
             .fn()
-            .mockResolvedValue({ id: VEHICLE_ID, activo: true }),
+            .mockResolvedValue({ id: VEHICLE_ID, activo: true, estado: EstadoVehiculo.DISPONIBLE }),
         };
         const assignmentRepository = {
           create: jest.fn((value) => value),
@@ -516,7 +539,7 @@ describe('AsignacionesService', () => {
           activo: true,
           horario: { activo: true },
         };
-        const vehicle = { id: 'replacement-vehicle-id', activo: true };
+        const vehicle = { id: 'replacement-vehicle-id', activo: true, estado: EstadoVehiculo.DISPONIBLE };
         const assignmentRepository = {
           findOne: jest.fn().mockResolvedValue(assignment),
           save: jest.fn(async (value) => value),
@@ -571,6 +594,23 @@ describe('AsignacionesService', () => {
         expect(vehicleRepository.findOne).toHaveBeenCalledWith({
           where: { id: vehicle.id, activo: true },
         });
+      });
+
+      it.each([
+        EstadoVehiculo.MANTENIMIENTO,
+        EstadoVehiculo.FUERA_DE_SERVICIO,
+        EstadoVehiculo.EN_SERVICIO,
+      ])('rejects updating an assignment when vehicle state is %s', async (estado) => {
+        const assignment = createAssignment();
+        const assignmentRepository = { findOne: jest.fn().mockResolvedValue(assignment), save: jest.fn() };
+        const vehicleRepository = { findOne: jest.fn().mockResolvedValue({ id: 'replacement-vehicle-id', activo: true, estado }) };
+        const manager = createManager(new Map<Function, object>([
+          [Asignacion, assignmentRepository],
+          [Vehiculo, vehicleRepository],
+        ]));
+        const service = new AsignacionesService({} as Repository<Asignacion>, {} as Repository<Conductor>, createAuditContext(manager) as unknown as ContextoAuditoriaService);
+        await expect(service.actualizar(ASSIGNMENT_ID, { vehicleId: 'replacement-vehicle-id' }, ACTOR_ID, REQUEST_IP)).rejects.toThrow(ConflictException);
+        expect(assignmentRepository.save).not.toHaveBeenCalled();
       });
 
       it('throws NotFoundException when the assignment does not exist', async () => {
