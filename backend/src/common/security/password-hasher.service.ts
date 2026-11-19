@@ -6,7 +6,7 @@ export class PasswordHasherService {
 
   private readonly options = {
     type: argon2.argon2id,
-    memoryCost: 19456, 
+    memoryCost: 19456,
     timeCost: 2,
     parallelism: 1,
   } as const;

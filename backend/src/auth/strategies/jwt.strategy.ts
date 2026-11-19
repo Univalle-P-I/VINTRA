@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   validate(payload: JwtPayload): AuthenticatedUser {
     if (!payload || typeof payload.sub !== 'string' || payload.sub.length === 0) {
       throw new UnauthorizedException('El token no contiene un usuario válido.');
-    } 
+    }
 
     const tokenRoles = payload.roles ?? [];
     if (

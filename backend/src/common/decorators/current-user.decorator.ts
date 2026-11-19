@@ -8,4 +8,3 @@ export const CurrentUser = createParamDecorator(
   (_data: unknown, context: ExecutionContext): AuthenticatedUser | undefined =>
     context.switchToHttp().getRequest<AuthenticatedRequest>().user,
 );
-

@@ -5,7 +5,7 @@ import type { UserAccount } from '../entities/user-account.entity.js';
 
 @Exclude()
 export class UserInfoDto {
-  
+
   @Expose()
   id!: string;
 
