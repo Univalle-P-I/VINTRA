@@ -42,7 +42,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       id: payload.sub,
       ...(typeof payload.email === 'string' ? { email: payload.email } : {}),
       roles: tokenRoles,
-      ...(typeof payload.sid === 'string' ? { sessionId: payload.sid } : {}),
+      ...(typeof payload.sid === 'string' ? { sid: payload.sid } : {}),
     };
   }
 }

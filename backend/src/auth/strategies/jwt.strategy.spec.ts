@@ -4,6 +4,7 @@ import { roles } from '../../common/enums/roles.enum';
 import { JwtStrategy } from './jwt.strategy';
 
 describe('JwtStrategy', () => {
+
   // La estrategia solo necesita leer el secreto para estas pruebas unitarias.
   const config = {
     get: jest.fn().mockReturnValue('x'.repeat(32)),
@@ -17,14 +18,13 @@ describe('JwtStrategy', () => {
         sub: 'usuario-1',
         email: 'usuario@ejemplo.com',
         roles: [roles.ADMIN],
-        sessionId: 'sesion-1',
         sid: 'sesion-1',
       }),
     ).toEqual({
       id: 'usuario-1',
       email: 'usuario@ejemplo.com',
       roles: [roles.ADMIN],
-      sessionId: 'sesion-1',
+      sid: 'sesion-1',
     });
   });
 
@@ -43,7 +43,7 @@ describe('JwtStrategy', () => {
       strategy.validate({
         sub: 'usuario-1',
         roles: ['DESCONOCIDO' as roles],
-        sessionId: 'sesion-1',
+        sid: 'sesion-1',
       }),
     ).toThrow(UnauthorizedException);
   });
