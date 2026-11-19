@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { RutasModule } from './rutas/rutas.module';
 import { UsersModule } from './users/users.module';
 
 export function createDatabaseOptions(
@@ -39,7 +40,7 @@ export function createDatabaseOptions(
       inject: [ConfigService],
       useFactory: createDatabaseOptions,
     }),
-    RutasModule,
+    RutasModule
   ],
   controllers: [AppController, HealthController],
   providers: [
