@@ -61,7 +61,7 @@ SonarQube complementa pruebas, revisiones y dependabot/escaneo de dependencias; 
 
 ## Despliegue y operación
 
-- La documentación VPS y workflows actuales declaran SSH/SCP para frontend, pero backend/staging requiere validación (#90). Aplicar permisos mínimos a usuario de despliegue, llaves dedicadas, almacenamiento restringido y rotación.
+- Los workflows de staging y producción usan SSH para actualizar el repositorio y ejecutar Docker Compose. La configuración efectiva del VPS requiere validación (#90). Aplicar permisos mínimos a usuario de despliegue, llaves dedicadas, almacenamiento restringido y rotación.
 - No exponer PostgreSQL directamente a internet; restringir red/firewall a los componentes que lo requieren.
 - Separar configuración/secretos por entorno. Cambios de esquema y despliegues con copia de respaldo verificada y rollback documentado.
 - Logs estructurados, health separado del estado DB, alertas sin datos sensibles y procedimiento de respuesta.

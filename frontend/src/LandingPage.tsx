@@ -470,7 +470,7 @@ export default function LandingPage({ onLogin }: { onLogin: () => void }) {
             <img
               alt="Vista cartográfica ilustrativa de vehículos, rutas e incidencias"
               className="home-preview-image"
-              src="/assets/landing/764ea.png"
+              src={`${import.meta.env.BASE_URL}assets/landing/764ea.png`}
             />
             <aside className="home-preview-status">
               <h3>Estado General de Operación</h3>

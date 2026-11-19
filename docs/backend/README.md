@@ -27,12 +27,12 @@ El objetivo es mantener una comunicación clara entre los componentes del sistem
 
 ### Requisitos de ejecución
 
-- Node.js y npm para ejecución local.
+- Node.js 24.15 o superior y npm para ejecución local, en línea con la versión 24 usada en CI y Docker.
 - PostgreSQL para persistencia de datos.
 - Variables de entorno para configurar la conexión a la base de datos y el puerto de la API.
 - Docker y Docker Compose para ejecutar los servicios en un entorno reproducible.
 
-**Versiones:** deben confirmarse las versiones exactas utilizadas por el equipo antes de cerrar la documentación.
+Las versiones de las dependencias quedan fijadas en [`backend/package-lock.json`](../../backend/package-lock.json). Instálalas con `npm ci` para reproducirlas.
 
 ## 3. Arquitectura y módulos
 
@@ -124,7 +124,7 @@ Los siguientes contratos son una propuesta inicial para orientar la integración
 
 ### 5.1. Ejemplo de solicitud y respuesta
 
-### Consultar la disponibilidad del servicio**
+### Consultar la disponibilidad del servicio
 
 ```http
 GET /health HTTP/1.1
@@ -132,18 +132,18 @@ Host: localhost:3002
 Accept: application/json
 ```
 
-Respuesta propuesta:
+Respuesta del endpoint implementado:
 
 ```json
 {
   "status": "ok",
-  "service": "vintra-api"
+  "service": "vintra-backend"
 }
 ```
 
-Este contrato solo debe darse por implementado cuando exista el endpoint `/health` en el backend.
+El controlador [`HealthController`](../../backend/src/health.controller.ts) implementa este contrato y `GET /health/db`. Los demás recursos de la tabla siguen siendo una propuesta.
 
-### Registrar una posición de seguimiento**
+### Registrar una posición de seguimiento
 
 ```http
 POST /tracking
@@ -231,13 +231,13 @@ El registro de eventos deberá facilitar el diagnóstico de fallos y la trazabil
 
 ```bash
 cd backend
-npm install
+npm ci
 ```
 
 ### Ejecución en desarrollo
 
 ```bash
-npm run start:dev
+CORS_ORIGIN=http://localhost:5173 npm run start:dev
 ```
 
 ### Compilación
@@ -269,7 +269,7 @@ Para detener los servicios:
 docker compose down
 ```
 
-La configuración de la base de datos debe estar definida mediante las variables de entorno requeridas. No se deben subir archivos `.env` con credenciales reales al repositorio.
+Primero copia `.env.example` a `.env` en la raíz y prepara PostgreSQL según el [README raíz](../../README.md#ejecutar-la-prueba-de-conexión). Allí también se muestra el comando CORS equivalente para PowerShell. No se deben subir archivos `.env` con credenciales reales al repositorio.
 
 ## 9. Pendientes para cerrar la documentación
 

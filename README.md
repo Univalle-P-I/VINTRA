@@ -15,6 +15,7 @@
   </p>
 
   <p>
+    <a href="docs/README.md">Documentación</a> ·
     <a href="docs/arquitectura/README.md">Arquitectura</a> ·
     <a href="CONTRIBUTING.md">Cómo contribuir</a>
   </p>
@@ -105,7 +106,7 @@ El stack definido para esta prueba de integración es React + Vite en frontend, 
 
 ## Ejecutar la prueba de conexión
 
-Requisitos: Docker Compose, Node.js 22 o superior y npm.
+Requisitos: Docker Compose, Node.js 24.15 o superior y npm.
 
 ### Ejecutar todo con Docker Compose
 
@@ -132,6 +133,7 @@ En dos terminales, inicia API y frontend:
 ```powershell
 cd backend
 npm ci
+$env:CORS_ORIGIN = 'http://localhost:5173'
 npm run start:dev
 ```
 
@@ -143,6 +145,11 @@ npm run dev
 
 Abre `http://localhost:5173`. Para detener PostgreSQL ejecuta
 `docker compose down`; la base de datos conserva sus datos en el volumen.
+
+El ejemplo de `.env` configura el origen de Docker (`http://localhost:5174`).
+En desarrollo local, el comando anterior cambia `CORS_ORIGIN` solo para la
+terminal de la API, de modo que acepte el frontend de Vite en el puerto 5173.
+En Bash, usa `CORS_ORIGIN=http://localhost:5173 npm run start:dev`.
 
 ## Equipo
 
@@ -166,6 +173,7 @@ Estructura actual del repositorio:
 │   ├── backend/
 │   ├── base-de-datos/
 │   ├── frontend/
+│   ├── gestion-github/
 │   ├── infraestructura/
 │   ├── modelado/
 │   ├── scrum/
@@ -183,7 +191,7 @@ Estructura actual del repositorio:
 ## Flujo de trabajo
 
 - **Estrategia de ramas:** `main` → `develop` → `feat/` · `fix/` · `docs/`
-- **Workflows de CI:** `ci.yml` valida whitespace, Markdown y enlaces, y ejecuta los workflows reutilizables de backend y frontend.
+- **Workflows de CI:** `ci.yml` valida whitespace, Markdown y enlaces, y ejecuta los workflows reutilizables de backend y frontend en PR hacia `develop` y `main`.
 - **Plantillas de Issues y Pull Requests:** ver mas en  [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - **Despliegue:** VPS *(configuración pendiente)*
 Responsable: grupo GitHub-CI-CD-VPS, encargado de que el repositorio funcione como columna vertebral que integra a los demás equipos, no solo como un lugar donde guardar código.

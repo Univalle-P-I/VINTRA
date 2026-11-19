@@ -5,7 +5,7 @@
 ## Mapeo y decisiones
 
 | Historia | Resultado y fichas ejecutables | Prioridad | Decisión pendiente |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | HU1 | Acceso administrativo: roles/matriz [#70](https://github.com/Univalle-P-I/VINTRA/issues/70) → autenticación [#71](https://github.com/Univalle-P-I/VINTRA/issues/71). El login visual ya llegó en [PR #52](https://github.com/Univalle-P-I/VINTRA/pull/52); no equivale a autenticación real. | P1 | Confirmar actores y roles en #53/#70; #71 requiere stack, modelo y contrato (#54/#65/#66). |
 | HU2 | Registro/API [#72](https://github.com/Univalle-P-I/VINTRA/issues/72), listado [#73](https://github.com/Univalle-P-I/VINTRA/issues/73) y formulario [#74](https://github.com/Univalle-P-I/VINTRA/issues/74). | P0 | Confirmar campos y alcance CRUD (#53/#58). |
 | HU3 | Estado y disponibilidad de vehículos [#75](https://github.com/Univalle-P-I/VINTRA/issues/75); pruebas de integración [#86](https://github.com/Univalle-P-I/VINTRA/issues/86). Extiende el catálogo de HU2; no duplica su registro. | P0 | Validar estados y transiciones en #58. |

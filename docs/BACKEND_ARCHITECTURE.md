@@ -2,9 +2,9 @@
 
 ## Estado y alcance
 
-Este documento propone cómo organizar el backend para el MVP de coordinación de rutas de recolección. Se basa en `develop`, documentación del repositorio, las HUs 1–12, issues #53–#93 y tarjetas visibles del tablero. Las PR #47, #49 y #50 siguen abiertas al momento de este diseño: se consideran como cambios esperados una vez corregidas y fusionadas, no como código ya integrado.
+Este documento propone cómo organizar el backend para el MVP de coordinación de rutas de recolección. El diseño original se basó en documentación del repositorio, las HUs 1–12, issues #53–#93 y las propuestas de las PR #47, #49 y #50. Para ejecutar la versión actual, usa la [guía del backend](../backend/README.md).
 
-La aplicación actual de `develop` todavía contiene el backend .NET. La PR #47 propone sustituirlo por NestJS y PostgreSQL; NestJS es la decisión expresada por el equipo. La PR #47 configura TypeORM, mientras la documentación de la PR #49 menciona acceso directo con `pg`. El ORM debe resolverse en el issue #54 antes de fijar la implementación. Este diseño mantiene el acceso a datos detrás de repositorios para que la decisión no invada los módulos.
+La implementación actual de `develop` contiene NestJS y conecta PostgreSQL mediante TypeORM y su driver `pg`, según [`backend/src/app.module.ts`](../backend/src/app.module.ts). Las alternativas de acceso directo con `pg` y las decisiones formales de dominio siguen sujetas al issue #54. Este diseño mantiene el acceso a datos detrás de repositorios para que la decisión no invada los módulos.
 
 No se consideran implementadas las funciones solo descritas en planes. El MVP se centra en administración de usuarios/roles, vehículos, personal/cuadrillas/disponibilidad, rutas y asignación/seguimiento de operaciones cuando lo aprueben las HUs. GPS en vivo, ETA, mapa ciudadano, notificaciones, reportes avanzados y servicios externos requieren decisión y no se incluyen como alcance confirmado.
 
@@ -103,4 +103,4 @@ La hoja propone Argon2id para contraseñas y hashes SHA-256 de tokens de sesión
 
 ## Fuentes y límites
 
-Fuentes revisadas: `README.md`, `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/backend/README.md`, `docs/modelado/README.md`, `docs/SONARQUBE.md`, `docs/infraestructura/VPS.md`, PR #47/#49/#50, issues #53–#93 y tablero Trello (HUs, sprints, tarjetas de modelo, decisiones, skeleton y DevOps). Hay discrepancias entre estos materiales; los issues de validación anteriores son el criterio para resolverlas. No se pudo comprobar en ejecución el estado real del VPS ni la aceptación final de todas las HUs.
+Fuentes revisadas: `README.md`, `CONTRIBUTING.md`, `docs/arquitectura/README.md`, `docs/backend/README.md`, `docs/modelado/README.md`, `docs/SONARQUBE.md`, `docs/infraestructura/VPS.md`, PR #47/#49/#50, issues #53–#93 y tablero Trello (HUs, sprints, tarjetas de modelo, decisiones, skeleton y DevOps). Hay discrepancias entre estos materiales; los issues de validación anteriores son el criterio para resolverlas. No se pudo comprobar en ejecución el estado real del VPS ni la aceptación final de todas las HUs.
