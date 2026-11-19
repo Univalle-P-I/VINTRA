@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Barrio } from '../barrios/entities/barrios.entity';
@@ -84,6 +89,19 @@ export class MicrorutasService {
     id: string,
     dto: AsociarBarriosDto,
   ): Promise<MicrorutaDetalle> {
+    const idsBarrios = dto.barrios.map(({ barrioId }) => barrioId);
+    if (new Set(idsBarrios).size !== idsBarrios.length) {
+      throw new BadRequestException({
+        message: 'La solicitud contiene campos no válidos.',
+        details: [
+          {
+            field: 'barrios',
+            reason: 'No se puede repetir un barrio en la misma solicitud.',
+          },
+        ],
+      });
+    }
+
     const microruta = await this.microrutasRepository.findOne({
       where: { id },
     });
@@ -92,7 +110,6 @@ export class MicrorutasService {
       throw new NotFoundException('Microruta no encontrada.');
     }
 
-    const idsBarrios = [...new Set(dto.barrios.map(({ barrioId }) => barrioId))];
     const barrios = await this.barriosRepository.find({
       where: { id: In(idsBarrios) },
     });
@@ -100,6 +117,15 @@ export class MicrorutasService {
 
     if (idsBarrios.some((barrioId) => !barriosPorId.has(barrioId))) {
       throw new NotFoundException('Uno o más barrios no fueron encontrados.');
+    }
+
+    const barriosAsociados = await this.microrutaBarrioRepository.find({
+      where: { microruta: { id }, barrio: { id: In(idsBarrios) } },
+    });
+    if (barriosAsociados.length > 0) {
+      throw new ConflictException(
+        'Uno o más barrios ya están asociados a la microruta.',
+      );
     }
 
     const relaciones = dto.barrios.map(({ barrioId, ordenVisita }) => {

@@ -1,4 +1,8 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Barrio } from '../barrios/entities/barrios.entity';
@@ -133,14 +137,43 @@ describe('MicrorutasService', () => {
     expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
   });
 
+  it('rechaza barrios repetidos sin consultar barrios ni guardar', async () => {
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [
+          { barrioId: 'barrio-id', ordenVisita: 1 },
+          { barrioId: 'barrio-id', ordenVisita: 2 },
+        ],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(repositorioBarrios.find).not.toHaveBeenCalled();
+    expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
+  });
+
+  it('rechaza barrios ya asociados sin guardar', async () => {
+    repositorioMicrorutas.findOne.mockResolvedValue({ id: 'micro-id' });
+    repositorioBarrios.find.mockResolvedValue([{ id: 'barrio-id' }]);
+    repositorioMicrorutaBarrios.find.mockResolvedValueOnce([
+      { barrio: { id: 'barrio-id' }, ordenVisita: 1 },
+    ]);
+
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [{ barrioId: 'barrio-id', ordenVisita: 1 }],
+      }),
+    ).rejects.toBeInstanceOf(ConflictException);
+    expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
+  });
+
   it('guarda las asociaciones válidas y devuelve el detalle', async () => {
     const microruta = { id: 'micro-id' } as Microruta;
     const barrio = { id: 'barrio-id' } as Barrio;
     repositorioMicrorutas.findOne.mockResolvedValue(microruta);
     repositorioBarrios.find.mockResolvedValue([barrio]);
-    repositorioMicrorutaBarrios.find.mockResolvedValue([
-      { barrio, ordenVisita: 1 },
-    ]);
+    repositorioMicrorutaBarrios.find
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ barrio, ordenVisita: 1 }]);
 
     const detalle = await servicio.asociarBarrios('micro-id', {
       barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],

@@ -73,7 +73,7 @@ publica en `/api/docs`.
 | `POST /microrutas` | Crea una microruta; exige una macroruta existente | 201, 400, 404 |
 | `GET /microrutas` | Lista microrutas | 200 |
 | `GET /microrutas/:id` | Detalle con macroruta y barrios ordenados por `ordenVisita` | 200, 404 |
-| `POST /microrutas/:id/barrios` | Asocia barrios a una microruta y devuelve el detalle | 201, 400, 404 |
+| `POST /microrutas/:id/barrios` | Asocia barrios a una microruta y devuelve el detalle | 201, 400, 404, 409 |
 | `GET /barrios` | Lista barrios (solo lectura) | 200 |
 | `GET /barrios/:id` | Detalle de un barrio | 200, 404 |
 
@@ -83,6 +83,8 @@ Reglas de negocio:
   y no se guarda nada.
 - Al asociar barrios, deben existir la microruta y todos los barrios; si falta
   alguno, responde `404` y no se guarda nada.
+- Un barrio repetido en la solicitud responde `400`, y uno ya asociado responde
+  `409`; en ambos casos no se guarda nada.
 - Las entradas se validan con DTO: se rechazan propiedades desconocidas (por
   ejemplo, `geom`) y valores inválidos con `400`.
 - Los errores usan el formato `statusCode`, `code`, `message`, `details` y
@@ -111,7 +113,7 @@ npm test -- --runInBand
 - Aprobar PR #115 y ajustar entidades (nombres, unicidades, tipos).
 - Migraciones y semillas, a la espera del esquema aprobado (#115).
 - Prueba de integración contra PostgreSQL cuando exista el esquema.
-- Unicidad de barrio por microruta: hoy `asociarBarrios` no evita duplicados.
+- Restricción única en BD para (microruta, barrio): hoy la unicidad solo se valida en el servicio.
 - Decidir PostGIS y geometrías (#54); `geom` no se acepta ni se guarda.
 - Formato definitivo de errores y paginación (#66).
 - Horarios (`schedule`, `microroute_schedule`) quedan fuera de este alcance.
