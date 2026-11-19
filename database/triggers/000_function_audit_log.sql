@@ -45,7 +45,7 @@ BEGIN
     IF TG_TABLE_NAME = 'user_account' THEN
         v_old := v_old - 'pwd_hash' - 'document_id';
         v_new := v_new - 'pwd_hash' - 'document_id';
-    ELSIF TG_TABLE_NAME IN ('session', 'password_reset_token', 'email_validation_token') THEN
+    ELSIF TG_TABLE_NAME IN ('session', 'password_reset_token', 'email_verification_token') THEN
         v_old := v_old - 'token_hash';
         v_new := v_new - 'token_hash';
     END IF;
