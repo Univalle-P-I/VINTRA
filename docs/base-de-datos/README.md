@@ -43,9 +43,9 @@ En esta guía se expone la documentación de la base de datos de VINTRA, su arqu
 
 ## Estado
 
-- Estado: `En revisión`
+- Estado: `Completado`
 - Responsable: Ricardo Farid Cuero
-- Ultima fecha de modificación: **15/11/2026**
+- Ultima fecha de modificación: **19/11/2026**
 
 ---
 
@@ -57,7 +57,7 @@ El motor de la base de datos es ![PostgreSQL Badge](https://img.shields.io/badge
 
 ### 2.1. Diagrama Entidad-Relación
 
-El der cuenta con `38 tablas`: 19 del modelo de datos y las 19 restantes tablas de auditoría (`*_log`, ver [sección 4](#4-auditoría-y-trazabilidad)). No se incluye la tabla de sistema `spatial_ref_sys` que instala PostGIS. Las características y restricciones de cada atributo están en el [diccionario de datos](#24-diccionario-de-datos); las reglas de cada relación, en la [sección 2.3](#23-relaciones-y-reglas).
+El der cuenta con `36 tablas`: 18 del modelo de datos y las 18 restantes tablas de auditoría (`*_log`, ver [sección 4](#4-auditoría-y-trazabilidad)). No se incluye la tabla de sistema `spatial_ref_sys` que instala PostGIS. Las características y restricciones de cada atributo están en el [diccionario de datos](#24-diccionario-de-datos); las reglas de cada relación, en la [sección 2.3](#23-relaciones-y-reglas).
 
 > Aclaración: cada tabla `*_log` tiene una FK hacia su entidad (objeto modificado) y una segunda FK hacia `user_account(id)` (actor que realiza la modificación). Todas comparten la misma estructura y se llenan automáticamente mediante triggers.
 
@@ -662,7 +662,7 @@ Se ejecutan después de las migraciones `000` a `039` y de los seeders. Como se 
 | 019 | `019_trigger_vehicle_position.sql` | `vehicle_position` |
 | 100 | `100_function_updated_at.sql` | — (función `fn_set_updated_at()` y triggers `trg_<tabla>_updated_at`) |
 
-Los triggers `001` a `019` son de auditoría; el archivo `100` instala los triggers `BEFORE UPDATE` de `updated_at` ([sección 4.4](#44-trigger-de-updated_at)).
+Los triggers `001` a `018` son de auditoría; el archivo `100` instala los triggers `BEFORE UPDATE` de `updated_at` ([sección 4.4](#44-trigger-de-updated_at)).
 
 ### 3.3. Reglas de Migraciones y Seeders
 
@@ -683,7 +683,7 @@ El modelo registra cada cambio en las entidades auditadas mediante triggers. Est
 
 ### 4.1. Alcance
 
-- Hay **19 triggers de auditoría**, uno por entidad auditada, y una función compartida `fn_audit_log()` que escribe en la tabla `<tabla>_log` correspondiente.
+- Hay **18 triggers de auditoría**, uno por entidad auditada, y una función compartida `fn_audit_log()` que escribe en la tabla `<tabla>_log` correspondiente.
 - Se disparan con `AFTER INSERT OR UPDATE OR DELETE`.
 - Todas las tablas `*_log` comparten la misma estructura: `id` (PK), `entity_id` (FK hacia la entidad auditada), `actor_id` (FK hacia `user_account`), `action` (`audit_action`), `old` y `new` (JSONB), `request_ip` (INET) y `created_at` (TIMESTAMPTZ). Tienen índices por `entity_id`, `actor_id` y `created_at`.
 - Cada `*_log` guarda `entity_id` (FK hacia la tabla auditada) y `actor_id` (FK hacia `user_account`), por lo que no se puede borrar de manera física una fila auditada (ver [4.3](#43-borrado-lógico)).
@@ -710,13 +710,12 @@ SELECT set_config('app.request_ip', '<ip_del_cliente>', true);
 ```
 
 - Si una variable tiene un valor que no es un UUID o una IP válidos, el trigger falla y la operación original también.
-- La rama `DELETE` existe en la función, pero el `DELETE` físico no es viable mientras `*_log.entity_id` tenga una FK hacia la entidad auditada. Para habilitarlo habría que eliminar o hacer diferible esa FK; el borrado operativo es el lógico.
 
 ### 4.3. Borrado Lógico
 
 El borrado operativo es lógico (`is_active = FALSE`) y se audita como `SOFT_DELETE`; la reactivación se audita como `RESTORE`. Todas las entidades cuentan operativamente con el atributo `is_active`.
 
-No se debería ejecutar `DELETE` físico directamente sobre entidades con historial de auditoría. Además de la pérdida de trazabilidad, la FK de `*_log.entity_id` lo impide.
+No se debería ejecutar `DELETE` físico directamente sobre entidades con historial de auditoría.
 
 ### 4.4. Trigger de `updated_at`
 
@@ -853,7 +852,7 @@ El respaldo ya incluye la creación de las extensiones `postgis` y `pgcrypto`, p
 
 Validación posterior:
 
-- Existen las 38 tablas de aplicación (19 entidades + 19 `*_log`), con sus `PK`, `FK`, `UNIQUE` y `CHECK`; `spatial_ref_sys` es la tabla de sistema de PostGIS.
+- Existen las 36 tablas de aplicación (18 entidades + 18 `*_log`), con sus `PK`, `FK`, `UNIQUE` y `CHECK`; `spatial_ref_sys` es la tabla de sistema de PostGIS.
 - Existen los [índices GIST](#34-índices-mínimos) sobre las columnas `geom`.
 - El catálogo `vehicle_type` tiene su `code` estable; los estados y roles se validan con tipos ENUM.
 - Las geometrías son válidas (`ST_IsValid`).
