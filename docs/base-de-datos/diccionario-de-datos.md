@@ -11,7 +11,7 @@ Documentación de las 36 tablas: 18 entidades del modelo y 18 tablas de auditor�
   - [profile](#profile)
   - [session](#session)
   - [password\_reset\_token](#password_reset_token)
-  - [email\_validation\_token](#email_validation_token)
+  - [email\_verification\_token](#email_verification_token)
   - [vehicle\_type](#vehicle_type)
   - [vehicle](#vehicle)
   - [macroroute](#macroroute)
@@ -36,7 +36,7 @@ Documentación de las 36 tablas: 18 entidades del modelo y 18 tablas de auditor�
   - [vehicle\_log](#vehicle_log)
   - [session\_log](#session_log)
   - [password\_reset\_token\_log](#password_reset_token_log)
-  - [email\_validation\_token\_log](#email_validation_token_log)
+  - [email\_verification\_token\_log](#email_verification_token_log)
   - [vehicle\_type\_log](#vehicle_type_log)
   - [btura\_neighborhood\_log](#btura_neighborhood_log)
   - [schedule\_log](#schedule_log)
@@ -135,20 +135,20 @@ tokens de un solo uso para restablecer la contraseña
 
 - user_account_id referencia user_account(id): una cuenta puede tener muchas solicitudes; cada token pertenece a una sola cuenta.
 
-## email_validation_token
+## email_verification_token
 
 tokens de un solo uso para validar el correo electrónico
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único de la solicitud de validación de correo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | email_validation_token_pkey (id) |
-| user_account_id | Cuenta de usuario de quien solicitó la validación del correo. | UUID | N/A | SI | NO | FK | FK user_account(id); ON DELETE CASCADE | idx_email_validation_token_user_account_id (user_account_id) |
+| id | Identificador único de la solicitud de validación de correo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | email_verification_token_pkey (id) |
+| user_account_id | Cuenta de usuario de quien solicitó la validación del correo. | UUID | N/A | SI | NO | FK | FK user_account(id); ON DELETE CASCADE | idx_email_verification_token_user_account_id (user_account_id) |
 | email | Correo electrónico que se está verificando. | VARCHAR | 254 | SI | NO | N/A | — | — |
-| token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI | N/A | UNIQUE (token_hash) via uq_email_validation_token_hash | uq_email_validation_token_hash (token_hash) |
+| token_hash | Hash SHA-256 (hexadecimal) del token enviado al usuario. El token en claro nunca se almacena. | CHAR | 64 | SI | SI | N/A | UNIQUE (token_hash) via uq_email_verification_token_hash | uq_email_verification_token_hash (token_hash) |
 | request_ip | Dirección IP desde la que se hizo la solicitud. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | is_active | Indica si el token_hash está disponible (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | used_at | Fecha y hora en que se usó el token. NULL mientras no se haya usado (un solo uso). | TIMESTAMPTZ | N/A | NO | NO | N/A | NULL permitido | — |
-| expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_email_validation_token_expires_at (expires_at) |
+| expires_at | Fecha y hora de vencimiento del token (vida corta). | TIMESTAMPTZ | N/A | SI | NO | N/A | CHECK (expires_at > created_at) | idx_email_verification_token_expires_at (expires_at) |
 | created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | — |
 
 - user_account_id referencia user_account(id): una cuenta de usuario puede tener muchas solicitudes de validación; cada token pertenece a un solo registro de cuenta de usuario.
@@ -576,23 +576,23 @@ auditoría de cambios en password_reset_token
 - entity_id referencia password_reset_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
-## email_validation_token_log
+## email_verification_token_log
 
-auditoría de cambios en email_validation_token
+auditoría de cambios en email_verification_token
 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| id | Identificador único del evento de auditoría sobre un token de validación de correo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | email_validation_token_log_pkey (id) |
-| entity_id | Identificador del registro de un token de validación de correo afectado. | UUID | N/A | NO | NO | FK | FK email_validation_token(id); ON DELETE SET NULL | idx_email_validation_token_log_entity_id (entity_id) |
-| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id); ON DELETE SET NULL | idx_email_validation_token_log_actor_id(actor_id) |
+| id | Identificador único del evento de auditoría sobre un token de validación de correo. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | email_verification_token_log_pkey (id) |
+| entity_id | Identificador del registro de un token de validación de correo afectado. | UUID | N/A | NO | NO | FK | FK email_verification_token(id); ON DELETE SET NULL | idx_email_verification_token_log_entity_id (entity_id) |
+| actor_id | Quién realizó la acción: identificador de la cuenta de usuario o indicador de proceso automático. se guarda como UUID, si actor fue usuario. Vacio: si fue proceso automático. | UUID | N/A | NO | NO | FK | FK user_account(id); ON DELETE SET NULL | idx_email_verification_token_log_actor_id(actor_id) |
 | action | Acción registrada: CREATE, UPDATE, SOFT_DELETE, DELETE o RESTORE. | ENUM | N/A | SI | NO | N/A | ENUM: CREATE, UPDATE, SOFT_DELETE, DELETE, RESTORE | — |
 | old | Valores anteriores al cambio en formato JSON. NULL en CREATE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | new | Valores actuales al cambio en formato JSON. NULL en DELETE físico; en SOFT_DELETE conserva el registro con is_active = FALSE y en RESTORE con is_active = TRUE. No debe contener contraseñas ni hashes. | JSONB | N/A | NO | NO | N/A | NULL permitido | — |
 | request_ip | Dirección IP desde la que se originó la acción. | INET | N/A | NO | NO | N/A | NULL permitido | — |
 | is_active | Indica si la auditoría está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
-| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_email_validation_token_log_created_at (created_at) |
+| created_at | Fecha y hora de creación del registro (UTC). Por defecto now(). | TIMESTAMPTZ | N/A | SI | NO | N/A | DEFAULT now() | idx_email_verification_token_log_created_at (created_at) |
 
-- entity_id referencia email_validation_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
+- entity_id referencia email_verification_token(id): una entidad puede tener muchos registros de auditoría; cada registro pertenece a una sola entidad.
 - actor_id referencia user_account(id): un actor puede tener muchos registros de auditoría; cada registro pertenece a un solo actor.
 
 ## vehicle_type_log

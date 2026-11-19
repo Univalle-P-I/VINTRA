@@ -116,7 +116,7 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
-    email_validation_token {
+    email_verification_token {
         UUID id
         UUID user_account_id
         VARCHAR email
@@ -391,7 +391,7 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
-    email_validation_token_log {
+    email_verification_token_log {
         UUID id
         UUID entity_id
         UUID actor_id
@@ -478,7 +478,7 @@ erDiagram
     user_account ||--o{ profile : "tiene"
     user_account ||--o{ session : "abre"
     user_account ||--o{ password_reset_token : "genera"
-    user_account ||--o{ email_validation_token : "genera"
+    user_account ||--o{ email_verification_token : "genera"
     user_account ||--o{ driver : "pertenece"
     crew ||--o{ driver : "tiene"
     crew ||--o{ crew_member : "tiene"
@@ -496,7 +496,7 @@ erDiagram
     profile ||--o{ profile_log : "genera"
     session ||--o{ session_log : "genera"
     password_reset_token ||--o{ password_reset_token_log : "genera"
-    email_validation_token ||--o{ email_validation_token_log : "genera"
+    email_verification_token ||--o{ email_verification_token_log : "genera"
     vehicle_type ||--o{ vehicle_type_log : "genera"
     vehicle ||--o{ vehicle_log : "genera"
     macroroute ||--o{ macroroute_log : "genera"
@@ -528,7 +528,7 @@ erDiagram
 | Recorridos | `assignment` | Conductor, programación de microruta y vehículo |
 | Seguimiento en tiempo real | `vehicle_position` | Puntos GPS de una asignación |
 | Auditoría | `*_log` | Ver [sección 4](#4-auditoría-y-trazabilidad) |
-| Autenticación | `session`, `password_reset_token`, `email_validation_token` | Solo se almacenan hashes de los tokens (ver [sección 7.2](#72-reglas-de-tratamiento)) |
+| Autenticación | `session`, `password_reset_token`, `email_verification_token` | Solo se almacenan hashes de los tokens (ver [sección 7.2](#72-reglas-de-tratamiento)) |
 
 ### 2.3. Relaciones y Reglas
 
@@ -539,7 +539,7 @@ La cardinalidad de todas las relaciones se lee directamente en el [DER](#21-diag
 | `user_account` → `profile` | 1 a N | El par (`user_account_id`, `user_role`) es único |
 | `user_account` → `session` | 1 a N | Sesión revocable y con vencimiento |
 | `user_account` → `password_reset_token` | 1 a N | Token de un solo uso |
-| `user_account` → `email_validation_token` | 1 a N | Token de validación del correo |
+| `user_account` → `email_verification_token` | 1 a N | Token de validación del correo |
 | `user_account` → `driver` | 1 a N | Un conductor corresponde a unos datos personales |
 | `microroute_schedule` → `assignment` | 1 a N | Una programación de microruta se asigna a varias ejecuciones |
 | `schedule` → `microroute_schedule` | 1 a N | Un horario se reutiliza en varias microrrutas |
@@ -860,7 +860,7 @@ Validación posterior:
 Después de restaurar en producción:
 
 - Revocar las sesiones existentes (`session.revoked_at`).
-- Invalidar los tokens pendientes de `password_reset_token` y `email_validation_token` (`used_at`).
+- Invalidar los tokens pendientes de `password_reset_token` y `email_verification_token` (`used_at`).
 
 Se recomienda una restauración de prueba mensual en un ambiente aislado.
 
@@ -872,9 +872,9 @@ Define cómo se tratan los datos sensibles identificados en el [diccionario de d
 
 | Clasificación | Datos |
 | --- | --- |
-| Secreto (nunca se expone ni se registra) | `user_account.pwd_hash`, `session.token_hash`, `password_reset_token.token_hash`, `email_validation_token.token_hash` |
-| Personal | `user_account.document_id`, `user_account.first_name`, `user_account.last_name`, `user_account.email`, `user_account.phone`, `crew_member.full_name`, `email_validation_token.email`, `*_log.old` y `*_log.new` |
-| Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_validation_token`, `*_log`), `*_log.actor_id`, `vehicle_position` (`geom`, `recorded_at`) |
+| Secreto (nunca se expone ni se registra) | `user_account.pwd_hash`, `session.token_hash`, `password_reset_token.token_hash`, `email_verification_token.token_hash` |
+| Personal | `user_account.document_id`, `user_account.first_name`, `user_account.last_name`, `user_account.email`, `user_account.phone`, `crew_member.full_name`, `email_verification_token.email`, `*_log.old` y `*_log.new` |
+| Rastreo de actividad | `request_ip` (`session`, `password_reset_token`, `email_verification_token`, `*_log`), `*_log.actor_id`, `vehicle_position` (`geom`, `recorded_at`) |
 
 ### 7.2. Reglas de Tratamiento
 
@@ -893,7 +893,7 @@ Define cómo se tratan los datos sensibles identificados en el [diccionario de d
 | Tabla | Política propuesta |
 | --- | --- |
 | `session` | Eliminar las vencidas o revocadas con más de 30 días |
-| `password_reset_token`, `email_validation_token` | Eliminar las usadas o vencidas con más de 30 días |
+| `password_reset_token`, `email_verification_token` | Eliminar las usadas o vencidas con más de 30 días |
 | `vehicle_position` | Definir un periodo de conservación (es la tabla de mayor crecimiento) |
 | Cuentas dadas de baja | Deshabilitar con `user_account.is_active = FALSE` (estado operativo prioritario); `user_status` conserva el estado administrativo. |
 | Tablas `*_log` | Definir un periodo de retención de auditoría; no eliminar sin aprobación |
