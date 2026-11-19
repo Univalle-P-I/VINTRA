@@ -12,7 +12,6 @@ import { Profile } from "../profiles/entities/profile.entity";
 @Injectable()
 export class UserService {
      constructor(
-
       @InjectRepository(UserAccount)
       private readonly userAccountRepo: Repository<UserAccount>,
       @InjectRepository(Profile)
