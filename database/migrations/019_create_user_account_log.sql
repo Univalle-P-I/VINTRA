@@ -10,7 +10,7 @@ $$;
 
 CREATE TABLE user_account_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    entity_id UUID NOT NULL,
+    entity_id UUID,
     actor_id UUID,
     action audit_action NOT NULL,
     old JSONB,
@@ -18,8 +18,8 @@ CREATE TABLE user_account_log (
     request_ip INET,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT fk_user_account_log_user_account FOREIGN KEY (entity_id) REFERENCES user_account (id) ON DELETE CASCADE,
-    CONSTRAINT fk_user_account_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE CASCADE
+    CONSTRAINT fk_user_account_log_user_account FOREIGN KEY (entity_id) REFERENCES user_account (id) ON DELETE SET NULL,
+    CONSTRAINT fk_user_account_log_actor FOREIGN KEY (actor_id) REFERENCES user_account (id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_user_account_log_entity_id ON user_account_log (entity_id);
