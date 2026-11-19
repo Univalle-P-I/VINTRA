@@ -190,6 +190,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Reglas de negocio:**
 
 - Sin filtros, se devuelven solo los vehículos activos.
+- El filtro isActive=false solo está permitido para ADMIN y OPERATIONS_MANAGER; si lo solicita DRIVER responde 403 Forbidden.
 - Los resultados se ordenan por placa ascendente.
 - Se incluye la información del tipo de vehículo asociado.
 - Un valor inválido en cualquier parámetro devuelve `400 Bad Request`.

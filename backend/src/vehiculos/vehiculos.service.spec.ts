@@ -1,10 +1,11 @@
 import type { EntityManager, Repository } from 'typeorm';
 
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
+import { Perfil, RolUsuario } from '../perfiles/entidades/perfil.entity';
 import { TipoVehiculo } from './entidades/tipo-vehiculo.entity';
 import { EstadoVehiculo, Vehiculo } from './entidades/vehiculo.entity';
 import { VehiculosService } from './vehiculos.service';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 
 describe('VehiculosService', () => {
   describe('listarTipos', () => {
@@ -605,24 +606,40 @@ describe('VehiculosService', () => {
       });
     });
 
-    it('aplica filtros y paginación cuando se proporcionan', async () => {
+    it('aplica filtros y paginación cuando se proporcionan para roles autorizados', async () => {
       const vehiculoRepository = {
         find: jest.fn().mockResolvedValue([]),
+      };
+      const perfilRepository = {
+        find: jest
+          .fn()
+          .mockResolvedValue([{ rol: RolUsuario.OPERATIONS_MANAGER, activo: true }]),
       };
 
       const service = new VehiculosService(
         {} as Repository<TipoVehiculo>,
         vehiculoRepository as unknown as Repository<Vehiculo>,
         {} as ContextoAuditoriaService,
+        perfilRepository as unknown as Repository<Perfil>,
       );
 
-      await service.listar({
-        vehicleTypeId: 'type-id',
-        vehicleStatus: EstadoVehiculo.MANTENIMIENTO,
-        plate: 'ABC123',
-        isActive: false,
-        page: 2,
-        limit: 10,
+      await service.listar(
+        {
+          vehicleTypeId: 'type-id',
+          vehicleStatus: EstadoVehiculo.MANTENIMIENTO,
+          plate: 'ABC123',
+          isActive: false,
+          page: 2,
+          limit: 10,
+        },
+        ACTOR_ID,
+      );
+
+      expect(perfilRepository.find).toHaveBeenCalledWith({
+        where: {
+          cuentaUsuario: { id: ACTOR_ID },
+          activo: true,
+        },
       });
 
       expect(vehiculoRepository.find).toHaveBeenCalledWith({
@@ -637,6 +654,34 @@ describe('VehiculosService', () => {
         take: 10,
         skip: 10,
       });
+    });
+
+    it('rechaza con ForbiddenException cuando DRIVER solicita isActive=false', async () => {
+      const vehiculoRepository = {
+        find: jest.fn(),
+      };
+      const perfilRepository = {
+        find: jest
+          .fn()
+          .mockResolvedValue([{ rol: RolUsuario.DRIVER, activo: true }]),
+      };
+
+      const service = new VehiculosService(
+        {} as Repository<TipoVehiculo>,
+        vehiculoRepository as unknown as Repository<Vehiculo>,
+        {} as ContextoAuditoriaService,
+        perfilRepository as unknown as Repository<Perfil>,
+      );
+
+      await expect(
+        service.listar({ isActive: false }, ACTOR_ID),
+      ).rejects.toThrow(
+        new ForbiddenException(
+          'No tiene permisos para consultar vehículos inactivos.',
+        ),
+      );
+
+      expect(vehiculoRepository.find).not.toHaveBeenCalled();
     });
   });
 

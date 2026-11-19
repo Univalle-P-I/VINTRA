@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TipoVehiculo } from './entidades/tipo-vehiculo.entity';
+import { Perfil } from '../perfiles/entidades/perfil.entity';
 import { Vehiculo } from './entidades/vehiculo.entity';
 import { AutenticacionModule } from '../autenticacion/autenticacion.module';
 import { VehiculosController } from './vehiculos.controller';
@@ -13,6 +14,7 @@ import { VehiculosService } from './vehiculos.service';
     TypeOrmModule.forFeature([
       TipoVehiculo,
       Vehiculo,
+      Perfil,
     ]),
     AutenticacionModule,
   ],

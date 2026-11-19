@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import type { FindOptionsWhere, Repository } from 'typeorm';
 
 import { ContextoAuditoriaService } from '../comun/contexto-auditoria.service';
+import { Perfil, RolUsuario } from '../perfiles/entidades/perfil.entity';
 import { ActualizarTipoVehiculoDto } from './dto/actualizar-tipo-vehiculo.dto';
 import { ActualizarVehiculoDto } from './dto/actualizar-vehiculo.dto';
 import { ConsultarVehiculosDto } from './dto/consultar-vehiculos.dto';
@@ -23,6 +25,8 @@ export class VehiculosService {
     @InjectRepository(Vehiculo)
     private readonly vehiculoRepository: Repository<Vehiculo>,
     private readonly contextoAuditoria: ContextoAuditoriaService,
+    @InjectRepository(Perfil)
+    private readonly perfilRepository?: Repository<Perfil>,
   ) {}
 
   listarTipos(): Promise<TipoVehiculo[]> {
@@ -86,9 +90,16 @@ export class VehiculosService {
     }
   }
 
-  listar(filtros: ConsultarVehiculosDto = {}): Promise<Vehiculo[]> {
+  async listar(
+    filtros: ConsultarVehiculosDto = {},
+    actorId?: string,
+  ): Promise<Vehiculo[]> {
     const { vehicleTypeId, vehicleStatus, plate, isActive, page, limit } =
       filtros;
+
+    if (isActive === false) {
+      await this.validarAccesoVehiculosInactivos(actorId);
+    }
 
     const where: FindOptionsWhere<Vehiculo> = { activo: isActive ?? true };
     if (vehicleTypeId) where.tipoVehiculo = { id: vehicleTypeId };
@@ -101,6 +112,34 @@ export class VehiculosService {
       order: { placa: 'ASC' },
       ...(limit ? { take: limit, skip: ((page ?? 1) - 1) * limit } : {}),
     });
+  }
+
+  private async validarAccesoVehiculosInactivos(
+    actorId?: string,
+  ): Promise<void> {
+    if (!actorId || !this.perfilRepository) {
+      throw new ForbiddenException(
+        'No tiene permisos para consultar vehículos inactivos.',
+      );
+    }
+
+    const perfiles = await this.perfilRepository.find({
+      where: {
+        cuentaUsuario: { id: actorId },
+        activo: true,
+      },
+    });
+
+    const rolesPermitidos = new Set<RolUsuario>([
+      RolUsuario.ADMIN,
+      RolUsuario.OPERATIONS_MANAGER,
+    ]);
+
+    if (!perfiles.some((perfil) => rolesPermitidos.has(perfil.rol))) {
+      throw new ForbiddenException(
+        'No tiene permisos para consultar vehículos inactivos.',
+      );
+    }
   }
 
   async obtener(id: string): Promise<Vehiculo> {

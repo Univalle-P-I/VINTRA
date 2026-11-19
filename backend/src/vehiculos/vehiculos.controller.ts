@@ -103,8 +103,11 @@ export class VehiculosController {
     roles: [RolUsuario.ADMIN, RolUsuario.OPERATIONS_MANAGER, RolUsuario.DRIVER],
     errors: [400],
   })
-  listar(@Query() filtros: ConsultarVehiculosDto) {
-    return this.vehiculosService.listar(filtros);
+  listar(
+    @Query() filtros: ConsultarVehiculosDto,
+    @UsuarioAutenticado() actor: AuthenticatedUser,
+  ) {
+    return this.vehiculosService.listar(filtros, actor.userId);
   }
 
   @Get('vehicles/:id')
