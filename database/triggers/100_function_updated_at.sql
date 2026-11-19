@@ -15,11 +15,6 @@ BEFORE UPDATE ON user_account
 FOR EACH ROW
 EXECUTE FUNCTION fn_set_updated_at();
 
-CREATE OR REPLACE TRIGGER trg_user_data_updated_at
-BEFORE UPDATE ON user_data
-FOR EACH ROW
-EXECUTE FUNCTION fn_set_updated_at();
-
 CREATE OR REPLACE TRIGGER trg_vehicle_updated_at
 BEFORE UPDATE ON vehicle
 FOR EACH ROW
