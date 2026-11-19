@@ -59,7 +59,7 @@ El motor de la base de datos es ![PostgreSQL Badge](https://img.shields.io/badge
 
 El der cuenta con `36 tablas`: 18 del modelo de datos y las 18 restantes tablas de auditoría (`*_log`, ver [sección 4](#4-auditoría-y-trazabilidad)). No se incluye la tabla de sistema `spatial_ref_sys` que instala PostGIS. Las características y restricciones de cada atributo están en el [diccionario de datos](#24-diccionario-de-datos); las reglas de cada relación, en la [sección 2.3](#23-relaciones-y-reglas).
 
-> Aclaración: cada tabla `*_log` tiene una FK hacia su entidad (objeto modificado) y una segunda FK hacia `user_account(id)` (actor que realiza la modificación). Todas comparten la misma estructura y se llenan automáticamente mediante triggers.
+> Aclaración: cada tabla `*_log` tiene una FK hacia su **entidad** (entidad modificada) y una segunda FK hacia **user_account(id)** (actor que realiza la modificación). Todas comparten la misma estructura y se llenan automáticamente mediante triggers.
 
 ```mermaid
 %%{init: {'theme': 'forest'}}%%
@@ -588,41 +588,45 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 | --- | --- | --- |
 | 000 | `000_create_extensions.sql` | PostgreSQL 16 |
 | 001 | `001_create_user_account.sql` | — |
-| 003 | `003_create_profile.sql` | `user_account` |
-| 004 | `004_create_session.sql` | `user_account` |
-| 005 | `005_create_password_reset_token.sql` | `user_account` |
-| 006 | `006_create_email_validation_token.sql` | `user_account` |
-| 007 | `007_create_vehicle_type.sql` | — |
-| 008 | `008_create_vehicle.sql` | `vehicle_type` |
-| 009 | `009_create_macroroute.sql` | PostGIS 3.6 |
-| 010 | `010_create_microroute.sql` | `macroroute` |
-| 011 | `011_create_btura_neighborhood.sql` | PostGIS 3.6 |
-| 012 | `012_create_schedule.sql` | — |
-| 013 | `013_create_microroute_schedule.sql` | `microroute`, `schedule` |
-| 014 | `014_create_microroute_neighborhood.sql` | `microroute`, `btura_neighborhood` |
-| 015 | `015_create_crew.sql` | — |
-| 016 | `016_create_crew_member.sql` | `crew` |
-| 017 | `017_create_driver.sql` | `user_account`, `crew` |
-| 018 | `018_create_assignment.sql` | `driver`, `microroute_schedule`, `vehicle` |
-| 019 | `019_create_vehicle_position.sql` | `assignment`, PostGIS 3.6 |
-| 020 | `020_create_user_account_log.sql` | `user_account` (doble relación, ver [diccionario](diccionario-de-datos.md)) |
-| 022 | `022_create_profile_log.sql` | `profile`, `user_account` |
-| 023 | `023_create_crew_log.sql` | `crew`, `user_account` |
-| 024 | `024_create_crew_member_log.sql` | `crew_member`, `user_account` |
-| 025 | `025_create_driver_log.sql` | `driver`, `user_account` |
-| 026 | `026_create_macroroute_log.sql` | `macroroute`, `user_account` |
-| 027 | `027_create_microroute_log.sql` | `microroute`, `user_account` |
-| 028 | `028_create_assignment_log.sql` | `assignment`, `user_account` |
-| 029 | `029_create_vehicle_log.sql` | `vehicle`, `user_account` |
-| 031 | `031_create_session_log.sql` | `session`, `user_account` |
-| 032 | `032_create_password_reset_token_log.sql` | `password_reset_token`, `user_account` |
-| 033 | `033_create_email_validation_token_log.sql` | `email_validation_token`, `user_account` |
-| 034 | `034_create_vehicle_type_log.sql` | `vehicle_type`, `user_account` |
-| 035 | `035_create_btura_neighborhood_log.sql` | `btura_neighborhood`, `user_account` |
-| 036 | `036_create_schedule_log.sql` | `schedule`, `user_account` |
-| 037 | `037_create_microroute_schedule_log.sql` | `microroute_schedule`, `user_account` |
-| 038 | `038_create_microroute_neighborhood_log.sql` | `microroute_neighborhood`, `user_account` |
-| 039 | `039_create_vehicle_position_log.sql` | `vehicle_position`, `user_account` |
+| 002 | `002_create_profile.sql` | `user_account` |
+| 003 | `003_create_session.sql` | `user_account` |
+| 004 | `004_create_password_reset_token.sql` | `user_account` |
+| 005 | `005_create_email_verification_token.sql` | `user_account` |
+| 006 | `006_create_vehicle_type.sql` | — |
+| 007 | `007_create_vehicle.sql` | `vehicle_type` |
+| 008 | `008_create_macroroute.sql` | PostGIS 3.6 |
+| 009 | `009_create_microroute.sql` | `macroroute` |
+| 010 | `010_create_btura_neighborhood.sql` | PostGIS 3.6 |
+| 011 | `011_create_schedule.sql` | — |
+| 012 | `012_create_microroute_schedule.sql` | `microroute`, `schedule` |
+| 013 | `013_create_microroute_neighborhood.sql` | `microroute`, `btura_neighborhood` |
+| 014 | `014_create_crew.sql` | — |
+| 015 | `015_create_crew_member.sql` | `crew` |
+| 016 | `016_create_driver.sql` | `user_account`, `crew` |
+| 017 | `017_create_assignment.sql` | `driver`, `microroute_schedule`, `vehicle` |
+| 018 | `018_create_vehicle_position.sql` | `assignment`, PostGIS 3.6 |
+| 019 | `019_create_user_account_log.sql` | `user_account` (doble relación, ver [diccionario](diccionario-de-datos.md)) |
+| 020 | `020_create_profile_log.sql` | `profile`, `user_account` |
+| 021 | `021_create_crew_log.sql` | `crew`, `user_account` |
+| 022 | `022_create_crew_member_log.sql` | `crew_member`, `user_account` |
+| 023 | `023_create_driver_log.sql` | `driver`, `user_account` |
+| 024 | `024_create_macroroute_log.sql` | `macroroute`, `user_account` |
+| 025 | `025_create_microroute_log.sql` | `microroute`, `user_account` |
+| 026 | `026_create_assignment_log.sql` | `assignment`, `user_account` |
+| 027 | `027_create_vehicle_log.sql` | `vehicle`, `user_account` |
+| 028 | `028_create_session_log.sql` | `session`, `user_account` |
+| 029 | `029_create_password_reset_token_log.sql` | `password_reset_token`, `user_account` |
+| 030 | `030_create_email_verification_token_log.sql` | `email_verification_token`, `user_account` |
+| 031 | `031_create_vehicle_type_log.sql` | `vehicle_type`, `user_account` |
+| 032 | `032_create_btura_neighborhood_log.sql` | `btura_neighborhood`, `user_account` |
+| 033 | `033_create_schedule_log.sql` | `schedule`, `user_account` |
+| 034 | `034_create_microroute_schedule_log.sql` | `microroute_schedule`, `user_account` |
+| 035 | `035_create_microroute_neighborhood_log.sql` | `microroute_neighborhood`, `user_account` |
+| 036 | `036_create_vehicle_position_log.sql` | `vehicle_position`, `user_account` |
+| 040 | `040_add_is_active_to_user_account.sql` | `user_account` |
+| 041 | `041_extend_audit_action_enum.sql` | `audit_action` |
+| 042 | `042_add_is_active_to_audited_reference_tables.sql` | `user_data`, `macroroute`, `microroute`, `btura_neighborhood`, `microroute_neighborhood` |
+| 043 | `043_remove_log_entity_fk.sql` | `*_log` |
 
 #### 3.2.2. Seeders
 
@@ -637,29 +641,29 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 
 #### 3.2.3. Triggers
 
-Se ejecutan después de las migraciones `000` a `039` y de los seeders. Como se instalan al final, los datos insertados por los seeders no generan registros de auditoría. Cada trigger de auditoría escribe en la tabla `<tabla>_log` correspondiente; su comportamiento se describe en la [sección 4](#4-auditoría-y-trazabilidad).
+Se ejecutan después de las migraciones y de los seeders. Como se instalan al final, los datos insertados por los seeders no generan registros de auditoría. Cada trigger de auditoría escribe en la tabla `<tabla>_log` correspondiente; su comportamiento se describe en la [sección 4](#4-auditoría-y-trazabilidad).
 
 | # | Trigger | Tabla auditada |
 | --- | --- | --- |
 | 000 | `000_function_audit_log.sql` | — (función compartida `fn_audit_log()`) |
 | 001 | `001_trigger_user_account.sql` | `user_account` |
-| 003 | `003_trigger_profile.sql` | `profile` |
-| 004 | `004_trigger_session.sql` | `session` |
-| 005 | `005_trigger_password_reset_token.sql` | `password_reset_token` |
-| 006 | `006_trigger_email_validation_token.sql` | `email_validation_token` |
-| 007 | `007_trigger_vehicle_type.sql` | `vehicle_type` |
-| 008 | `008_trigger_vehicle.sql` | `vehicle` |
-| 009 | `009_trigger_macroroute.sql` | `macroroute` |
-| 010 | `010_trigger_microroute.sql` | `microroute` |
-| 011 | `011_trigger_btura_neighborhood.sql` | `btura_neighborhood` |
-| 012 | `012_trigger_schedule.sql` | `schedule` |
-| 013 | `013_trigger_microroute_schedule.sql` | `microroute_schedule` |
-| 014 | `014_trigger_microroute_neighborhood.sql` | `microroute_neighborhood` |
-| 015 | `015_trigger_crew.sql` | `crew` |
-| 016 | `016_trigger_crew_member.sql` | `crew_member` |
-| 017 | `017_trigger_driver.sql` | `driver` |
-| 018 | `018_trigger_assignment.sql` | `assignment` |
-| 019 | `019_trigger_vehicle_position.sql` | `vehicle_position` |
+| 002 | `002_trigger_profile.sql` | `profile` |
+| 003 | `003_trigger_session.sql` | `session` |
+| 004 | `004_trigger_password_reset_token.sql` | `password_reset_token` |
+| 005 | `005_trigger_email_verification_token.sql` | `email_verification_token` |
+| 006 | `006_trigger_vehicle_type.sql` | `vehicle_type` |
+| 007 | `007_trigger_vehicle.sql` | `vehicle` |
+| 008 | `008_trigger_macroroute.sql` | `macroroute` |
+| 009 | `009_trigger_microroute.sql` | `microroute` |
+| 010 | `010_trigger_btura_neighborhood.sql` | `btura_neighborhood` |
+| 011 | `011_trigger_schedule.sql` | `schedule` |
+| 012 | `012_trigger_microroute_schedule.sql` | `microroute_schedule` |
+| 013 | `013_trigger_microroute_neighborhood.sql` | `microroute_neighborhood` |
+| 014 | `014_trigger_crew.sql` | `crew` |
+| 015 | `015_trigger_crew_member.sql` | `crew_member` |
+| 016 | `016_trigger_driver.sql` | `driver` |
+| 017 | `017_trigger_assignment.sql` | `assignment` |
+| 018 | `018_trigger_vehicle_position.sql` | `vehicle_position` |
 | 100 | `100_function_updated_at.sql` | — (función `fn_set_updated_at()` y triggers `trg_<tabla>_updated_at`) |
 
 Los triggers `001` a `018` son de auditoría; el archivo `100` instala los triggers `BEFORE UPDATE` de `updated_at` ([sección 4.4](#44-trigger-de-updated_at)).
@@ -685,8 +689,8 @@ El modelo registra cada cambio en las entidades auditadas mediante triggers. Est
 
 - Hay **18 triggers de auditoría**, uno por entidad auditada, y una función compartida `fn_audit_log()` que escribe en la tabla `<tabla>_log` correspondiente.
 - Se disparan con `AFTER INSERT OR UPDATE OR DELETE`.
-- Todas las tablas `*_log` comparten la misma estructura: `id` (PK), `entity_id` (FK hacia la entidad auditada), `actor_id` (FK hacia `user_account`), `action` (`audit_action`), `old` y `new` (JSONB), `request_ip` (INET) y `created_at` (TIMESTAMPTZ). Tienen índices por `entity_id`, `actor_id` y `created_at`.
-- Cada `*_log` guarda `entity_id` (FK hacia la tabla auditada) y `actor_id` (FK hacia `user_account`), por lo que no se puede borrar de manera física una fila auditada (ver [4.3](#43-borrado-lógico)).
+- Todas las tablas `*_log` comparten la misma estructura: `id` (PK), `entity_id` (FK hacia la entidad auditada), `actor_id` (FK hacia `user_account`), `action` (`audit_action`), `old` y `new` (JSONB), `request_ip` (INET), `is_active` (BOOLEAN) y `created_at` (TIMESTAMPTZ). Tienen índices por `entity_id`, `actor_id` y `created_at`.
+- Cada `*_log` guarda `entity_id` (FK hacia la tabla auditada) y `actor_id` (FK hacia `user_account`), estas FK estan restringidas por ON DELETE SET NULL lo que indica que pueden ser borrado los registros originales y mantener su historial en auditoría (ver [4.3](#43-borrado-lógico)).
 
 ### 4.2. Funcionamiento
 
@@ -698,9 +702,9 @@ El modelo registra cada cambio en las entidades auditadas mediante triggers. Est
 | `UPDATE` con `is_active` de `FALSE` a `TRUE` | `RESTORE` | registro anterior | registro con `is_active = TRUE` |
 | `DELETE` físico | `DELETE` | registro anterior | `NULL` |
 
-- El ENUM `audit_action` se define en la [migración `020`](../../database/migrations/019_create_user_account_log.sql) con los cinco valores `CREATE`, `UPDATE`, `SOFT_DELETE`, `DELETE` y `RESTORE`.
+- El ENUM `audit_action` se define en la [migración `019`](../../database/migrations/019_create_user_account_log.sql) con los cinco valores `CREATE`, `UPDATE`, `SOFT_DELETE`, `DELETE` y `RESTORE`.
 - `SOFT_DELETE` y `RESTORE` solo aplican a entidades con columna `is_active`; en las demás, un `UPDATE` se registra como `UPDATE`.
-- `old` y `new` guardan la fila completa en JSON. Solo se excluyen `user_account.pwd_hash` y `user_account.document_id`; el resto, incluidos los datos personales, se registra (clasificación en la [sección 7.1](#71-clasificación)).
+- `old` y `new` guardan la fila completa en JSON. Solo se excluyen `user_account.pwd_hash`, `user_account.document_id` y `token_hash` de las tablas de autenticación; el resto, incluidos los datos personales, se registra (clasificación en la [sección 7.1](#71-clasificación)).
 - `actor_id` se toma de la variable de sesión `app.current_user_id` y `request_ip` de `app.request_ip`. Si no están definidas, se guardan como `NULL`.
 - La aplicación debe definirlas en cada transacción:
 
@@ -719,7 +723,7 @@ No se debería ejecutar `DELETE` físico directamente sobre entidades con histor
 
 ### 4.4. Trigger de `updated_at`
 
-Aparte de la auditoría, [`database/triggers/100_function_updated_at.sql`](../../database/triggers/100_function_updated_at.sql) crea `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at` (`BEFORE UPDATE`), que actualizan `updated_at` en cada `UPDATE` de las 12 tablas que tienen esa columna: `user_account`, `vehicle`, `macroroute`, `microroute`, `btura_neighborhood`, `schedule`, `microroute_schedule`, `crew`, `crew_member`, `driver` y `assignment`.
+Aparte de la auditoría, [`database/triggers/100_function_updated_at.sql`](../../database/triggers/100_function_updated_at.sql) crea `fn_set_updated_at()` y los triggers `trg_<tabla>_updated_at` (`BEFORE UPDATE`), que actualizan `updated_at` en cada `UPDATE` de las 11 tablas que tienen esa columna: `user_account`, `vehicle`, `macroroute`, `microroute`, `btura_neighborhood`, `schedule`, `microroute_schedule`, `crew`, `crew_member`, `driver` y `assignment`.
 
 ## 5. Configuración Local
 

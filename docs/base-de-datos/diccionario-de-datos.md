@@ -67,9 +67,9 @@ cuenta de acceso del usuario (credenciales y estado; contiene datos sensibles e 
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único de la cuenta de usuario. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | user_account_pkey (id) |
-| user_status | Estado administrativo de la cuenta. Se conserva como estado secundario; `is_active` es el estado operativo prioritario para el inicio de sesión. | ENUM | N/A | SI | NO | N/A | ENUM: ACTIVE, INACTIVE, LOCKED, PENDING_VERIFICATION | — |
+| user_status | Estado administrativo de la cuenta. Se conserva como estado secundario; `is_active` es el estado operativo prioritario para el inicio de sesión. | ENUM | N/A | SI | NO | N/A | ENUM: ACTIVE, INACTIVE | — |
 | document_type | Tipo de documento de identidad del titular de la cuenta. | ENUM | N/A | SI | SI | N/A | ENUM: CC; UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
-| document_id | Número de documento de identidad del titular. Dato personal sensible. No puede repetirse junto con document_type. | CHAR | 20 | SI | SI | N/A | UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
+| document_id | Número de documento de identidad del titular. Dato personal sensible. No puede repetirse junto con document_type. | VARCHAR | 20 | SI | SI | N/A | UNIQUE (document_type, document_id) via uq_user_account_document | uq_user_account_document (document_type, document_id) |
 | pwd_hash | Hash de la contraseña (Argon2id; incluye sal y parámetros). | TEXT | N/A | SI | NO | N/A | — | — |
 | first_name | Nombres de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
 | last_name | Apellidos de la persona. Dato personal. | VARCHAR | 80 | SI | NO | N/A | — | — |
@@ -359,7 +359,7 @@ posiciones GPS reportadas por el vehículo durante una asignación
 | Atributo | Descripción | Tipo | Longitud | Mandatorio | Único | Clave | Restricciones | Índice |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | id | Identificador único del reporte de posición. | UUID | N/A | SI | SI | PK | DEFAULT gen_random_uuid() | vehicle_position_pkey (id) |
-| assignment_id | Asignación a la que pertenece la posición. Solo se aceptan posiciones de asignaciones en curso (regla de la aplicación). | UUID | N/A | SI | NO | FK | FK assignment(id) | idx_vehicle_position_assignment_recorded (assignment_id, recorded_at) |
+| assignment_id | Asignación a la que pertenece la posición. Solo se aceptan posiciones de asignaciones en curso (regla de la aplicación). | UUID | N/A | SI | NO | FK | FK assignment(id); ON DELETE CASCADE | idx_vehicle_position_assignment_recorded (assignment_id, recorded_at) |
 | geom | Ubicación geográfica del vehículo (PostGIS, geometría de tipo punto). | POINT | N/A | SI | NO | N/A | NO DOCUMENTADO | idx_vehicle_position_geom GIST (geom) |
 | is_active | Indica si el registro está vigente (TRUE) o inactivo (FALSE). Por defecto TRUE. | BOOLEAN | N/A | SI | NO | N/A | DEFAULT TRUE | — |
 | recorded_at | Fecha y hora en que el dispositivo registró la posición (distinta de created_at, que es la del servidor). | TIMESTAMPTZ | N/A | SI | NO | N/A | — | idx_vehicle_position_assignment_recorded (assignment_id, recorded_at) |
