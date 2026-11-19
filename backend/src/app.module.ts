@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profiles/profile.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { RutasModule } from './rutas/rutas.module';
@@ -35,6 +36,7 @@ export function createDatabaseOptions(
     }),
     AuthModule,
     UsersModule,
+    ProfileModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

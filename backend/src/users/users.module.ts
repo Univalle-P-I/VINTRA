@@ -10,6 +10,7 @@ import { Session } from './entities/session.entity';
 import { PasswordResetToken } from './entities/pwd-reset.entity';
 import { Profile } from '../profiles/entities/profile.entity';
 import { EmailValidationToken } from './entities/email-validation-token.entity';
+import { EmailValidationService } from './services/email-validation.service';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { EmailValidationToken } from './entities/email-validation-token.entity';
 ]),
   ],
   controllers: [UsersController],
-  providers: [UserService, SessionService, PwdRecoveryService, PasswordHasherService],
+  providers: [UserService, SessionService, PwdRecoveryService, PasswordHasherService, EmailValidationService],
   exports: [UserService, SessionService, PwdRecoveryService],
 })
 export class UsersModule {}
