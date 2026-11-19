@@ -90,6 +90,49 @@ Reglas de negocio:
 - Los errores usan el formato `statusCode`, `code`, `message`, `details` y
   `requestId`.
 
+### Errores al asociar barrios
+
+Cuerpo de la solicitud (`POST /microrutas/:id/barrios`):
+
+```json
+{
+  "barrios": [
+    { "barrioId": "uuid-del-barrio-1", "ordenVisita": 1 },
+    { "barrioId": "uuid-del-barrio-2", "ordenVisita": 2 }
+  ]
+}
+```
+
+`400`: el mismo `barrioId` aparece más de una vez en la solicitud.
+
+```json
+{
+  "statusCode": 400,
+  "code": "VALIDATION_ERROR",
+  "message": "La solicitud contiene campos no válidos.",
+  "details": [
+    {
+      "field": "barrios",
+      "reason": "No se puede repetir un barrio en la misma solicitud."
+    }
+  ],
+  "requestId": "..."
+}
+```
+
+`409`: algún barrio ya está asociado a la microruta. Se rechaza la solicitud
+completa; no se guarda ninguno de los barrios enviados.
+
+```json
+{
+  "statusCode": 409,
+  "code": "CONFLICT",
+  "message": "Uno o más barrios ya están asociados a la microruta.",
+  "details": [],
+  "requestId": "..."
+}
+```
+
 ## Correspondencia con el diccionario de BD
 
 | Entidad | Tabla |
@@ -101,6 +144,9 @@ Reglas de negocio:
 
 ## Pruebas
 
+Requieren Node.js 24, la misma versión que usan el CI y el `Dockerfile`; con
+otra versión las suites pueden fallar al cargar los módulos ESM de NestJS.
+
 Las pruebas unitarias usan repositorios simulados y no requieren base de datos:
 
 ```bash
@@ -108,12 +154,21 @@ cd backend
 npm test -- --runInBand
 ```
 
+Las pruebas e2e se ejecutan contra PostgreSQL (`docker compose up -d` desde la
+raíz del repositorio) y, por ahora, no cubren los endpoints de rutas:
+
+```bash
+cd backend
+npm run test:e2e -- --runInBand
+```
+
 ## Pendientes
 
 - Aprobar PR #115 y ajustar entidades (nombres, unicidades, tipos).
 - Migraciones y semillas, a la espera del esquema aprobado (#115).
 - Prueba de integración contra PostgreSQL cuando exista el esquema.
-- Restricción única en BD para (microruta, barrio): hoy la unicidad solo se valida en el servicio.
+- Restricción única en BD para (microruta, barrio): hoy la unicidad solo se
+  valida en el servicio.
 - Decidir PostGIS y geometrías (#54); `geom` no se acepta ni se guarda.
 - Formato definitivo de errores y paginación (#66).
 - Horarios (`schedule`, `microroute_schedule`) quedan fuera de este alcance.
