@@ -116,7 +116,7 @@ describe('AppController (e2e)', () => {
 
     const response = await request(getInitializedApp().getHttpServer())
       .get('/health/db')
-      .expect(503);
+      .expect(500);
 
     expect(response.body).toEqual({
       status: 'error',
