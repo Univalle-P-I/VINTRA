@@ -53,7 +53,7 @@ describe('bootstrap', () => {
       origin: 'http://localhost:5173',
     });
     expect(mockApp.setGlobalPrefix).toHaveBeenCalledWith('api/v1', {
-      exclude: ['health'],
+      exclude: ['health', 'health/db'],
     });
     expect(mockApp.useGlobalPipes).toHaveBeenCalledTimes(1);
     expect(mockApp.useGlobalFilters).toHaveBeenCalledTimes(1);
