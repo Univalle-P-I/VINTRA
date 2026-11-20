@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { Request, Response } from 'express';
@@ -53,6 +54,8 @@ function obtenerRequestId(request: Request): string {
 
 @Catch()
 export class FiltroExcepciones implements ExceptionFilter {
+  private readonly logger = new Logger(FiltroExcepciones.name);
+
   catch(excepcion: unknown, host: ArgumentsHost): void {
     const contexto = host.switchToHttp();
     const request = contexto.getRequest<Request>();
@@ -63,10 +66,23 @@ export class FiltroExcepciones implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
     const codigo =
       CODIGOS_POR_ESTADO[statusCode] ?? 'INTERNAL_ERROR';
+    const requestId = obtenerRequestId(request);
     const cuerpo =
       excepcion instanceof HttpException
         ? excepcion.getResponse()
         : undefined;
+    if (
+      !(excepcion instanceof HttpException) ||
+      (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR && statusCode < 600)
+    ) {
+      const mensajeError =
+        excepcion instanceof Error ? excepcion.message : String(excepcion);
+      const stack = excepcion instanceof Error ? excepcion.stack : undefined;
+      this.logger.error(
+        `[${requestId}] ${mensajeError}`,
+        stack,
+      );
+    }
     const datos = esObjeto(cuerpo) ? cuerpo : undefined;
     const mensaje =
       statusCode >= HttpStatus.INTERNAL_SERVER_ERROR
@@ -82,7 +98,7 @@ export class FiltroExcepciones implements ExceptionFilter {
       code: codigo,
       message: mensaje,
       details: obtenerDetalles(datos?.details),
-      requestId: obtenerRequestId(request),
+      requestId,
     });
   }
 }

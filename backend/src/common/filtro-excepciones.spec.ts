@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   HttpException,
   HttpStatus,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,6 +13,17 @@ import { FiltroExcepciones } from './filtro-excepciones';
 
 describe('FiltroExcepciones', () => {
   const filtro = new FiltroExcepciones();
+  let loggerError: jest.SpyInstance;
+
+  beforeEach(() => {
+    loggerError = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    loggerError.mockRestore();
+  });
 
   function crearContexto(requestId?: unknown) {
     const request = { headers: { 'x-request-id': requestId } };
@@ -50,6 +62,7 @@ describe('FiltroExcepciones', () => {
       details: [{ field: 'nombre', reason: 'Es obligatorio.' }],
       requestId: 'req-123.test',
     });
+    expect(loggerError).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -69,6 +82,7 @@ describe('FiltroExcepciones', () => {
     expect(respuesta.json.mock.calls[0][0].requestId).toMatch(
       /^[0-9a-f-]{36}$/i,
     );
+    expect(loggerError).not.toHaveBeenCalled();
   });
 
   it('usa el mensaje de texto de la respuesta HTTP y el código interno desconocido', () => {
@@ -91,9 +105,11 @@ describe('FiltroExcepciones', () => {
   });
 
   it('normaliza errores no controlados sin exponer sus mensajes', () => {
-    const { host, respuesta } = crearContexto(42);
+    const requestId = 'request-error-123';
+    const { host, respuesta } = crearContexto(requestId);
+    const excepcion = new Error('secreto');
 
-    filtro.catch(new Error('secreto'), host);
+    filtro.catch(excepcion, host);
 
     expect(respuesta.status).toHaveBeenCalledWith(
       HttpStatus.INTERNAL_SERVER_ERROR,
@@ -104,10 +120,12 @@ describe('FiltroExcepciones', () => {
         code: 'INTERNAL_ERROR',
         message: 'Error interno del servidor.',
         details: [],
+        requestId,
       }),
     );
-    expect(respuesta.json.mock.calls[0][0].requestId).toMatch(
-      /^[0-9a-f-]{36}$/i,
+    expect(loggerError).toHaveBeenCalledWith(
+      `[${requestId}] ${excepcion.message}`,
+      excepcion.stack,
     );
   });
 
