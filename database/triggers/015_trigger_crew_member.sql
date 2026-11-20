@@ -1,0 +1,8 @@
+BEGIN;
+
+CREATE OR REPLACE TRIGGER trg_crew_member_audit
+AFTER INSERT OR UPDATE OR DELETE ON crew_member
+FOR EACH ROW
+EXECUTE FUNCTION fn_audit_log();
+
+COMMIT;
