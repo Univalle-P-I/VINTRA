@@ -181,6 +181,21 @@ describe('MicrorutasService', () => {
     expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
   });
 
+  it('rejects repeated visit orders without saving', async () => {
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [
+          { barrioId: 'barrio-1', ordenVisita: 1 },
+          { barrioId: 'barrio-2', ordenVisita: 1 },
+        ],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(repositorioMicrorutas.findOne).not.toHaveBeenCalled();
+    expect(repositorioBarrios.find).not.toHaveBeenCalled();
+    expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
+  });
+
   it('rechaza un cambio concurrente del DTO antes de crear relaciones', async () => {
     const microruta = { id: 'micro-id' } as Microruta;
     const barrio = { id: 'barrio-id' } as Barrio;
@@ -248,7 +263,10 @@ describe('MicrorutasService', () => {
     repositorioBarrios.find.mockResolvedValue([barrio]);
     repositorioMicrorutaBarrios.find.mockResolvedValue([]);
     repositorioMicrorutaBarrios.save.mockRejectedValue(
-      new QueryFailedError('INSERT', [], { code: '23505' }),
+      new QueryFailedError('INSERT', [], {
+        code: '23505',
+        constraint: 'uq_microroute_neighborhood',
+      }),
     );
 
     await expect(
@@ -260,6 +278,49 @@ describe('MicrorutasService', () => {
         'Uno o más barrios ya están asociados a la microruta.',
       ),
     );
+  });
+
+  it('returns 409 when the visit order constraint fails', async () => {
+    const microruta = { id: 'micro-id' } as Microruta;
+    const barrio = { id: 'barrio-id' } as Barrio;
+    repositorioMicrorutas.findOne.mockResolvedValue(microruta);
+    repositorioBarrios.find.mockResolvedValue([barrio]);
+    repositorioMicrorutaBarrios.find.mockResolvedValue([]);
+    repositorioMicrorutaBarrios.save.mockRejectedValue(
+      new QueryFailedError('INSERT', [], {
+        code: '23505',
+        constraint: 'uq_microroute_neighborhood_order',
+      }),
+    );
+
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],
+      }),
+    ).rejects.toThrow(
+      new ConflictException(
+        'Uno o más órdenes de visita ya están en uso en la microruta.',
+      ),
+    );
+  });
+
+  it('rethrows unique violations from other constraints', async () => {
+    const microruta = { id: 'micro-id' } as Microruta;
+    const barrio = { id: 'barrio-id' } as Barrio;
+    const error = new QueryFailedError('INSERT', [], {
+      code: '23505',
+      constraint: 'some_other_constraint',
+    });
+    repositorioMicrorutas.findOne.mockResolvedValue(microruta);
+    repositorioBarrios.find.mockResolvedValue([barrio]);
+    repositorioMicrorutaBarrios.find.mockResolvedValue([]);
+    repositorioMicrorutaBarrios.save.mockRejectedValue(error);
+
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],
+      }),
+    ).rejects.toBe(error);
   });
 
   it('relanza los errores distintos a una violación de unicidad al guardar', async () => {

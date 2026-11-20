@@ -102,6 +102,20 @@ export class MicrorutasService {
       });
     }
 
+    const visitOrders = dto.barrios.map(({ ordenVisita }) => ordenVisita);
+    if (new Set(visitOrders).size !== visitOrders.length) {
+      throw new BadRequestException({
+        message: 'La solicitud contiene campos no válidos.',
+        details: [
+          {
+            field: 'barrios',
+            reason:
+              'No se puede repetir un orden de visita en la misma solicitud.',
+          },
+        ],
+      });
+    }
+
     const microruta = await this.microrutasRepository.findOne({
       where: { id },
     });
@@ -148,9 +162,19 @@ export class MicrorutasService {
         error instanceof QueryFailedError &&
         error.driverError.code === '23505'
       ) {
-        throw new ConflictException(
-          'Uno o más barrios ya están asociados a la microruta.',
-        );
+        if (error.driverError.constraint === 'uq_microroute_neighborhood') {
+          throw new ConflictException(
+            'Uno o más barrios ya están asociados a la microruta.',
+          );
+        }
+
+        if (
+          error.driverError.constraint === 'uq_microroute_neighborhood_order'
+        ) {
+          throw new ConflictException(
+            'Uno o más órdenes de visita ya están en uso en la microruta.',
+          );
+        }
       }
 
       throw error;

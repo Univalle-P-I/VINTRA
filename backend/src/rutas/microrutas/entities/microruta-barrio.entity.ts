@@ -9,7 +9,7 @@ import {
 import { Barrio } from '../../barrios/entities/barrios.entity';
 import { Microruta } from './microruta.entity';
 
-@Unique(['microruta', 'barrio'])
+@Unique('uq_microroute_neighborhood', ['microruta', 'barrio'])
 @Entity({ name: 'microroute_neighborhood' })
 export class MicrorutaBarrio {
   @PrimaryGeneratedColumn('uuid')

@@ -85,6 +85,8 @@ Reglas de negocio:
   alguno, responde `404` y no se guarda nada.
 - Un barrio repetido en la solicitud responde `400`, y uno ya asociado responde
   `409`; en ambos casos no se guarda nada.
+- Un orden de visita repetido en la solicitud responde `400`, y uno ya usado
+  en la microruta responde `409` una vez que exista la restricción en el esquema.
 - Las entradas se validan con DTO: se rechazan propiedades desconocidas (por
   ejemplo, `geom`) y valores inválidos con `400`.
 - Los errores usan el formato `statusCode`, `code`, `message`, `details` y
