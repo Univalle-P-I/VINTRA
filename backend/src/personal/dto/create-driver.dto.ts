@@ -1,4 +1,5 @@
-import { IsISO8601, IsOptional, IsUUID } from 'class-validator';
+import { IsOptional, IsUUID, ValidateIf } from 'class-validator';
+import { IsIsoDateTimeWithZone } from '../validators/is-iso-date-time-with-zone';
 
 /**
  * Contrato de entrada para registrar un conductor (tabla `driver`).
@@ -9,12 +10,16 @@ export class CreateDriverDto {
   @IsUUID()
   userAccountId!: string;
 
+  /** Opcional: omitirlo o enviar `null` deja al conductor sin cuadrilla. */
   @IsOptional()
   @IsUUID()
-  crewId?: string;
+  crewId?: string | null;
 
-  /** ISO 8601. Si se omite, la base de datos usa la fecha actual. */
-  @IsOptional()
-  @IsISO8601({ strict: true, strictSeparator: true })
+  /**
+   * Fecha y hora ISO 8601 con zona horaria (Z o ±HH:MM). Si se omite, la base
+   * de datos usa la fecha actual; `null` se rechaza.
+   */
+  @ValidateIf((_dto, value: unknown) => value !== undefined)
+  @IsIsoDateTimeWithZone()
   startedAt?: string;
 }

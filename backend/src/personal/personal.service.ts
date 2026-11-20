@@ -15,6 +15,7 @@ import type { UpdateCrewMemberDto } from './dto/update-crew-member.dto';
 import type { UpdateDriverDto } from './dto/update-driver.dto';
 import { CrewMember } from './entities/crew-member.entity';
 import { Driver } from './entities/driver.entity';
+import { parseIsoDateTime } from './validators/is-iso-date-time-with-zone';
 
 /**
  * CRUD de conductores y miembros de cuadrilla (VIN-024, #76).
@@ -38,7 +39,7 @@ export class PersonalService {
     const driver = this.driverRepository.create({
       userAccountId: dto.userAccountId,
       crewId: dto.crewId ?? null,
-      ...(dto.startedAt ? { startedAt: new Date(dto.startedAt) } : {}),
+      ...(dto.startedAt ? { startedAt: parseIsoDateTime(dto.startedAt) } : {}),
     });
     const saved = await this.saveDriver(driver);
     return this.findDriver(saved.id);
@@ -69,10 +70,11 @@ export class PersonalService {
       driver.crewId = dto.crewId;
     }
     if (dto.startedAt !== undefined) {
-      driver.startedAt = new Date(dto.startedAt);
+      driver.startedAt = parseIsoDateTime(dto.startedAt);
     }
     if (dto.endedAt !== undefined) {
-      driver.endedAt = dto.endedAt === null ? null : new Date(dto.endedAt);
+      driver.endedAt =
+        dto.endedAt === null ? null : parseIsoDateTime(dto.endedAt);
     }
     if (dto.isActive !== undefined) {
       driver.isActive = dto.isActive;

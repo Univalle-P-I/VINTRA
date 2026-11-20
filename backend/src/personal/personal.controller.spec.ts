@@ -18,6 +18,7 @@ type DriverBody = {
   userAccountId: string;
   crewId: string | null;
   isActive: boolean;
+  startedAt: string;
   endedAt: string | null;
 };
 type MemberBody = {
@@ -312,6 +313,147 @@ describe('PersonalController (HTTP)', () => {
       );
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  describe('valores null y formato de fechas', () => {
+    const INVALID_DATES: Array<[string, unknown]> = [
+      ['una fecha por semana', '2026-W47-5'],
+      ['solo la fecha', '2026-11-19'],
+      ['una hora sin zona horaria', '2026-11-19T08:00:00'],
+      ['el 30 de febrero', '2026-02-30T08:00:00Z'],
+      ['la hora 24', '2026-11-19T24:00:00Z'],
+      ['un número', 1763539200],
+    ];
+
+    async function createDriver(): Promise<DriverBody> {
+      const res = await callApi<DriverBody>(baseUrl, 'POST', '/personal/drivers', {
+        userAccountId: USER_ID,
+        startedAt: '2026-11-19T08:00:00Z',
+      });
+      return res.body;
+    }
+
+    it('rechaza null en startedAt e isActive sin modificar el conductor', async () => {
+      const driver = await createDriver();
+      const path = `/personal/drivers/${driver.id}`;
+
+      const startedAtNull = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+        startedAt: null,
+      });
+      const isActiveNull = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+        isActive: null,
+      });
+      const after = await callApi<DriverBody>(baseUrl, 'GET', path);
+
+      expect([startedAtNull.status, isActiveNull.status]).toEqual([400, 400]);
+      expect(after.body.startedAt).toBe('2026-11-19T08:00:00.000Z');
+      expect(after.body.isActive).toBe(true);
+    });
+
+    it('rechaza null en startedAt al registrar un conductor', async () => {
+      const res = await callApi<ErrorBody>(baseUrl, 'POST', '/personal/drivers', {
+        userAccountId: USER_ID,
+        startedAt: null,
+      });
+
+      expect(res.status).toBe(400);
+      expect(drivers.rows).toHaveLength(0);
+    });
+
+    it('permite limpiar crewId y endedAt con null', async () => {
+      const driver = await createDriver();
+      const path = `/personal/drivers/${driver.id}`;
+      await callApi(baseUrl, 'PATCH', path, {
+        crewId: CREW_ID,
+        endedAt: '2026-11-20T08:00:00Z',
+      });
+
+      const cleared = await callApi<DriverBody>(baseUrl, 'PATCH', path, {
+        crewId: null,
+        endedAt: null,
+      });
+
+      expect(cleared.status).toBe(200);
+      expect(cleared.body.crewId).toBeNull();
+      expect(cleared.body.endedAt).toBeNull();
+    });
+
+    it.each(INVALID_DATES)(
+      'rechaza %s al registrar y al actualizar sin guardar nada',
+      async (_description, value) => {
+        const created = await callApi<ErrorBody>(baseUrl, 'POST', '/personal/drivers', {
+          userAccountId: USER_ID,
+          startedAt: value,
+        });
+        expect(created.status).toBe(400);
+        expect(drivers.rows).toHaveLength(0);
+
+        const driver = await createDriver();
+        const path = `/personal/drivers/${driver.id}`;
+        const startedAt = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+          startedAt: value,
+        });
+        const endedAt = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+          endedAt: value,
+        });
+        const after = await callApi<DriverBody>(baseUrl, 'GET', path);
+
+        expect([startedAt.status, endedAt.status]).toEqual([400, 400]);
+        expect(after.body.startedAt).toBe('2026-11-19T08:00:00.000Z');
+        expect(after.body.endedAt ?? null).toBeNull();
+      },
+    );
+
+    it('convierte a UTC una fecha con desfase horario', async () => {
+      const res = await callApi<DriverBody>(baseUrl, 'POST', '/personal/drivers', {
+        userAccountId: USER_ID,
+        startedAt: '2026-11-19T03:00:00-05:00',
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body.startedAt).toBe('2026-11-19T08:00:00.000Z');
+    });
+
+    it('rechaza null en fullName e isActive de un miembro sin modificarlo', async () => {
+      const created = await callApi<MemberBody>(baseUrl, 'POST', '/personal/crew-members', {
+        fullName: 'Ana Pérez',
+      });
+      const path = `/personal/crew-members/${created.body.id}`;
+
+      const onCreate = await callApi<ErrorBody>(baseUrl, 'POST', '/personal/crew-members', {
+        fullName: null,
+      });
+      const fullNameNull = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+        fullName: null,
+      });
+      const isActiveNull = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+        isActive: null,
+      });
+      const after = await callApi<MemberBody>(baseUrl, 'GET', path);
+
+      expect([onCreate.status, fullNameNull.status, isActiveNull.status]).toEqual([
+        400, 400, 400,
+      ]);
+      expect(members.rows).toHaveLength(1);
+      expect(after.body).toMatchObject({ fullName: 'Ana Pérez', isActive: true });
+    });
+
+    it('permite sacar a un miembro de su cuadrilla con crewId null', async () => {
+      const created = await callApi<MemberBody>(baseUrl, 'POST', '/personal/crew-members', {
+        fullName: 'Luis Mora',
+        crewId: CREW_ID,
+      });
+
+      const res = await callApi<MemberBody>(
+        baseUrl,
+        'PATCH',
+        `/personal/crew-members/${created.body.id}`,
+        { crewId: null },
+      );
+
+      expect(res.status).toBe(200);
+      expect(res.body.crewId).toBeNull();
     });
   });
 });

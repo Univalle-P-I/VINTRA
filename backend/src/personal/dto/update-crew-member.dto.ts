@@ -6,14 +6,16 @@ import {
   IsString,
   IsUUID,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 /**
- * Contrato de entrada para actualizar un miembro de cuadrilla. `null` en
- * `crewId` lo saca de su cuadrilla.
+ * Contrato de entrada para actualizar un miembro de cuadrilla. Solo `crewId`
+ * admite `null` (lo saca de su cuadrilla); en `fullName` e `isActive` se
+ * rechaza.
  */
 export class UpdateCrewMemberDto {
-  @IsOptional()
+  @ValidateIf((_dto, value: unknown) => value !== undefined)
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() : value,
   )
@@ -27,7 +29,7 @@ export class UpdateCrewMemberDto {
   crewId?: string | null;
 
   /** `false` da de baja (baja lógica) y `true` restaura. */
-  @IsOptional()
+  @ValidateIf((_dto, value: unknown) => value !== undefined)
   @IsBoolean()
   isActive?: boolean;
 }

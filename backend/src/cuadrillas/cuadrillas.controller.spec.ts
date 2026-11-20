@@ -122,4 +122,28 @@ describe('CuadrillasController (HTTP)', () => {
     expect(malformed.status).toBe(400);
     expect(missing.status).toBe(404);
   });
+
+  it('rechaza null en name e isActive sin modificar la cuadrilla', async () => {
+    const created = await callApi<CrewBody>(baseUrl, 'POST', '/cuadrillas', {
+      name: 'Norte',
+    });
+    const path = `/cuadrillas/${created.body.id}`;
+
+    const onCreate = await callApi<ErrorBody>(baseUrl, 'POST', '/cuadrillas', {
+      name: null,
+    });
+    const nameNull = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+      name: null,
+    });
+    const isActiveNull = await callApi<ErrorBody>(baseUrl, 'PATCH', path, {
+      isActive: null,
+    });
+    const after = await callApi<CrewBody>(baseUrl, 'GET', path);
+
+    expect([onCreate.status, nameNull.status, isActiveNull.status]).toEqual([
+      400, 400, 400,
+    ]);
+    expect(crews.rows).toHaveLength(1);
+    expect(after.body).toMatchObject({ name: 'Norte', isActive: true });
+  });
 });

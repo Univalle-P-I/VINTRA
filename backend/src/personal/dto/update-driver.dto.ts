@@ -1,24 +1,31 @@
-import { IsBoolean, IsISO8601, IsOptional, IsUUID } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
+import { IsIsoDateTimeWithZone } from '../validators/is-iso-date-time-with-zone';
 
 /**
- * Contrato de entrada para actualizar un conductor. `null` en `crewId` o
- * `endedAt` limpia el valor. No se puede cambiar la cuenta de usuario.
+ * Contrato de entrada para actualizar un conductor. Solo `crewId` y `endedAt`
+ * admiten `null` (limpian el valor); en `startedAt` e `isActive` se rechaza.
+ * No se puede cambiar la cuenta de usuario.
  */
 export class UpdateDriverDto {
   @IsOptional()
   @IsUUID()
   crewId?: string | null;
 
-  @IsOptional()
-  @IsISO8601({ strict: true, strictSeparator: true })
+  @ValidateIf((_dto, value: unknown) => value !== undefined)
+  @IsIsoDateTimeWithZone()
   startedAt?: string;
 
   @IsOptional()
-  @IsISO8601({ strict: true, strictSeparator: true })
+  @IsIsoDateTimeWithZone()
   endedAt?: string | null;
 
   /** `false` da de baja (baja lógica) y `true` restaura. */
-  @IsOptional()
+  @ValidateIf((_dto, value: unknown) => value !== undefined)
   @IsBoolean()
   isActive?: boolean;
 }
