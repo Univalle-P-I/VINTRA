@@ -5,10 +5,9 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { QueryFailedError } from 'typeorm';
+import { In, QueryFailedError } from 'typeorm';
 import { Barrio } from '../barrios/entities/barrios.entity';
 import { Macroruta } from '../macrorutas/entities/macroruta.entity';
-import { AsociarBarriosDto } from './dto/asociar-barrios.dto';
 import { CrearMicrorutaDto } from './dto/crear-microruta.dto';
 import { MicrorutaBarrio } from './entities/microruta-barrio.entity';
 import { Microruta } from './entities/microruta.entity';
@@ -196,28 +195,6 @@ describe('MicrorutasService', () => {
     expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
   });
 
-  it('rechaza un cambio concurrente del DTO antes de crear relaciones', async () => {
-    const microruta = { id: 'micro-id' } as Microruta;
-    const barrio = { id: 'barrio-id' } as Barrio;
-    const dto = {
-      barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],
-    } as AsociarBarriosDto & {
-      barrios: { barrioId: string; ordenVisita: number }[];
-    };
-    repositorioMicrorutas.findOne.mockImplementation(async () => {
-      dto.barrios = [{ barrioId: 'barrio-cambiado', ordenVisita: 2 }];
-      return microruta;
-    });
-    repositorioBarrios.find.mockResolvedValue([barrio]);
-    repositorioMicrorutaBarrios.find.mockResolvedValue([]);
-
-    await expect(
-      servicio.asociarBarrios('micro-id', dto),
-    ).rejects.toBeInstanceOf(NotFoundException);
-    expect(repositorioMicrorutaBarrios.create).not.toHaveBeenCalled();
-    expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
-  });
-
   it('rechaza barrios ya asociados sin guardar', async () => {
     repositorioMicrorutas.findOne.mockResolvedValue({ id: 'micro-id' });
     repositorioBarrios.find.mockResolvedValue([{ id: 'barrio-id' }]);
@@ -254,6 +231,46 @@ describe('MicrorutasService', () => {
       }),
     ]);
     expect(detalle.barrios[0].barrio).toEqual(barrio);
+  });
+
+  it('asocia un barrio si su UUID se proporciona en mayúsculas', async () => {
+    const microruta = { id: 'micro-id' } as Microruta;
+    const barrioId = '09b2c3dc-0035-4e29-aa18-d9a4e803191d';
+    const barrio = { id: barrioId } as Barrio;
+    repositorioMicrorutas.findOne.mockResolvedValue(microruta);
+    repositorioBarrios.find.mockResolvedValue([barrio]);
+    repositorioMicrorutaBarrios.find
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ barrio, ordenVisita: 1 }]);
+
+    await servicio.asociarBarrios('micro-id', {
+      barrios: [{ barrioId: barrioId.toUpperCase(), ordenVisita: 1 }],
+    });
+
+    expect(repositorioBarrios.find).toHaveBeenCalledWith({
+      where: { id: In([barrioId]) },
+    });
+    expect(repositorioMicrorutaBarrios.create).toHaveBeenCalledWith({
+      microruta,
+      barrio,
+      ordenVisita: 1,
+    });
+  });
+
+  it('rechaza UUIDs repetidos aunque difieran en mayúsculas', async () => {
+    const barrioId = '09b2c3dc-0035-4e29-aa18-d9a4e803191d';
+
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [
+          { barrioId, ordenVisita: 1 },
+          { barrioId: barrioId.toUpperCase(), ordenVisita: 2 },
+        ],
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(repositorioBarrios.find).not.toHaveBeenCalled();
+    expect(repositorioMicrorutaBarrios.save).not.toHaveBeenCalled();
   });
 
   it('responde 409 si guardar falla por una asociación duplicada', async () => {

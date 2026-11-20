@@ -89,7 +89,15 @@ export class MicrorutasService {
     id: string,
     dto: AsociarBarriosDto,
   ): Promise<MicrorutaDetalle> {
-    const idsBarrios = dto.barrios.map(({ barrioId }) => barrioId);
+    const barriosSolicitados = dto.barrios.map(
+      ({ barrioId, ordenVisita }) => ({
+        barrioIdNormalizado: barrioId.toLowerCase(),
+        ordenVisita,
+      }),
+    );
+    const idsBarrios = barriosSolicitados.map(
+      ({ barrioIdNormalizado }) => barrioIdNormalizado,
+    );
     if (new Set(idsBarrios).size !== idsBarrios.length) {
       throw new BadRequestException({
         message: 'La solicitud contiene campos no válidos.',
@@ -142,18 +150,22 @@ export class MicrorutasService {
       );
     }
 
-    const relaciones = dto.barrios.map(({ barrioId, ordenVisita }) => {
-      const barrio = barriosPorId.get(barrioId);
-      if (!barrio) {
-        throw new NotFoundException('Uno o más barrios no fueron encontrados.');
-      }
+    const relaciones = barriosSolicitados.map(
+      ({ barrioIdNormalizado, ordenVisita }) => {
+        const barrio = barriosPorId.get(barrioIdNormalizado);
+        if (!barrio) {
+          throw new NotFoundException(
+            'Uno o más barrios no fueron encontrados.',
+          );
+        }
 
-      return this.microrutaBarrioRepository.create({
-        microruta,
-        barrio,
-        ordenVisita,
-      });
-    });
+        return this.microrutaBarrioRepository.create({
+          microruta,
+          barrio,
+          ordenVisita,
+        });
+      },
+    );
 
     try {
       await this.microrutaBarrioRepository.save(relaciones);
