@@ -75,6 +75,128 @@ campos en `camelCase` (`id`, `crewId`, `isActive`, `createdAt`, etc.).
 | Errores | Id inexistente: `404`. Cuadrilla o cuenta de usuario inexistente (clave foránea) y fechas inválidas: `400`. El formato común de errores queda pendiente de #66, así que se usan las respuestas por defecto de NestJS. |
 | Seguridad | Sin autenticación ni permisos hasta que se aprueben #54, #70 y #71. |
 
+## Contrato de entrada
+
+Todos los campos de las solicitudes se validan con `class-validator`. Se
+rechaza cualquier propiedad que no figure en las tablas.
+
+### Crear conductor
+
+| Campo | Tipo | Obligatorio | Regla |
+| --- | --- | --- | --- |
+| `userAccountId` | `string` | Sí | UUID de la cuenta de usuario. |
+| `crewId` | `string` | No | UUID de la cuadrilla. |
+| `startedAt` | `string` | No | Fecha ISO 8601. Si se omite, la base de datos usa la fecha actual. |
+
+### Actualizar conductor
+
+Todos los campos son opcionales. No se puede cambiar la cuenta de usuario.
+
+| Campo | Tipo | Regla |
+| --- | --- | --- |
+| `crewId` | `string` o `null` | UUID de la cuadrilla. `null` quita al conductor de su cuadrilla. |
+| `startedAt` | `string` | Fecha ISO 8601. |
+| `endedAt` | `string` o `null` | Fecha ISO 8601, no anterior a `startedAt`. `null` limpia el valor. |
+| `isActive` | `boolean` | `false` da de baja y `true` restaura. |
+
+### Crear miembro de cuadrilla
+
+| Campo | Tipo | Obligatorio | Regla |
+| --- | --- | --- | --- |
+| `fullName` | `string` | Sí | No vacío, hasta 120 caracteres. Se recortan los espacios. |
+| `crewId` | `string` | No | UUID de la cuadrilla. |
+
+### Actualizar miembro de cuadrilla
+
+Todos los campos son opcionales.
+
+| Campo | Tipo | Regla |
+| --- | --- | --- |
+| `fullName` | `string` | No vacío, hasta 120 caracteres. Se recortan los espacios. |
+| `crewId` | `string` o `null` | UUID de la cuadrilla. `null` saca al miembro de su cuadrilla. |
+| `isActive` | `boolean` | `false` da de baja y `true` restaura. |
+
+### Filtros de los listados
+
+Aplican a `GET /personal/drivers` y a `GET /personal/crew-members`.
+
+| Parámetro | Tipo | Regla |
+| --- | --- | --- |
+| `isActive` | `true` o `false` | Sin este parámetro solo se listan los activos. |
+| `crewId` | UUID | Devuelve solo el personal de esa cuadrilla. |
+
+## Ejemplos
+
+Los valores son ilustrativos.
+
+### Ejemplo: registrar un conductor
+
+```http
+POST /personal/drivers
+Content-Type: application/json
+```
+
+```json
+{
+  "userAccountId": "3f1c2d4e-5a6b-4c7d-8e9f-0a1b2c3d4e5f",
+  "crewId": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+}
+```
+
+Respuesta `201`:
+
+```json
+{
+  "id": "c0a80101-7b2e-4d5f-9a3c-2b1d4e6f8a90",
+  "userAccountId": "3f1c2d4e-5a6b-4c7d-8e9f-0a1b2c3d4e5f",
+  "crewId": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+  "startedAt": "2026-11-19T14:30:00.000Z",
+  "endedAt": null,
+  "isActive": true,
+  "createdAt": "2026-11-19T14:30:00.000Z",
+  "updatedAt": "2026-11-19T14:30:00.000Z"
+}
+```
+
+### Ejemplo: quitar la cuadrilla y dar de baja
+
+```http
+PATCH /personal/drivers/c0a80101-7b2e-4d5f-9a3c-2b1d4e6f8a90
+Content-Type: application/json
+```
+
+```json
+{
+  "crewId": null
+}
+```
+
+```http
+DELETE /personal/drivers/c0a80101-7b2e-4d5f-9a3c-2b1d4e6f8a90
+```
+
+### Ejemplo: respuestas de error
+
+Cuerpo inválido (`400`):
+
+```json
+{
+  "message": ["userAccountId must be a UUID"],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+Recurso inexistente (`404`):
+
+```json
+{
+  "message": "El conductor no existe.",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+
 ## Correspondencia con las tablas
 
 | Entidad | Tabla | Migración de referencia |

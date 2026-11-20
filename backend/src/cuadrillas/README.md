@@ -67,6 +67,100 @@ y `/personal/drivers?crewId=`.
 | Errores | Id inexistente: `404`. Datos inválidos: `400`. El formato común de errores queda pendiente de #66, así que se usan las respuestas por defecto de NestJS. |
 | Seguridad | Sin autenticación ni permisos hasta que se aprueben #54, #70 y #71. |
 
+## Contrato de entrada
+
+Todos los campos de las solicitudes se validan con `class-validator`. Se
+rechaza cualquier propiedad que no figure en las tablas.
+
+### Crear cuadrilla
+
+| Campo | Tipo | Obligatorio | Regla |
+| --- | --- | --- | --- |
+| `name` | `string` | Sí | No vacío, hasta 100 caracteres. Se recortan los espacios. |
+
+### Actualizar cuadrilla
+
+Todos los campos son opcionales.
+
+| Campo | Tipo | Regla |
+| --- | --- | --- |
+| `name` | `string` | No vacío, hasta 100 caracteres. Se recortan los espacios. |
+| `isActive` | `boolean` | `false` da de baja y `true` restaura. |
+
+### Filtros del listado
+
+| Parámetro | Tipo | Regla |
+| --- | --- | --- |
+| `isActive` | `true` o `false` | Sin este parámetro solo se listan las cuadrillas activas. |
+
+## Ejemplos
+
+Los valores son ilustrativos.
+
+### Ejemplo: crear una cuadrilla
+
+```http
+POST /cuadrillas
+Content-Type: application/json
+```
+
+```json
+{
+  "name": "Cuadrilla Norte"
+}
+```
+
+Respuesta `201`:
+
+```json
+{
+  "id": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+  "name": "Cuadrilla Norte",
+  "isActive": true,
+  "createdAt": "2026-11-19T14:30:00.000Z",
+  "updatedAt": "2026-11-19T14:30:00.000Z"
+}
+```
+
+### Ejemplo: dar de baja y restaurar
+
+```http
+DELETE /cuadrillas/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d
+```
+
+```http
+PATCH /cuadrillas/9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d
+Content-Type: application/json
+```
+
+```json
+{
+  "isActive": true
+}
+```
+
+### Ejemplo: respuestas de error
+
+Cuerpo inválido (`400`):
+
+```json
+{
+  "message": ["name should not be empty"],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+Recurso inexistente (`404`):
+
+```json
+{
+  "message": "La cuadrilla no existe.",
+  "error": "Not Found",
+  "statusCode": 404
+}
+```
+
 ## Correspondencia con las tablas
 
 | Entidad | Tabla | Migración de referencia |
