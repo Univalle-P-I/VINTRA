@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { QueryFailedError } from 'typeorm';
 import { Barrio } from '../barrios/entities/barrios.entity';
 import { Macroruta } from '../macrorutas/entities/macroruta.entity';
 import { AsociarBarriosDto } from './dto/asociar-barrios.dto';
@@ -238,6 +239,43 @@ describe('MicrorutasService', () => {
       }),
     ]);
     expect(detalle.barrios[0].barrio).toEqual(barrio);
+  });
+
+  it('responde 409 si guardar falla por una asociación duplicada', async () => {
+    const microruta = { id: 'micro-id' } as Microruta;
+    const barrio = { id: 'barrio-id' } as Barrio;
+    repositorioMicrorutas.findOne.mockResolvedValue(microruta);
+    repositorioBarrios.find.mockResolvedValue([barrio]);
+    repositorioMicrorutaBarrios.find.mockResolvedValue([]);
+    repositorioMicrorutaBarrios.save.mockRejectedValue(
+      new QueryFailedError('INSERT', [], { code: '23505' }),
+    );
+
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],
+      }),
+    ).rejects.toThrow(
+      new ConflictException(
+        'Uno o más barrios ya están asociados a la microruta.',
+      ),
+    );
+  });
+
+  it('relanza los errores distintos a una violación de unicidad al guardar', async () => {
+    const microruta = { id: 'micro-id' } as Microruta;
+    const barrio = { id: 'barrio-id' } as Barrio;
+    const error = new Error('Error al guardar');
+    repositorioMicrorutas.findOne.mockResolvedValue(microruta);
+    repositorioBarrios.find.mockResolvedValue([barrio]);
+    repositorioMicrorutaBarrios.find.mockResolvedValue([]);
+    repositorioMicrorutaBarrios.save.mockRejectedValue(error);
+
+    await expect(
+      servicio.asociarBarrios('micro-id', {
+        barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],
+      }),
+    ).rejects.toBe(error);
   });
 
   it('rechaza entradas inválidas con el ValidationPipe global', async () => {

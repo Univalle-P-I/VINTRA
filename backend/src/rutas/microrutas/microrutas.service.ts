@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, QueryFailedError, Repository } from 'typeorm';
 import { Barrio } from '../barrios/entities/barrios.entity';
 import { Macroruta } from '../macrorutas/entities/macroruta.entity';
 import { AsociarBarriosDto } from './dto/asociar-barrios.dto';
@@ -141,7 +141,21 @@ export class MicrorutasService {
       });
     });
 
-    await this.microrutaBarrioRepository.save(relaciones);
+    try {
+      await this.microrutaBarrioRepository.save(relaciones);
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        error.driverError.code === '23505'
+      ) {
+        throw new ConflictException(
+          'Uno o más barrios ya están asociados a la microruta.',
+        );
+      }
+
+      throw error;
+    }
+
     return this.obtener(id);
   }
 }

@@ -113,7 +113,7 @@ npm test -- --runInBand
 - Aprobar PR #115 y ajustar entidades (nombres, unicidades, tipos).
 - Migraciones y semillas, a la espera del esquema aprobado (#115).
 - Prueba de integración contra PostgreSQL cuando exista el esquema.
-- Restricción única en BD para (microruta, barrio): hoy la unicidad solo se valida en el servicio.
+- Restricción única en BD para (microruta, barrio): la entidad ya la declara; falta la restricción real en el esquema (#115 / VIN-026).
 - Decidir PostGIS y geometrías (#54); `geom` no se acepta ni se guarda.
 - Formato definitivo de errores y paginación (#66).
 - Horarios (`schedule`, `microroute_schedule`) quedan fuera de este alcance.
