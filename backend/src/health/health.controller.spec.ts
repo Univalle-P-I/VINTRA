@@ -17,7 +17,7 @@ describe('HealthController', () => {
   });
 
   describe('GET /health', () => {
-    it('should return the API health status', () => {
+    it('devuelve el estado de salud de la API', () => {
       expect(healthController.check()).toEqual({
         status: 'ok',
         service: 'vintra-backend',
@@ -26,7 +26,7 @@ describe('HealthController', () => {
   });
 
   describe('GET /health/db', () => {
-    it('should return the database status when the query succeeds', async () => {
+    it('devuelve el estado de la base de datos cuando la consulta tiene éxito', async () => {
       const currentTime = new Date('2026-10-28T12:00:00.000Z');
 
       dataSource.query.mockResolvedValue([
@@ -44,7 +44,7 @@ describe('HealthController', () => {
       );
     });
 
-    it('should return HTTP 500 when the database query fails', async () => {
+    it('devuelve HTTP 500 cuando falla la consulta a la base de datos', async () => {
       dataSource.query.mockRejectedValue(
         new Error('Database connection failed'),
       );

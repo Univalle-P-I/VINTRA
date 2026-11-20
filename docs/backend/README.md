@@ -141,7 +141,7 @@ Respuesta del endpoint implementado:
 }
 ```
 
-El controlador [`HealthController`](../../backend/src/health.controller.ts) implementa este contrato y `GET /health/db`. Los demás recursos de la tabla siguen siendo una propuesta.
+El controlador [`HealthController`](../../backend/src/health/health.controller.ts) implementa este contrato y `GET /health/db`. Los demas recursos de la tabla siguen siendo una propuesta.
 
 ### Registrar una posición de seguimiento
 
