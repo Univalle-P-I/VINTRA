@@ -92,9 +92,11 @@ Rutas de API candidatas. El diccionario de BD propone `macroroute` (nombre y geo
 
 ### `GET /api/v1/assignments` y `POST /api/v1/assignments`
 
-`POST` es una operación transaccional. El diccionario de BD propone `microroute_id`, `crew_id`, `vehicle_id`, `assignment_status_id` y `scheduled_date`, con `started_at`/`ended_at` opcionales. El contrato final debe alinearse con esos campos aprobados y resolver cómo se selecciona el horario, porque `assignment` no incluye una referencia a `microroute_schedule`. La hoja propone una asignación única por microruta y fecha; confirmar que no bloquee el segundo viaje de HU11 antes de crear esa restricción. Respuestas candidatas: `201`, `400`, `401`, `403`, `404`, `409` y `503`.
+`POST` es una operación transaccional (VIN-030, #93). Según `database/migrations/017_create_assignment.sql`, una asignación une un conductor (`driver_id`), una programación de microruta (`microroute_schedule_id`: microruta + franja horaria + día de la semana) y un vehículo (`vehicle_id`). La cuadrilla se deduce de `driver.crew_id`. Cuerpo: `{ programacionId, conductorId, vehiculoId, fecha }` con `fecha` `YYYY-MM-DD`, que debe coincidir con el día de la programación; `scheduled_start_at` y `scheduled_end_at` se calculan con la franja (`schedule.start_time`/`end_time`, hora local UTC-5). La asignación nace en estado `SCHEDULED`. Respuestas: `201`, `400` (solicitud inválida o fecha que no corresponde al día de la programación), `401`, `403` (solo `ADMIN` y `OP`), `404` y `409`.
 
 Validaciones obligatorias una vez fijadas reglas: disponibilidad, compatibilidad, conflicto temporal, estado habilitado, referencias válidas y concurrencia. Una respuesta `409` debe identificar el conflicto con un código seguro y accionable. No permitir que dos solicitudes concurrentes creen la misma asignación incompatible; usar transacción y restricción/estrategia aprobada.
+
+Reglas implementadas en `POST` (#93): programación, horario y microruta activos; conductor activo y vinculado; cuadrilla del conductor activa; vehículo activo y fuera de `MAINTENANCE`/`OUT_OF_SERVICE` (`IN_USE` se permite porque el cruce de horarios lo controla el chequeo temporal); y ninguna otra asignación vigente (`SCHEDULED` o `IN_PROGRESS`) que se solape en el tiempo con el mismo conductor, vehículo, cuadrilla o microruta. El `409` incluye `details: [{ field, reason }]` con el motivo. Las solicitudes simultáneas se serializan bloqueando las filas involucradas (`FOR UPDATE`) en orden fijo dentro de una transacción.
 
 ### `GET /api/v1/assignments/{assignmentId}`
 
