@@ -63,7 +63,7 @@ y `/personal/drivers?crewId=`.
 | Baja | `DELETE` pone `is_active` en `false` y devuelve el registro. No hay borrado físico, porque las claves foráneas de `driver` y `crew_member` usan `ON DELETE CASCADE`. |
 | Restaurar | `PATCH` con `{ "isActive": true }`. |
 | Listados | Solo cuadrillas activas por defecto; `?isActive=false` devuelve las inactivas. Orden estable por `created_at` e `id`. Sin paginación hasta que #66 la defina. |
-| Validación | Se rechazan propiedades desconocidas en el cuerpo y en los filtros. `name` es obligatorio, admite hasta 100 caracteres y se recortan los espacios. |
+| Validación | Se rechazan propiedades desconocidas en el cuerpo y en los filtros. `name` es obligatorio, admite hasta 100 caracteres y se recortan los espacios. En la actualización, `null` se rechaza. |
 | Errores | Id inexistente: `404`. Datos inválidos: `400`. El formato común de errores queda pendiente de #66, así que se usan las respuestas por defecto de NestJS. |
 | Seguridad | Sin autenticación ni permisos hasta que se aprueben #54, #70 y #71. |
 
@@ -80,12 +80,13 @@ rechaza cualquier propiedad que no figure en las tablas.
 
 ### Actualizar cuadrilla
 
-Todos los campos son opcionales.
+Todos los campos son opcionales: omitir uno lo deja sin cambios. Ningún campo
+admite `null`.
 
 | Campo | Tipo | Regla |
 | --- | --- | --- |
-| `name` | `string` | No vacío, hasta 100 caracteres. Se recortan los espacios. |
-| `isActive` | `boolean` | `false` da de baja y `true` restaura. |
+| `name` | `string` | No vacío, hasta 100 caracteres. Se recortan los espacios. No admite `null`. |
+| `isActive` | `boolean` | `false` da de baja y `true` restaura. No admite `null`. |
 
 ### Filtros del listado
 

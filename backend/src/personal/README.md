@@ -70,7 +70,7 @@ campos en `camelCase` (`id`, `crewId`, `isActive`, `createdAt`, etc.).
 | Baja | `DELETE` pone `is_active` en `false` y devuelve el registro. No hay borrado físico, porque las claves foráneas usan `ON DELETE CASCADE`. |
 | Restaurar | `PATCH` con `{ "isActive": true }`. |
 | Listados | Solo registros activos por defecto; `?isActive=false` devuelve los inactivos. Orden estable por `created_at` e `id`. Sin paginación hasta que #66 la defina. |
-| Validación | Se rechazan propiedades desconocidas en el cuerpo y en los filtros. Los identificadores deben ser UUID y las fechas ISO 8601. `fullName` admite hasta 120 caracteres y se recortan los espacios. |
+| Validación | Se rechazan propiedades desconocidas en el cuerpo y en los filtros. Los identificadores deben ser UUID y las fechas ISO 8601 con zona horaria. Solo `crewId` y `endedAt` admiten `null`; en el resto de campos se rechaza. `fullName` admite hasta 120 caracteres y se recortan los espacios. |
 | Fechas del conductor | `endedAt` no puede ser anterior a `startedAt`. |
 | Errores | Id inexistente: `404`. Cuadrilla o cuenta de usuario inexistente (clave foránea) y fechas inválidas: `400`. El formato común de errores queda pendiente de #66, así que se usan las respuestas por defecto de NestJS. |
 | Seguridad | Sin autenticación ni permisos hasta que se aprueben #54, #70 y #71. |
@@ -85,19 +85,20 @@ rechaza cualquier propiedad que no figure en las tablas.
 | Campo | Tipo | Obligatorio | Regla |
 | --- | --- | --- | --- |
 | `userAccountId` | `string` | Sí | UUID de la cuenta de usuario. |
-| `crewId` | `string` | No | UUID de la cuadrilla. |
-| `startedAt` | `string` | No | Fecha ISO 8601. Si se omite, la base de datos usa la fecha actual. |
+| `crewId` | `string` | No | UUID de la cuadrilla. Si se omite o se envía `null`, el conductor queda sin cuadrilla. |
+| `startedAt` | `string` | No | Fecha ISO 8601 con zona horaria. Si se omite, la base de datos usa la fecha actual. No admite `null`. |
 
 ### Actualizar conductor
 
-Todos los campos son opcionales. No se puede cambiar la cuenta de usuario.
+Todos los campos son opcionales: omitir uno lo deja sin cambios. No se puede
+cambiar la cuenta de usuario. Solo `crewId` y `endedAt` admiten `null`.
 
 | Campo | Tipo | Regla |
 | --- | --- | --- |
 | `crewId` | `string` o `null` | UUID de la cuadrilla. `null` quita al conductor de su cuadrilla. |
-| `startedAt` | `string` | Fecha ISO 8601. |
-| `endedAt` | `string` o `null` | Fecha ISO 8601, no anterior a `startedAt`. `null` limpia el valor. |
-| `isActive` | `boolean` | `false` da de baja y `true` restaura. |
+| `startedAt` | `string` | Fecha ISO 8601 con zona horaria. No admite `null`. |
+| `endedAt` | `string` o `null` | Fecha ISO 8601 con zona horaria, no anterior a `startedAt`. `null` limpia el valor. |
+| `isActive` | `boolean` | `false` da de baja y `true` restaura. No admite `null`. |
 
 ### Crear miembro de cuadrilla
 
@@ -108,13 +109,28 @@ Todos los campos son opcionales. No se puede cambiar la cuenta de usuario.
 
 ### Actualizar miembro de cuadrilla
 
-Todos los campos son opcionales.
+Todos los campos son opcionales: omitir uno lo deja sin cambios. Solo `crewId`
+admite `null`.
 
 | Campo | Tipo | Regla |
 | --- | --- | --- |
-| `fullName` | `string` | No vacío, hasta 120 caracteres. Se recortan los espacios. |
+| `fullName` | `string` | No vacío, hasta 120 caracteres. Se recortan los espacios. No admite `null`. |
 | `crewId` | `string` o `null` | UUID de la cuadrilla. `null` saca al miembro de su cuadrilla. |
-| `isActive` | `boolean` | `false` da de baja y `true` restaura. |
+| `isActive` | `boolean` | `false` da de baja y `true` restaura. No admite `null`. |
+
+### Formato de fechas
+
+Las fechas (`startedAt` y `endedAt`) deben ser ISO 8601 completas con zona
+horaria: `AAAA-MM-DDTHH:MM:SS`, fracción de segundo opcional y `Z` o desfase
+`±HH:MM`. El servidor las convierte a UTC.
+
+| Se acepta | Se rechaza |
+| --- | --- |
+| `2026-11-19T08:00:00Z` | `2026-11-19` (solo la fecha) |
+| `2026-11-19T03:00:00-05:00` | `2026-11-19T08:00:00` (sin zona horaria) |
+| `2026-11-19T08:00:00+00:00` | `2026-11-19T08:00:00+0500` (desfase sin dos puntos) |
+| `2026-11-19T08:00:00.123Z` | `2026-W47-5` (fecha por semana) |
+| `2028-02-29T23:59:59Z` | `2026-02-30T08:00:00Z` (día inexistente) |
 
 ### Filtros de los listados
 
