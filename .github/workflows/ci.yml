@@ -29,12 +29,13 @@ jobs:
       - name: Check diff
         env:
           EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
           PUSH_BEFORE_SHA: ${{ github.event.before }}
-          SHA: ${{ github.sha }}
         run: |
+          head="$(git rev-parse HEAD)"
           if [ "$EVENT_NAME" = "pull_request" ]; then
-            base="$PR_BASE_SHA"
+            git fetch --no-tags origin "+refs/heads/$PR_BASE_REF:refs/remotes/origin/$PR_BASE_REF"
+            base="$(git merge-base "origin/$PR_BASE_REF" "$head")"
           elif [ "$PUSH_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
             base="$PUSH_BEFORE_SHA"
           else
@@ -42,7 +43,7 @@ jobs:
             exit 0
           fi
 
-          git diff --check "$base" "$SHA"
+          git diff --check "$base" "$head"
 
   lint-markdown:
     runs-on: ubuntu-latest

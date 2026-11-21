@@ -1,70 +1,81 @@
-
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
+import AppShell from './AppShell'
 import FleetPanel from './FleetPanel'
 import PeoplePanel from './PeoplePanel'
 import RoutePanel from './RoutePanel'
 import OperationsPanel from './OperationsPanel'
-import AdminPanel from './AdminPanel'
-import Shell from './Shell'
-import ConnectionStatus from './ConnectionStatus'
-import './App.css'
-import './styles/console.css'
+import OverviewPanel from './OverviewPanel'
+import { MapPage, DriverPanel, CitizenPanel } from './RolePanels'
+import { DataProvider } from './store'
+import { CAN_MANAGE, homeFor, navFor } from './navigation'
+import './styles/app.css'
+
+const EXIT_MS = 220
+const prefersReducedMotion = () =>
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function App() {
-  const [screen, setScreen] = useState('landing')
-  const [page, setPage] = useState('panel')
+  const [screen, setScreen] = useState('landing') // landing | login | app
+  const [leaving, setLeaving] = useState(false)
+  const timer = useRef(null)
+  useEffect(() => () => clearTimeout(timer.current), [])
 
-  const goToHome = () => {
-    setScreen('landing')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  // Cambio de pantalla: la actual se desliza y se desvanece; la nueva entra escalonada.
+  const transition = (change) => {
+    if (prefersReducedMotion()) return change()
+    clearTimeout(timer.current)
+    setLeaving(true)
+    timer.current = setTimeout(() => {
+      change()
+      setLeaving(false)
+    }, EXIT_MS)
   }
+  const [role, setRole] = useState('admin')
+  const [page, setPage] = useState('overview')
 
-  const goToLogin = () => {
-    setScreen('login')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  const top = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+  const goToHome = () => transition(() => { setScreen('landing'); top() })
+  const goToLogin = () => transition(() => { setScreen('login'); top() })
+  const navigate = (id) => { setPage(id); top() }
 
-  const navigate = (nextPage) => {
-    setPage(nextPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  // La autenticación real aún no existe: el rol elegido en el login solo simula
+  // qué parte de la interfaz se muestra. Los permisos reales los define el backend.
+  const handleLogin = (selectedRole = 'admin') =>
+    transition(() => {
+      setRole(selectedRole)
+      setPage(homeFor(selectedRole))
+      setScreen('app')
+      top()
+    })
 
-  const handleLogin = () => {
-    setPage('panel')
-    setScreen('app')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  const stage = (node) => (
+    <div className={leaving ? 'screen screen-leaving' : 'screen'} key={screen}>
+      {node}
+    </div>
+  )
 
-  return (
-    <>
-      {screen === 'landing' && (
-        <LandingPage onLogin={goToLogin} />
-      )}
+  if (screen === 'landing') return stage(<LandingPage onLogin={goToLogin} />)
+  if (screen === 'login') return stage(<LoginPage onHome={goToHome} onLogin={handleLogin} />)
 
-      {screen === 'login' && (
-        <LoginPage onHome={goToHome} onLogin={handleLogin} />
-      )}
+  const allowed = navFor(role).some((i) => i.id === page) ? page : homeFor(role)
+  const can = (k) => CAN_MANAGE[k].includes(role)
 
-      {screen === 'app' && (
-        <Shell page={page} setPage={navigate} onHome={goToHome}>
-          {page === 'panel' && (
-            <AdminPanel
-              goToFleet={() => navigate('fleet')}
-              goToPeople={() => navigate('people')}
-              goToRoutes={() => navigate('routes')}
-              goToOperations={() => navigate('operations')}
-            />
-          )}
-          {page === 'fleet' && <FleetPanel />}
-          {page === 'people' && <PeoplePanel />}
-          {page === 'routes' && <RoutePanel />}
-          {page === 'operations' && <OperationsPanel />}
-        </Shell>
-      )}
-      <ConnectionStatus />
-    </>
+  return stage(
+    <DataProvider>
+      <AppShell role={role} screen={allowed} onNavigate={navigate} onLogout={goToLogin} onHome={goToHome}>
+        {allowed === 'overview' && <OverviewPanel role={role} onNavigate={navigate} />}
+        {allowed === 'fleet' && <FleetPanel canManage={can('fleet')} />}
+        {allowed === 'people' && <PeoplePanel canManage={can('people')} />}
+        {allowed === 'routes' && <RoutePanel canManage={can('routes')} />}
+        {allowed === 'operations' && <OperationsPanel canManage={can('operations')} />}
+        {allowed === 'map' && <MapPage />}
+        {allowed === 'myroute' && <DriverPanel />}
+        {allowed === 'schedules' && <CitizenPanel />}
+      </AppShell>
+    </DataProvider>
   )
 }
 

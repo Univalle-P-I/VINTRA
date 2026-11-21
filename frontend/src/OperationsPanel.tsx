@@ -1,26 +1,116 @@
 import { FormEvent, useMemo, useState } from "react"
-import { Button, Field, SelectField, PageHeading, Metric, Section, Footer, SchematicMap } from "./ui"
+import { Badge, Button, DataTable, EmptyState, Field, Figure, Modal, PageHeading, Section, SelectField } from "./ui"
+import type { Column } from "./ui"
+import { localDateKey } from "./domain"
+import type { Assignment } from "./domain"
+import { useData } from "./store-context"
+import { useToast } from "./useToast"
+import MapView from "./MapView"
+import { assignmentConflict, findConflicts } from "./conflicts"
 
-type TripStatus = "Programado" | "En recorrido" | "Finalizado" | "Cancelado"
-type Trip = { id:string; route:string; vehicle:string; driver:string; date:string; status:TripStatus }
-const emptyTrip:Trip={id:"",route:"",vehicle:"",driver:"",date:"",status:"Programado"}
-export default function OperationsPanel(){
-  const [trips,setTrips]=useState<Trip[]>([])
-  const [draft,setDraft]=useState<Trip>(emptyTrip)
-  const [search,setSearch]=useState("")
-  const [status,setStatus]=useState("Todos")
-  const [message,setMessage]=useState("")
-  const filtered=useMemo(()=>trips.filter(t=>(!search.trim()||[t.id,t.route,t.vehicle,t.driver].some(v=>v.toLowerCase().includes(search.trim().toLowerCase())))&&(status==="Todos"||t.status===status)),[trips,search,status])
-  function save(e:FormEvent){e.preventDefault();if(!draft.route.trim()||!draft.date){setMessage("Selecciona una ruta e indica la fecha.");return}setTrips(current=>[...current,{...draft,id:draft.id||crypto.randomUUID()}]);setDraft(emptyTrip);setMessage("Recorrido agregado a la lista local. La asignación real requiere validación y persistencia desde el backend.")}
-  return <main className="content">
-    <PageHeading title="Gestión de operación" description="Programa recorridos, asigna recursos y consulta el estado de las operaciones." />
-    <div className="metrics"><Metric label="Recorridos registrados" value={trips.length} detail="Registros cargados en esta sesión"/><Metric label="Programados" value={trips.filter(t=>t.status==="Programado").length} detail="Según los registros cargados"/><Metric label="En recorrido" value={trips.filter(t=>t.status==="En recorrido").length} detail="Según los registros cargados"/><Metric label="Finalizados" value={trips.filter(t=>t.status==="Finalizado").length} detail="Según los registros cargados"/></div>
-    <Section title="Recorridos" subtitle="El seguimiento en tiempo real requiere integración con los servicios de operación y GPS.">
-      <div className="filters"><Field label="Buscar" value={search} onChange={setSearch} placeholder="Ruta, vehículo o conductor"/><SelectField label="Estado" value={status} onChange={setStatus}><option>Todos</option><option>Programado</option><option>En recorrido</option><option>Finalizado</option><option>Cancelado</option></SelectField></div>
-      <div className="data-table responsive-table operation-list-table"><div className="table-row table-head"><span>Ruta</span><span>Vehículo</span><span>Conductor</span><span>Fecha</span><span>Estado</span></div>{filtered.length?filtered.map(t=><div className="table-row" key={t.id}><span data-label="Ruta">{t.route}</span><span data-label="Vehículo">{t.vehicle||"Sin asignar"}</span><span data-label="Conductor">{t.driver||"Sin asignar"}</span><span data-label="Fecha">{t.date}</span><span data-label="Estado">{t.status}</span></div>):<p className="empty-state">No hay recorridos registrados para mostrar.</p>}</div>
+const fmt = (iso: string) => new Date(iso).toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" })
+const blank = { crew: "", microroute: "", vehicle: "", startAt: "", endAt: "" }
+
+export default function OperationsPanel({ canManage = true }: { canManage?: boolean }) {
+  const { assignments, crews, microroutes, vehicles, add } = useData()
+  const [filters, setFilters] = useState({ date: "", crew: "Todas", vehicle: "Todos", microroute: "Todas" })
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState(blank)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const { show, toast } = useToast()
+
+  const conflicts = useMemo(() => findConflicts(assignments), [assignments])
+  const usable = vehicles.filter((v) => v.isActive && (v.status === "Disponible" || v.status === "En operación"))
+  const rows = useMemo(() => assignments.filter((a) =>
+    (!filters.date || a.startAt.slice(0, 10) === filters.date) &&
+    (filters.crew === "Todas" || a.crew === filters.crew) &&
+    (filters.vehicle === "Todos" || a.vehicle === filters.vehicle) &&
+    (filters.microroute === "Todas" || a.microroute === filters.microroute)
+  ), [assignments, filters])
+
+  const [today] = useState(() => localDateKey())
+  const canCreate = crews.length > 0 && microroutes.length > 0 && usable.length > 0
+  const set = (k: keyof typeof filters) => (v: string) => setFilters((f) => ({ ...f, [k]: v }))
+  const close = () => { setOpen(false); setDraft(blank); setErrors({}) }
+  const openForm = () => setOpen(true) as void
+
+  function save(e: FormEvent) {
+    e.preventDefault()
+    const next: Record<string, string> = {}
+    if (!draft.crew) next.crew = "Selecciona una cuadrilla."
+    if (!draft.microroute) next.microroute = "Selecciona una microrruta."
+    if (!draft.vehicle) next.vehicle = "Selecciona un vehículo."
+    if (!draft.startAt) next.startAt = "Indica cuándo inicia."
+    if (!draft.endAt) next.endAt = "Indica cuándo termina."
+    else if (draft.startAt && draft.endAt <= draft.startAt) next.endAt = "El fin debe ser posterior al inicio."
+    setErrors(next)
+    if (Object.keys(next).length) return
+    const conflict = assignmentConflict(draft, assignments)
+    if (conflict) {
+      setErrors({ conflict: `No se puede guardar: ${conflict.toLowerCase()} en el horario seleccionado.` })
+      return
+    }
+    add.assignment(draft); close(); show("Asignación guardada.")
+  }
+
+  const columns: Column<Assignment>[] = [
+    { header: "Microrruta", render: (a) => <strong>{a.microroute}</strong> },
+    { header: "Cuadrilla", render: (a) => a.crew },
+    { header: "Vehículo", render: (a) => a.vehicle },
+    { header: "Inicio", render: (a) => fmt(a.startAt) },
+    { header: "Fin", render: (a) => fmt(a.endAt) },
+    { header: "Revisión", render: (a) => conflicts.has(a.id) ? <Badge tone="warn">{conflicts.get(a.id)}</Badge> : <Badge tone="ok">Sin conflictos</Badge> },
+  ]
+
+  const blocker = !crews.length ? "Crea una cuadrilla en Gestión de personal." : !microroutes.length ? "Crea una microrruta en Gestión de rutas." : !usable.length ? "Registra un vehículo activo y disponible en Gestión de flota." : ""
+
+  return <>
+    <PageHeading
+      title="Gestión de operación"
+      description="Cada asignación une una cuadrilla, una microrruta y un vehículo en una fecha y hora."
+      action={canManage ? <Button disabled={!canCreate} icon="plus" primary onClick={openForm}>Nueva asignación</Button> : undefined}
+    />
+    {canManage && blocker && <div className="attention"><strong>Antes de asignar</strong>{blocker}</div>}
+
+    <div className="figures">
+      <Figure lead label="Asignaciones de hoy" value={assignments.filter((a) => a.startAt.slice(0, 10) === today).length} />
+      <Figure label="Asignaciones registradas" value={assignments.length} />
+      <Figure label="Con conflictos" value={conflicts.size} note={conflicts.size ? "Revisa los horarios repetidos" : undefined} />
+    </div>
+
+    <Section title="Asignaciones">
+      <div className="filters">
+        <Field label="Fecha" type="date" value={filters.date} onChange={set("date")} />
+        <SelectField label="Cuadrilla" value={filters.crew} onChange={set("crew")}><option>Todas</option>{crews.map((c) => <option key={c.id}>{c.name}</option>)}</SelectField>
+        <SelectField label="Vehículo" value={filters.vehicle} onChange={set("vehicle")}><option>Todos</option>{vehicles.map((v) => <option key={v.id}>{v.plate}</option>)}</SelectField>
+        <SelectField label="Microrruta" value={filters.microroute} onChange={set("microroute")}><option>Todas</option>{microroutes.map((m) => <option key={m.id}>{m.name}</option>)}</SelectField>
+      </div>
+      <DataTable caption="Asignaciones de operación" columns={columns} rows={rows} empty={
+        <EmptyState title={assignments.length ? "Ninguna asignación coincide con los filtros" : "Todavía no hay asignaciones"}>
+          <p>{assignments.length ? "Cambia o limpia los filtros para ver más resultados." : "Las asignaciones aparecerán aquí cuando se creen o se consulten desde el sistema."}</p>
+        </EmptyState>} />
     </Section>
-    <div className="two-column"><Section title="Monitoreo GPS" subtitle="La ubicación se mostrará cuando exista conexión con el proveedor GPS."><SchematicMap/><p className="empty-state">Sin datos de ubicación disponibles.</p></Section><Section title="Novedades e incidencias" subtitle="Las incidencias se mostrarán cuando sean registradas en el sistema."><p className="empty-state">No hay novedades registradas.</p></Section></div>
-    <Section title="Programar recorrido"><form className="assignment-form" onSubmit={save}><div className="assignment-grid"><Field label="Ruta" value={draft.route} onChange={v=>setDraft(d=>({...d,route:v}))}/><Field label="Fecha" type="date" value={draft.date} onChange={v=>setDraft(d=>({...d,date:v}))}/><Field label="Vehículo" value={draft.vehicle} onChange={v=>setDraft(d=>({...d,vehicle:v}))}/><Field label="Conductor" value={draft.driver} onChange={v=>setDraft(d=>({...d,driver:v}))}/><SelectField label="Estado" value={draft.status} onChange={v=>setDraft(d=>({...d,status:v as TripStatus}))}><option>Programado</option><option>En recorrido</option><option>Finalizado</option><option>Cancelado</option></SelectField></div>{message&&<p className="form-message" role="status">{message}</p>}<div className="actions"><Button primary type="submit">Guardar recorrido</Button><Button onClick={()=>{setDraft(emptyTrip);setMessage("")}}>Limpiar</Button></div></form></Section>
-    <Footer/>
-  </main>
+
+    <Section title="Seguimiento en el mapa" subtitle="Cada posición pertenece a una asignación; la API puede mostrar su vehículo y microrruta asociados.">
+      <MapView label="Mapa de seguimiento de Buenaventura" />
+    </Section>
+
+    {open && (
+      <Modal title="Nueva asignación" onClose={close}>
+        <form noValidate onSubmit={save}>
+          <div className="form-grid">
+          <SelectField error={errors.crew} label="Cuadrilla" required value={draft.crew} onChange={(v) => setDraft((d) => ({ ...d, crew: v }))}><option value="">Seleccionar</option>{crews.map((c) => <option key={c.id}>{c.name}</option>)}</SelectField>
+          <SelectField error={errors.microroute} label="Microrruta" required value={draft.microroute} onChange={(v) => setDraft((d) => ({ ...d, microroute: v }))}><option value="">Seleccionar</option>{microroutes.map((m) => <option key={m.id}>{m.name}</option>)}</SelectField>
+          <SelectField error={errors.vehicle} label="Vehículo" required value={draft.vehicle} onChange={(v) => setDraft((d) => ({ ...d, vehicle: v }))}><option value="">Seleccionar</option>{usable.map((v) => <option key={v.id}>{v.plate}</option>)}</SelectField>
+            <span />
+          <Field label="Inicio" required type="datetime-local" value={draft.startAt} onChange={(v) => setDraft((d) => ({ ...d, startAt: v }))} error={errors.startAt} />
+          <Field label="Fin" required type="datetime-local" value={draft.endAt} onChange={(v) => setDraft((d) => ({ ...d, endAt: v }))} error={errors.endAt} />
+          </div>
+        {errors.conflict && <p className="form-alert" role="alert" style={{ marginTop: 12 }}>{errors.conflict}</p>}
+          <p className="muted" style={{ marginTop: 12 }}>Solo se listan vehículos activos con estado Disponible o En operación.</p>
+          <div className="actions" style={{ marginTop: 16 }}><Button primary type="submit">Guardar asignación</Button><Button onClick={close}>Cancelar</Button></div>
+        </form>
+      </Modal>)}
+    {toast}
+  </>
 }

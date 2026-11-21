@@ -13,9 +13,10 @@ Guía para documentar la experiencia de quienes consultan o administran el servi
 
 ## Estado
 
-- Estado: `Borrador`
+- Estado: `Implementación frontend parcial`
 - Responsable: Célula UI/UX
-- Pendiente: publicar la landing page, flujos y criterios visuales.
+- Implementación y límites actuales: [REDISENO.md](REDISENO.md)
+- Pendiente: autenticación y permisos reales, endpoints de negocio, integración GPS y habilitación del perfil ciudadano.
 
 ---
 
