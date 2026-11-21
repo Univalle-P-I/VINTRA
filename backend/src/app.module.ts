@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AsignacionesModule } from './asignaciones/asignaciones.module';
 import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profiles/profile.module';
@@ -47,6 +48,7 @@ export function createDatabaseOptions(
     PersonalModule,
     CuadrillasModule,
     RutasModule,
+    AsignacionesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
