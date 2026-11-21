@@ -8,7 +8,7 @@ jest.mock('@nestjs/core', () => ({
   },
 }));
 
-describe('bootstrap', () => {
+describe('inicio de la aplicación', () => {
   const originalPort = process.env.PORT;
 
   const mockApp = {
@@ -43,7 +43,7 @@ describe('bootstrap', () => {
     }
   });
 
-  it('configures CORS and uses port 3002 by default', async () => {
+  it('configura CORS y usa el puerto 3002 de forma predeterminada', async () => {
     delete process.env.PORT;
 
     await bootstrap();
@@ -65,7 +65,7 @@ describe('bootstrap', () => {
     expect(mockApp.listen.mock.calls).toEqual([[3002]]);
   });
 
-  it('uses the PORT environment variable when defined', async () => {
+  it('usa la variable de entorno PORT cuando está definida', async () => {
     process.env.PORT = '4000';
 
     await bootstrap();
@@ -73,7 +73,7 @@ describe('bootstrap', () => {
     expect(mockApp.listen.mock.calls).toEqual([[4000]]);
   });
 
-  it('rejects an invalid port before listening', async () => {
+  it('rechaza un puerto no válido antes de empezar a escuchar', async () => {
     process.env.PORT = 'not-a-port';
 
     await expect(bootstrap()).rejects.toThrow(
