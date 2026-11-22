@@ -24,7 +24,7 @@ CREATE TABLE user_account (
     pwd_hash TEXT NOT NULL,
     first_name VARCHAR(80) NOT NULL,
     last_name VARCHAR(80) NOT NULL,
-    email VARCHAR(254) NOT NULL,
+    email VARCHAR(254),
     phone VARCHAR(20),
     failed_attempts SMALLINT NOT NULL DEFAULT 0,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,

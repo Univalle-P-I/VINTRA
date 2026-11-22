@@ -623,10 +623,6 @@ El orden respeta las dependencias entre tablas: primero las entidades base, desp
 | 034 | `034_create_microroute_schedule_log.sql` | `microroute_schedule`, `user_account` |
 | 035 | `035_create_microroute_neighborhood_log.sql` | `microroute_neighborhood`, `user_account` |
 | 036 | `036_create_vehicle_position_log.sql` | `vehicle_position`, `user_account` |
-| 040 | `040_add_is_active_to_user_account.sql` | `user_account` |
-| 041 | `041_extend_audit_action_enum.sql` | `audit_action` |
-| 042 | `042_add_is_active_to_audited_reference_tables.sql` | `user_data`, `macroroute`, `microroute`, `btura_neighborhood`, `microroute_neighborhood` |
-| 043 | `043_remove_log_entity_fk.sql` | `*_log` |
 
 #### 3.2.2. Seeders
 
@@ -753,7 +749,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${IP:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -777,7 +773,7 @@ docker compose ps             # verificar estado "healthy"
 
 for dir in migrations seeders triggers; do
   for f in database/$dir/*.sql; do
-    docker compose exec -T database psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra < "$f"
+    docker compose exec -T database psql -v ON_ERROR_STOP=1 -U vintra_user -d vintra < "$f"
   done
 done
 ```

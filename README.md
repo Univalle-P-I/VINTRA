@@ -125,7 +125,7 @@ En la raíz, copia `.env.example` a `.env` y arranca PostgreSQL:
 
 ```powershell
 Copy-Item .env.example .env
-docker compose up -d postgres
+docker compose up -d database
 ```
 
 En dos terminales, inicia API y frontend:

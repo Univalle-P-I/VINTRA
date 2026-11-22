@@ -29,7 +29,7 @@ BEGIN
     END IF;
 
     IF TG_OP = 'DELETE' THEN
-        v_entity_id := OLD.id;
+        v_entity_id := NULL;
         v_old := to_jsonb(OLD);
         v_new := NULL;
     ELSIF TG_OP = 'UPDATE' THEN
