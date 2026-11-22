@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { createDatabaseOptions } from './app.module';
 
 describe('createDatabaseOptions', () => {
-  it('uses PostgreSQL configuration from ConfigService', () => {
+  it('usa la configuración de PostgreSQL de ConfigService', () => {
     const values: Record<string, string> = {
       DB_HOST: 'postgres',
       DB_PORT: '5432',
@@ -30,7 +30,7 @@ describe('createDatabaseOptions', () => {
     });
   });
 
-  it('uses localhost and port 5432 when defaults are needed', () => {
+  it('usa localhost y el puerto 5432 cuando hacen falta valores predeterminados', () => {
     const config = {
       get: jest.fn((_key: string, defaultValue?: string) => defaultValue),
     } as unknown as ConfigService;

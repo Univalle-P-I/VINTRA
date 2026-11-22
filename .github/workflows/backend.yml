@@ -27,6 +27,7 @@ jobs:
       POSTGRES_DB: vintra_test
       POSTGRES_USER: vintra_test
       POSTGRES_PASSWORD: vintra_test_password
+      JWT_SECRET: vintra-ci-test-secret-at-least-32-characters-100-real-no-fake-20-18
     defaults:
       run:
         working-directory: backend
