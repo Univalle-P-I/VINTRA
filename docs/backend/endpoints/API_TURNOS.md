@@ -36,7 +36,7 @@ La documentación Swagger declara autenticación Bearer mediante `access-token`.
 ### 2.1. Matriz de permisos declarada en el código
 
 | Operación | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|:---:|:---:|:---:|
+| --- | :---: | :---: | :---: |
 | Consultar horarios | Sí | Sí | Sí |
 | Crear horarios | Sí | Sí | No |
 | Actualizar horarios | Sí | Sí | No |
@@ -55,7 +55,7 @@ El controlador declara siete rutas.
 ### 3.1. Administración de horarios
 
 | Método | Endpoint | Descripción | Roles declarados |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/v1/schedules` | Listar horarios con filtros y paginación. | ADMIN, OPERATIONS_MANAGER, DRIVER |
 | GET | `/api/v1/schedules/:id` | Consultar un horario por UUID. | ADMIN, OPERATIONS_MANAGER, DRIVER |
 | POST | `/api/v1/schedules` | Crear un horario. | ADMIN, OPERATIONS_MANAGER |
@@ -64,7 +64,7 @@ El controlador declara siete rutas.
 ### 3.2. Asociación de horarios con microrutas
 
 | Método | Endpoint | Descripción | Roles declarados |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/v1/microroute-schedules` | Listar asociaciones con filtros. | ADMIN, OPERATIONS_MANAGER, DRIVER |
 | POST | `/api/v1/microroute-schedules` | Asociar un horario a una microruta. | ADMIN, OPERATIONS_MANAGER |
 | PATCH | `/api/v1/microroute-schedules/:id` | Actualizar el día o el estado de una asociación. | ADMIN, OPERATIONS_MANAGER |
@@ -78,7 +78,7 @@ No se identificaron endpoints DELETE en este controlador.
 **GET** `/api/v1/schedules`
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `isActive` | Boolean | No | Filtra horarios activos o inactivos. |
 | `page` | Number | No | Página solicitada, comenzando desde 0. |
 | `size` | Number | No | Cantidad de registros por página. |
@@ -112,7 +112,7 @@ El DTO establece un mínimo de 1 para `size`, pero no declara un límite máximo
 **GET** `/api/v1/schedules/:id`
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | Identificador del horario. |
 
 Se utiliza `ParseUUIDPipe` para validar el identificador.
@@ -124,7 +124,7 @@ El servicio busca el horario por ID sin aplicar un filtro de estado activo. Por 
 **GET** `/api/v1/microroute-schedules`
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `isActive` | Boolean | No | Filtra asociaciones activas o inactivas. |
 | `dayOfWeek` | Number | No | Filtra por día de la semana. |
 
@@ -154,7 +154,7 @@ Un identificador que no tenga formato UUID válido produce un error de solicitud
 Archivo: `dto/crear-horario.dto.ts`
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `name` | String | No | Trim, mínimo 1 carácter y máximo 20. |
 | `startTime` | String | Sí | Formato `HH:mm` o `HH:mm:ss`. |
 | `endTime` | String | Sí | Formato `HH:mm` o `HH:mm:ss`. |
@@ -176,7 +176,7 @@ Archivo: `dto/actualizar-horario.dto.ts`
 Todos los campos son opcionales.
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `name` | String | Trim y mínimo 1 carácter. |
 | `startTime` | String | Formato `HH:mm` o `HH:mm:ss`. |
 | `endTime` | String | Formato `HH:mm` o `HH:mm:ss`. |
@@ -193,7 +193,7 @@ El DTO tampoco exige que se envíe al menos un campo. Por ello, un objeto vacío
 Archivo: `dto/consultar-turnos.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `isActive` | Boolean | Transforma los textos `true` y `false` en booleanos. |
 | `page` | Number | Entero mayor o igual a 0. |
 | `size` | Number | Entero mayor o igual a 1. |
@@ -205,7 +205,7 @@ La conversión de `page` y `size` se realiza mediante `@Type(() => Number)`.
 Archivo: `dto/crear-microruta-horario.dto.ts`
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `microrouteId` | UUID | Sí | Identificador válido de microruta. |
 | `scheduleId` | UUID | Sí | Identificador válido de horario. |
 | `dayOfWeek` | Number | Sí | Entero entre 1 y 7. |
@@ -215,7 +215,7 @@ Archivo: `dto/crear-microruta-horario.dto.ts`
 Archivo: `dto/actualizar-microruta-horario.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `dayOfWeek` | Number | Opcional, entero entre 1 y 7. |
 | `isActive` | Boolean | Opcional, booleano. |
 
@@ -228,7 +228,7 @@ El DTO no exige que se envíe al menos un campo.
 Archivo: `dto/consultar-microruta-horarios.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `isActive` | Boolean | Opcional, transforma `true` y `false`. |
 | `dayOfWeek` | Number | Opcional, entero entre -32768 y 32767. |
 
@@ -332,7 +332,7 @@ El método privado `validarRangoHorario()` convierte las horas a segundos para c
 La hora final debe ser estrictamente posterior a la hora inicial.
 
 | Inicio | Fin | Resultado |
-|---|---|---|
+| --- | --- | --- |
 | 06:00 | 14:00 | Válido |
 | 08:30 | 08:30 | Inválido |
 | 15:00 | 10:00 | Inválido |
@@ -394,7 +394,7 @@ Archivo: `entidades/horario.entity.ts`
 Tabla: `schedule`
 
 | Propiedad | Columna | Tipo |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | UUID |
 | `nombre` | `name` | VARCHAR(20), nullable |
 | `horaInicio` | `start_time` | TIME |
@@ -414,7 +414,7 @@ Archivo: `entidades/microruta-horario.entity.ts`
 Tabla: `microroute_schedule`
 
 | Propiedad | Columna | Tipo |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | UUID |
 | `microruta` | `microroute_id` | Relación ManyToOne |
 | `horario` | `schedule_id` | Relación ManyToOne |
@@ -462,7 +462,7 @@ La generación efectiva de registros depende de los mecanismos de auditoría y d
 ## 10. Manejo de errores
 
 | Código HTTP | Significado | Situaciones identificadas |
-|---|---|---|
+| --- | --- | --- |
 | 200 | OK | Consultas y actualizaciones exitosas. |
 | 201 | Created | Creación de horario o asociación. |
 | 400 | Bad Request | UUID inválido, DTO inválido o rango horario incorrecto. |
@@ -492,7 +492,7 @@ npm test -- --runInBand src/turnos/turnos.service.spec.ts
 **Resultado reportado de una ejecución anterior:**
 
 | Indicador | Resultado |
-|---|---:|
+| --- | ---: |
 | Suites aprobadas | 1 |
 | Suites fallidas | 0 |
 | Pruebas aprobadas | 18 |
@@ -505,7 +505,7 @@ npm test -- --runInBand src/turnos/turnos.service.spec.ts
 ### 11.2. Cobertura funcional identificada
 
 | Grupo de pruebas | Casos verificados |
-|---|---|
+| --- | --- |
 | `listar` | Filtrado por estado, paginación y valores predeterminados. |
 | `obtener` | Consulta por ID y manejo de horario inexistente. |
 | `crear` | Creación de horario activo, nombre nulo y rechazo de rangos inválidos. |
@@ -533,7 +533,7 @@ Queda como posible ampliación incorporar pruebas específicas de controladores 
 ## 12. Archivos relacionados
 
 | Archivo | Responsabilidad |
-|---|---|
+| --- | --- |
 | `turnos.controller.ts` | Define los endpoints y permisos. |
 | `turnos.service.ts` | Implementa la lógica de negocio. |
 | `turnos.module.ts` | Registra e integra los componentes del módulo. |

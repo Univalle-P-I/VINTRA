@@ -1,4 +1,3 @@
-# API_PERSONAL.md
 # Documentación de API – Módulo Personal (Conductores)
 
 ## 1. Descripción general
@@ -33,7 +32,7 @@ El controlador aplica globalmente:
 Todos los endpoints requieren autenticación mediante Bearer Token.
 
 | Rol | Permisos |
-|---|---|
+| --- | --- |
 | ADMIN | Listar, consultar, registrar y actualizar conductores. |
 | OPERATIONS_MANAGER | Listar, consultar, registrar y actualizar conductores. |
 | DRIVER | Consultar únicamente su propio perfil mediante `/me`. |
@@ -48,7 +47,7 @@ Las respuestas documentadas para errores de seguridad son:
 ## 3. Endpoints disponibles
 
 | Método | Ruta | Roles | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | GET | `/api/v1/personal/conductores` | ADMIN, OPERATIONS_MANAGER | Lista los conductores. |
 | GET | `/api/v1/personal/conductores/me` | DRIVER | Consulta el perfil propio. |
 | GET | `/api/v1/personal/conductores/:id` | ADMIN, OPERATIONS_MANAGER | Consulta un conductor por UUID. |
@@ -181,7 +180,7 @@ No requiere.
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | Identificador del conductor. |
 
 **Headers:**
@@ -229,7 +228,7 @@ Registrar un conductor creando sus datos personales, su cuenta de acceso y su vi
 **Body:**
 
 | Campo | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `documentType` | Enum | Sí | Debe pertenecer a `TipoDocumento`. |
 | `documentId` | String | Sí | No vacío, máximo 20 caracteres. |
 | `firstName` | String | Sí | Entre 2 y 80 caracteres; elimina espacios externos. |
@@ -287,7 +286,7 @@ Devuelve los datos públicos del conductor creado.
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | Identificador del conductor. |
 
 **Headers:**
@@ -301,7 +300,7 @@ Devuelve los datos públicos del conductor creado.
 Todos los campos son opcionales.
 
 | Campo | Tipo | Validación |
-|---|---|---|
+| --- | --- | --- |
 | `firstName` | String | Entre 2 y 80 caracteres; elimina espacios externos. |
 | `lastName` | String | Entre 2 y 80 caracteres; elimina espacios externos. |
 | `email` | String | Correo válido, máximo 254 caracteres; elimina espacios externos y convierte a minúsculas. |
@@ -355,7 +354,7 @@ La respuesta combina información de:
 La estructura pública es:
 
 | Campo | Origen |
-|---|---|
+| --- | --- |
 | `id` | Conductor |
 | `userDataId` | DatosUsuario |
 | `crewId` | Cuadrilla relacionada |
@@ -378,7 +377,7 @@ Si no existe una cuadrilla asociada, `crewId` se devuelve como `null`.
 **Diferencia crítica con la migración propuesta:** esta entidad y este mapeo reflejan el código TypeORM, que utiliza `driver.user_data_id` y la relación `DatosUsuario`. En cambio, `016_create_driver.sql` del PR #115 define `driver.user_account_id` como FK a `user_account`; además, ese PR no crea una tabla `user_data`. El esquema del código y la migración no son intercambiables ni compatibles sin una decisión y un cambio coordinado. El PR sigue pendiente de aprobación.
 
 | Propiedad | Columna | Tipo / comportamiento |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | UUID, clave primaria. |
 | `datosUsuario` | `user_data_id` | Relación ManyToOne obligatoria. |
 | `cuadrilla` | `crew_id` | Relación ManyToOne opcional. |
@@ -426,7 +425,7 @@ La implementación concreta del registro de auditoría corresponde al módulo de
 ## 8. Manejo de errores
 
 | Situación | Excepción / código |
-|---|---|
+| --- | --- |
 | Conductor inexistente | NotFoundException / 404 |
 | Cuadrilla inexistente o inactiva | NotFoundException / 404 |
 | Violación de unicidad PostgreSQL `23505` | ConflictException / 409 |
@@ -457,7 +456,7 @@ El mensaje implementado indica que el correo o documento ya está asociado a otr
 **Cobertura funcional observada:**
 
 | Funcionalidad | Pruebas |
-|---|---:|
+| --- | ---: |
 | Listar conductores | 1 |
 | Consultar conductor por ID | 2 |
 | Consultar perfil propio | 2 |
@@ -498,7 +497,7 @@ Los siguientes endpoints fueron reportados como parte de cambios desarrollados p
 Por lo tanto, se registran como propuestas y no como funcionalidades confirmadas en la rama de código utilizada como referencia para esta documentación.
 
 | Método | Ruta propuesta | Propósito |
-|---|---|---|
+| --- | --- | --- |
 | DELETE | `/api/v1/personal/drivers/:id` | Eliminar o desactivar un conductor, según el comportamiento definitivo de la implementación. |
 | DELETE | `/api/v1/personal/crew-members/:id` | Eliminar o desactivar un integrante de cuadrilla. |
 | GET | `/api/v1/personal/crew-members/:id` | Consultar un integrante de cuadrilla por su identificador. |
@@ -516,6 +515,7 @@ Por lo tanto, se registran como propuestas y no como funcionalidades confirmadas
 - Contratos de respuesta y errores específicos.
 
 Una vez integrada la Pull Request, se deberá contrastar esta sección con los controladores, servicios, DTO y entidades definitivos para actualizar la documentación principal.
+
 ## 12. Conclusión
 
 El módulo `personal` implementa la gestión de conductores mediante cinco endpoints protegidos por JWT y control de roles.

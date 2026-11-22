@@ -18,7 +18,7 @@ Este módulo permite consultar y administrar la información geográfica y opera
 El módulo comprende cuatro recursos:
 
 | Recurso | Descripción |
-|---|---|
+| --- | --- |
 | Barrios (`neighborhoods`) | Administración de barrios, comunas y geometrías territoriales. |
 | Macrorutas (`macroroutes`) | Administración de recorridos generales de recolección. |
 | Microrutas (`microroutes`) | Administración de recorridos específicos asociados a una macroruta. |
@@ -60,7 +60,7 @@ Content-Type: application/json
 Los roles utilizados en el módulo son:
 
 | Rol | Código |
-|---|---|
+| --- | --- |
 | Administrador | `ADMIN` |
 | Responsable de operaciones | `OPERATIONS_MANAGER` |
 | Conductor | `DRIVER` |
@@ -68,7 +68,7 @@ Los roles utilizados en el módulo son:
 ### 3.3. Matriz de permisos
 
 | Recurso / operación | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|:---:|:---:|:---:|
+| --- | :---: | :---: | :---: |
 | Listar barrios | Sí | Sí | Sí |
 | Consultar barrio por ID | Sí | Sí | Sí |
 | Crear barrio | Sí | Sí | No |
@@ -106,7 +106,7 @@ La autorización se define mediante `@Roles()` en el controlador y se aplica con
 **Parámetros de consulta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `name` | string | No | Busca coincidencias parciales en el nombre. |
 | `commune` | string | No | Busca coincidencias parciales en la comuna. |
 | `page` | number | No | Número de página. Predeterminado: 1. |
@@ -156,7 +156,7 @@ El ejemplo representa la estructura de salida de la consulta; los valores son il
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Consulta realizada correctamente. |
 | 400 | Parámetros de consulta inválidos. |
 | 401 | No autenticado. |
@@ -175,7 +175,7 @@ El ejemplo representa la estructura de salida de la consulta; los valores son il
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | Identificador del barrio. |
 
 **Ejemplo:**
@@ -209,7 +209,7 @@ GET /api/v1/neighborhoods/550e8400-e29b-41d4-a716-446655440000
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Barrio encontrado. |
 | 400 | Identificador UUID inválido. |
 | 401 | No autenticado. |
@@ -244,7 +244,7 @@ GET /api/v1/neighborhoods/550e8400-e29b-41d4-a716-446655440000
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `commune` | string o null | No | Texto de 1 a 80 caracteres cuando se envía como cadena. |
 | `name` | string | Sí | Texto de 1 a 120 caracteres. |
 | `geometry` | object | Sí | GeoJSON de tipo `MultiPolygon`. |
@@ -262,7 +262,7 @@ GET /api/v1/neighborhoods/550e8400-e29b-41d4-a716-446655440000
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 201 | Barrio creado. |
 | 400 | Datos o geometría inválidos. |
 | 401 | No autenticado. |
@@ -294,7 +294,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `commune` | string o null | No | Texto de 1 a 80 caracteres cuando se envía como cadena; también admite `null`. |
 | `name` | string | No | Texto de 1 a 120 caracteres. |
 | `geometry` | object | No | GeoJSON `MultiPolygon`. |
@@ -311,7 +311,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Barrio actualizado. |
 | 400 | Identificador o datos inválidos. |
 | 401 | No autenticado. |
@@ -363,7 +363,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Consulta realizada correctamente. |
 | 401 | No autenticado. |
 | 403 | Sin permisos. |
@@ -381,7 +381,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | Identificador de la macroruta. |
 
 **Reglas de negocio:**
@@ -393,7 +393,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Macroruta encontrada. |
 | 400 | UUID inválido. |
 | 401 | No autenticado. |
@@ -428,7 +428,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `code` | string | Sí | De 1 a 30 caracteres. |
 | `name` | string | Sí | No vacío, máximo 120 caracteres. |
 | `geometry` | object | Sí | GeoJSON `MultiLineString`. |
@@ -445,7 +445,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 201 | Macroruta creada. |
 | 400 | Datos o geometría inválidos. |
 | 401 | No autenticado. |
@@ -475,7 +475,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `code` | string | No | De 1 a 30 caracteres. |
 | `name` | string | No | No vacío, máximo 120 caracteres. |
 | `geometry` | object | No | GeoJSON `MultiLineString`. |
@@ -491,7 +491,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Macroruta actualizada. |
 | 400 | Identificador o datos inválidos. |
 | 401 | No autenticado. |
@@ -518,7 +518,7 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 **Parámetros de consulta:**
 
 | Parámetro | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `macrorouteId` | UUID | No | Identificador de macroruta. |
 | `search` | string | No | Búsqueda en nombre o código. |
 | `includeGeometry` | boolean | No | Admite `true` o `false`. |
@@ -538,7 +538,7 @@ GET /api/v1/microroutes?macrorouteId=550e8400-e29b-41d4-a716-446655440000&search
 3. Ordena los resultados por código ascendente.
 4. Si se envía `macrorouteId`, filtra por el identificador de la macroruta.
 5. Si se envía `search`, busca coincidencias en nombre o código mediante `ILIKE`.
-6. 6. Si `includeGeometry` es `false`, selecciona explícitamente los campos básicos de la microruta y los datos de identificación de su macroruta asociada. Se omite la geometría de ambas entidades en esa consulta.
+6. 1. Si `includeGeometry` es `false`, selecciona explícitamente los campos básicos de la microruta y los datos de identificación de su macroruta asociada. Se omite la geometría de ambas entidades en esa consulta.
 7. La paginación predeterminada utiliza página 1 y límite 20.
 8. El servicio devuelve `items`, `total`, `page` y `limit`.
 
@@ -569,7 +569,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Consulta realizada correctamente. |
 | 400 | Parámetros inválidos. |
 | 401 | No autenticado. |
@@ -588,7 +588,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | Identificador de la microruta. |
 
 **Reglas de negocio:**
@@ -601,7 +601,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Microruta encontrada. |
 | 400 | UUID inválido. |
 | 401 | No autenticado. |
@@ -637,7 +637,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `macrorouteId` | UUID | Sí | Formato UUID. |
 | `code` | string | Sí | De 1 a 30 caracteres. |
 | `name` | string | Sí | No vacío, máximo 120 caracteres. |
@@ -654,7 +654,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 201 | Microruta creada. |
 | 400 | Datos o geometría inválidos. |
 | 401 | No autenticado. |
@@ -686,7 +686,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `macrorouteId` | UUID | No | Formato UUID. |
 | `code` | string | No | De 1 a 30 caracteres. |
 | `name` | string | No | No vacío, máximo 120 caracteres. |
@@ -705,7 +705,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Microruta actualizada. |
 | 400 | Identificador o datos inválidos. |
 | 401 | No autenticado. |
@@ -730,7 +730,7 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 **Parámetro de consulta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `microrouteId` | UUID | No | Filtra las asociaciones por identificador de microruta. |
 
 **Ejemplo:**
@@ -750,7 +750,7 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Consulta realizada correctamente. |
 | 400 | UUID inválido. |
 | 401 | No autenticado. |
@@ -781,7 +781,7 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `microrouteId` | UUID | Sí | Formato UUID. |
 | `neighborhoodId` | UUID | Sí | Formato UUID. |
 | `orderVisit` | number | Sí | Entero, mínimo 1. |
@@ -800,7 +800,7 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 201 | Asociación creada. |
 | 400 | UUID u orden de visita inválidos. |
 | 401 | No autenticado. |
@@ -831,7 +831,7 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validaciones |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `microrouteId` | UUID | No | Formato UUID. |
 | `neighborhoodId` | UUID | No | Formato UUID. |
 | `orderVisit` | number | No | Entero, mínimo 1. |
@@ -849,7 +849,7 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 **Respuestas HTTP:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 200 | Asociación actualizada. |
 | 400 | Identificador u orden inválidos. |
 | 401 | No autenticado. |
@@ -886,7 +886,7 @@ Los campos de texto utilizan transformaciones y validaciones según el DTO:
 La geometría se valida mediante `GeoJsonGeometryValidator`.
 
 | Recurso | Tipo GeoJSON | SRID |
-|---|---|---|
+| --- | --- | --- |
 | Barrio | `MultiPolygon` | 4326 |
 | Macroruta | `MultiLineString` | 4326 |
 | Microruta | `MultiLineString` | 4326 |
@@ -914,7 +914,7 @@ La paginación y el orden de visita utilizan validaciones numéricas:
 La aplicación configura un `ValidationPipe` global en `src/main.ts` con las siguientes opciones:
 
 | Opción | Comportamiento |
-|---|---|
+| --- | --- |
 | `whitelist: true` | Excluye las propiedades que no cuentan con decoradores de validación en el DTO. |
 | `forbidNonWhitelisted: true` | Rechaza las solicitudes que contienen propiedades no permitidas, en lugar de ignorarlas silenciosamente. |
 | `transform: true` | Transforma los datos recibidos a las instancias de los DTO y aplica las transformaciones declaradas. |
@@ -936,7 +936,7 @@ Las entidades del módulo se encuentran en:
 Entidad: `Barrio`.
 
 | Campo | Tipo | Restricciones |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Clave primaria `btura_neighborhood_pkey`. |
 | `commune` | VARCHAR(80) | Nullable. |
 | `name` | VARCHAR(120) | Obligatorio. |
@@ -954,7 +954,7 @@ Entidad: `Barrio`.
 Entidad: `Macroruta`.
 
 | Campo | Tipo | Restricciones |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Clave primaria `macroroute_pkey`. |
 | `code` | VARCHAR(30) | Obligatorio. |
 | `name` | VARCHAR(120) | Obligatorio. |
@@ -972,7 +972,7 @@ Restricciones e índices:
 Entidad: `Microruta`.
 
 | Campo | Tipo | Restricciones |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Clave primaria `microroute_pkey`. |
 | `macroroute_id` | UUID | FK obligatoria hacia `macroroute`. |
 | `code` | VARCHAR(30) | Obligatorio. |
@@ -1000,7 +1000,7 @@ La unicidad del código de microruta está definida sobre el campo `codigo`, no 
 Entidad: `MicrorutaBarrio`.
 
 | Campo | Tipo | Restricciones |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Clave primaria `microroute_neighborhood_pkey`. |
 | `neighborhood_id` | UUID | FK obligatoria hacia `btura_neighborhood`. |
 | `microroute_id` | UUID | FK obligatoria hacia `microroute`. |
@@ -1062,7 +1062,7 @@ La existencia y ejecución efectiva de triggers debe verificarse cuando las migr
 El módulo utiliza excepciones de NestJS y transforma determinados errores de PostgreSQL.
 
 | Excepción / condición | Código HTTP | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `UnauthorizedException` del guard | 401 | Token ausente o inválido. |
 | `ForbiddenException` del guard | 403 | El usuario no tiene el rol requerido. |
 | `BadRequestException` de validación o pipes | 400 | Datos, UUID o parámetros inválidos. |
@@ -1100,7 +1100,7 @@ npm test -- --runInBand src/rutas/rutas.service.spec.ts
 **Resultado reportado:**
 
 | Indicador | Resultado |
-|---|---:|
+| --- | ---: |
 | Suites aprobadas | 1 |
 | Suites fallidas | 0 |
 | Pruebas aprobadas | 24 |

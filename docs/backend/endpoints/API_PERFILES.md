@@ -25,7 +25,7 @@ Todos los endpoints están protegidos mediante:
 ### Matriz de permisos
 
 | Operación | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Consultar perfiles de una cuenta | Sí | Sí | No |
 | Crear perfiles | Sí | No | No |
 | Actualizar perfiles | Sí | No | No |
@@ -45,13 +45,13 @@ Los permisos están definidos mediante el decorador `@Roles()` en el controlador
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Validación | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `userId` | UUID | `ParseUUIDPipe` | Identificador de la cuenta de usuario. |
 
 **Headers:**
 
 | Header | Valor |
-|---|---|
+| --- | --- |
 | Authorization | Bearer JWT |
 
 **Body:** No requiere.
@@ -98,7 +98,7 @@ Ejemplo:
 **Headers:**
 
 | Header | Valor |
-|---|---|
+| --- | --- |
 | Authorization | Bearer JWT |
 | Content-Type | application/json |
 
@@ -114,7 +114,7 @@ Ejemplo:
 **DTO:** `CrearPerfilDto`.
 
 | Campo | Tipo | Validación | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `userAccountId` | string | `@IsUUID()` | Identificador de la cuenta a la que se asociará el perfil. |
 | `role` | RolUsuario | `@IsEnum(RolUsuario)` | Rol que se asignará. |
 
@@ -163,13 +163,13 @@ Ejemplo:
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Validación | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | `ParseUUIDPipe` | Identificador del perfil que se actualizará. |
 
 **Headers:**
 
 | Header | Valor |
-|---|---|
+| --- | --- |
 | Authorization | Bearer JWT |
 | Content-Type | application/json |
 
@@ -184,7 +184,7 @@ Ejemplo:
 **DTO:** `ActualizarPerfilDto`.
 
 | Campo | Tipo | Validación | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `isActive` | boolean | `@IsBoolean()` | Nuevo estado de actividad del perfil. |
 
 **Funcionamiento:**
@@ -240,7 +240,7 @@ Las validaciones se implementan mediante `class-validator`.
 **Tabla:** `profile`.
 
 | Propiedad TypeScript | Columna BD | Tipo / característica |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | UUID, llave primaria `profile_pkey`. |
 | `cuentaUsuario` | `user_account_id` | Relación obligatoria con `CuentaUsuario`. |
 | `rol` | `user_role` | Enum `user_role`. |
@@ -259,7 +259,7 @@ Esto significa que cada perfil debe pertenecer a una cuenta de usuario y que una
 ### 5.2. Índices y restricciones
 
 | Nombre | Tipo | Propósito |
-|---|---|---|
+| --- | --- | --- |
 | `profile_pkey` | Primary Key | Identifica de forma única cada perfil. |
 | `fk_profile_user_account` | Foreign Key | Relaciona el perfil con una cuenta existente. |
 | `idx_profile_user_account_id` | Index | Facilita las consultas por cuenta. |
@@ -270,7 +270,7 @@ Esto significa que cada perfil debe pertenecer a una cuenta de usuario y que una
 El backend define los siguientes roles:
 
 | Enum en el backend | Valor almacenado en PostgreSQL |
-|---|---|
+| --- | --- |
 | `RolUsuario.ADMIN` | `ADMIN` |
 | `RolUsuario.OPERATIONS_MANAGER` | `OP` |
 | `RolUsuario.DRIVER` | `DRIVER` |
@@ -286,7 +286,7 @@ Por tanto, el backend utiliza nombres descriptivos y la base de datos utiliza lo
 ### Métodos principales
 
 | Método | Responsabilidad |
-|---|---|
+| --- | --- |
 | `listarPorCuenta()` | Consulta los perfiles de una cuenta y los transforma en objetos públicos. |
 | `crear()` | Verifica la existencia de la cuenta y crea un perfil activo dentro del contexto transaccional de auditoría. |
 | `actualizar()` | Busca el perfil, modifica su estado y guarda los cambios dentro del contexto transaccional de auditoría. |
@@ -295,7 +295,7 @@ Por tanto, el backend utiliza nombres descriptivos y la base de datos utiliza lo
 ### 6.1. Manejo de errores
 
 | Situación | Excepción | HTTP |
-|---|---|---|
+| --- | --- | --- |
 | Cuenta inexistente al crear | `NotFoundException` | 404 |
 | Perfil inexistente al actualizar | `NotFoundException` | 404 |
 | Perfil duplicado para una cuenta y rol | `ConflictException` | 409 |
@@ -318,7 +318,7 @@ Esto proporciona el contexto de auditoría para la operación. La generación ef
 **Archivo:** `perfiles.module.ts`.
 
 | Componente | Función |
-|---|---|
+| --- | --- |
 | `TypeOrmModule.forFeature([Perfil, CuentaUsuario])` | Registra los repositorios necesarios. |
 | `AutenticacionModule` | Proporciona las dependencias de autenticación. |
 | `PerfilesController` | Expone los endpoints del módulo. |
@@ -338,7 +338,7 @@ npm test -- --runInBand src/perfiles/perfiles.service.spec.ts
 ### Resultado
 
 | Indicador | Resultado |
-|---|---:|
+| --- | ---: |
 | Suites aprobadas | 1 |
 | Suites fallidas | 0 |
 | Pruebas aprobadas | 6 |
@@ -351,7 +351,7 @@ npm test -- --runInBand src/perfiles/perfiles.service.spec.ts
 ### 8.1. Escenarios cubiertos
 
 | Operación | Escenario probado |
-|---|---|
+| --- | --- |
 | `listarPorCuenta` | Devuelve perfiles públicos ordenados por fecha de creación. |
 | `crear` | Verifica la cuenta y crea un perfil activo dentro del contexto transaccional. |
 | `crear` | Rechaza la creación cuando la cuenta no existe. |

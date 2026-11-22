@@ -38,7 +38,7 @@ Todos los endpoints requieren autenticación.
 ### Matriz de permisos
 
 | Operación | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Consultar posiciones de cualquier asignación | Sí | Sí | No |
 | Consultar posiciones de asignación propia | No | No | Sí |
 | Registrar posición administrativamente | Sí | Sí | No |
@@ -62,13 +62,13 @@ En las rutas destinadas al conductor, el servicio verifica que la asignación co
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | assignmentId | UUID | Sí | Identificador de la asignación. |
 
 **Parámetros de consulta:**
 
 | Parámetro | Tipo | Predeterminado | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | page | Integer | 1 | Mínimo 1. |
 | limit | Integer | 100 | Entre 1 y 100. |
 
@@ -121,13 +121,13 @@ Los valores son ilustrativos. La estructura exacta de cada elemento depende de l
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | assignmentId | UUID | Sí | Identificador de una asignación propia. |
 
 **Parámetros de consulta:**
 
 | Parámetro | Tipo | Predeterminado | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | page | Integer | 1 | Mínimo 1. |
 | limit | Integer | 100 | Entre 1 y 100. |
 
@@ -179,7 +179,7 @@ El servicio verifica:
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | assignmentId | UUID | Sí | `@IsUUID()`. |
 | geometry | Object | Sí | `@IsObject()` y `GeoJsonGeometryValidator` para Point. |
 | recordedAt | Date | Sí | Conversión mediante `@Type(() => Date)` y validación `@IsDate()`. |
@@ -269,7 +269,7 @@ Archivo: `dto/consultar-posiciones.dto.ts`
 Define los parámetros de paginación.
 
 | Propiedad | Decoradores | Regla |
-|---|---|---|
+| --- | --- | --- |
 | page | `@Type(() => Number)`, `@IsInt()`, `@Min(1)` | Entero mayor o igual a 1. |
 | limit | `@Type(() => Number)`, `@IsInt()`, `@Min(1)`, `@Max(100)` | Entero entre 1 y 100. |
 
@@ -283,7 +283,7 @@ Valores predeterminados:
 Archivo: `dto/crear-posicion-vehiculo.dto.ts`
 
 | Propiedad | Decoradores | Regla |
-|---|---|---|
+| --- | --- | --- |
 | assignmentId | `@IsUUID()` | Identificador UUID válido. |
 | geometry | `@IsObject()`, `@Validate(GeoJsonGeometryValidator, ['Point'])` | Objeto GeoJSON Point. |
 | recordedAt | `@Type(() => Date)`, `@IsDate()` | Fecha válida. |
@@ -335,7 +335,7 @@ Archivo: `entidades/posicion-vehiculo.entity.ts`
 **Tabla:** `vehicle_position`.
 
 | Propiedad | Columna | Tipo |
-|---|---|---|
+| --- | --- | --- |
 | id | id | UUID, clave primaria. |
 | asignacion | assignment_id | Relación ManyToOne obligatoria con Asignacion. |
 | geometria | geom | geometry(Point, 4326). |
@@ -370,7 +370,7 @@ Esto permite representar ubicaciones geográficas mediante coordenadas GPS y rea
 ### Índices
 
 | Índice | Propósito |
-|---|---|
+| --- | --- |
 | `idx_vehicle_position_assignment_recorded` | Optimizar consultas por asignación y fecha de registro. |
 | `idx_vehicle_position_geom` | Optimizar operaciones espaciales sobre la geometría. |
 
@@ -384,7 +384,7 @@ Esto permite representar ubicaciones geográficas mediante coordenadas GPS y rea
 ## 7. Manejo de errores
 
 | Código HTTP | Excepción | Situación |
-|---|---|---|
+| --- | --- | --- |
 | 400 | BadRequestException | Geometría inválida, UUID o parámetros incorrectos. |
 | 401 | Unauthorized | JWT ausente, inválido o revocado. |
 | 403 | ForbiddenException | Rol no autorizado, asignación ajena o conductor inactivo. |
@@ -472,7 +472,7 @@ npm test -- --runInBand src/seguimiento/seguimiento.service.spec.ts
 ### Resultado obtenido
 
 | Indicador | Resultado |
-|---|---:|
+| --- | ---: |
 | Suites ejecutadas | 1 |
 | Suites aprobadas | 1 |
 | Pruebas ejecutadas | 9 |
@@ -485,12 +485,14 @@ npm test -- --runInBand src/seguimiento/seguimiento.service.spec.ts
 ### Escenarios cubiertos
 
 **Consulta (`listar`):**
+
 - Consulta correcta con paginación y orden descendente.
 - Asignación inexistente.
 - Intento de consultar asignación de otro conductor.
 - Intento de consulta por conductor inactivo.
 
 **Creación (`crear`):**
+
 - Geometría inválida.
 - Registro correcto dentro del contexto transaccional.
 - Asignación inexistente.

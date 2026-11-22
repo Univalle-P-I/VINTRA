@@ -49,7 +49,7 @@ Representa la cuenta utilizada para acceder al sistema.
 **Tabla:** `user_account`
 
 | Atributo en código | Columna | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | Identificador UUID de la cuenta. |
 | `estado` | `user_status` | Estado de la cuenta. |
 | `tipoDocumento` | `document_type` | Tipo de documento. |
@@ -84,7 +84,7 @@ Representa la información personal y de contacto del usuario.
 **Tabla:** `user_data`
 
 | Atributo en código | Columna | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | Identificador UUID compartido con la cuenta. |
 | `nombres` | `first_name` | Nombres del usuario. |
 | `apellidos` | `last_name` | Apellidos del usuario. |
@@ -127,7 +127,7 @@ Archivo: `dto/crear-usuario-interno.dto.ts`
 Se utiliza para crear una cuenta interna.
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `firstName` | string | Obligatorio, mínimo 2 y máximo 80 caracteres. Se eliminan espacios al inicio y al final. |
 | `lastName` | string | Obligatorio, mínimo 2 y máximo 80 caracteres. Se eliminan espacios al inicio y al final. |
 | `email` | string | Obligatorio, formato de correo válido, máximo 254 caracteres. Se convierte a minúsculas y se eliminan espacios externos. |
@@ -152,7 +152,7 @@ Permite actualizar los datos personales del usuario autenticado.
 Todos sus campos son opcionales.
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `firstName` | string | Mínimo 2 y máximo 80 caracteres. Se eliminan espacios externos. |
 | `lastName` | string | Mínimo 2 y máximo 80 caracteres. Se eliminan espacios externos. |
 | `email` | string | Formato de correo válido, máximo 254 caracteres. Se convierte a minúsculas y se eliminan espacios externos. |
@@ -191,7 +191,7 @@ Los endpoints que reciben un cuerpo JSON utilizan también:
 ### 5.1. Control de acceso por roles
 
 | Operación | ADMIN | OPERATIONS_MANAGER | DRIVER | Otro usuario autenticado |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Crear usuario | Sí | No | No | No |
 | Listar usuarios | Sí | Sí | No | No |
 | Consultar `/me` | Sí | Sí | Sí | Sí |
@@ -221,7 +221,7 @@ Los endpoints `/me` no declaran un rol específico mediante `@Roles()`, por lo q
 **Headers:**
 
 | Header | Valor |
-|---|---|
+| --- | --- |
 | `Authorization` | `Bearer <access_token>` |
 | `Content-Type` | `application/json` |
 
@@ -378,7 +378,7 @@ Ejemplo:
 **Headers:**
 
 | Header | Valor |
-|---|---|
+| --- | --- |
 | `Authorization` | `Bearer <access_token>` |
 | `Content-Type` | `application/json` |
 
@@ -430,7 +430,7 @@ Se pueden enviar uno o varios de los campos admitidos por `ActualizarDatosUsuari
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Validación |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Se valida mediante `ParseUUIDPipe`. |
 
 **Ejemplo:**
@@ -466,7 +466,7 @@ Se pueden enviar uno o varios de los campos admitidos por `ActualizarDatosUsuari
 El servicio utiliza la interfaz `UsuarioPublico` para construir las respuestas.
 
 | Campo | Tipo | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | string | Identificador UUID. |
 | `firstName` | string | Nombres. |
 | `lastName` | string | Apellidos. |
@@ -528,7 +528,7 @@ El método `crearEntidades()` también permite reutilizar la creación de cuenta
 ## 10. Manejo de errores
 
 | Código HTTP | Significado | Situación |
-|---|---|---|
+| --- | --- | --- |
 | `400` | Bad Request | DTO inválido o UUID incorrecto. |
 | `401` | Unauthorized | JWT ausente, inválido o revocado. |
 | `403` | Forbidden | El rol no permite la operación. |
@@ -554,7 +554,7 @@ npm test -- --runInBand src/usuarios
 **Resultado:**
 
 | Indicador | Resultado |
-|---|---:|
+| --- | ---: |
 | Suites aprobadas | 1 |
 | Suites fallidas | 0 |
 | Pruebas aprobadas | 9 |

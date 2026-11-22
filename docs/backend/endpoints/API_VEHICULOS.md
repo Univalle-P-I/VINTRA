@@ -38,7 +38,7 @@ Los endpoints del controlador están protegidos mediante:
 Los roles utilizados en el código son:
 
 | Rol | Descripción |
-|---|---|
+| --- | --- |
 | `ADMIN` | Administrador |
 | `OPERATIONS_MANAGER` | Responsable de operaciones |
 | `DRIVER` | Conductor |
@@ -46,7 +46,7 @@ Los roles utilizados en el código son:
 ### Matriz de permisos
 
 | Método | Endpoint | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|---|---:|---:|---:|
+| --- | --- | ---: | ---: | ---: |
 | GET | `/vehicle-types` | Sí | Sí | Sí |
 | POST | `/vehicle-types` | Sí | Sí | No |
 | PATCH | `/vehicle-types/:id` | Sí | Sí | No |
@@ -73,10 +73,12 @@ Los roles utilizados en el código son:
 **Respuesta esperada:** Lista de tipos de vehículos activos, ordenados alfabéticamente por nombre.
 
 **Reglas de negocio:**
+
 - Solo se incluyen tipos activos.
 - Los resultados se ordenan por nombre ascendente.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: consulta realizada correctamente.
 - `401 Unauthorized`: token ausente o inválido.
 - `403 Forbidden`: rol no autorizado.
@@ -103,17 +105,19 @@ Los roles utilizados en el código son:
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validación |
-|---|---|---:|---|
+| --- | --- | ---: | --- |
 | `code` | string | Sí | Entre 1 y 30 caracteres; se eliminan espacios externos y se convierte a mayúsculas. |
 | `name` | string | Sí | Entre 1 y 100 caracteres; se eliminan espacios externos. |
 | `isActive` | boolean | No | Si no se envía, se establece en `true`. |
 
 **Reglas de negocio:**
+
 - El código debe ser único.
 - Si no se proporciona `isActive`, el tipo se crea activo.
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `201 Created`: tipo creado.
 - `400 Bad Request`: datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -132,7 +136,7 @@ Los roles utilizados en el código son:
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Identificador del tipo de vehículo. |
 
 **Cuerpo de la solicitud:**
@@ -147,12 +151,14 @@ Los roles utilizados en el código son:
 Todos los campos son opcionales, pero los que se envíen deben cumplir las validaciones definidas para la creación.
 
 **Reglas de negocio:**
+
 - El tipo debe existir.
 - Solo se actualizan los campos enviados.
 - El código debe continuar siendo único.
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: actualización realizada.
 - `400 Bad Request`: UUID o datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -174,11 +180,13 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Parámetros:** No requiere parámetros.
 
 **Reglas de negocio:**
+
 - Solo se consultan vehículos activos.
 - Los resultados se ordenan por placa ascendente.
 - Se incluye la información del tipo de vehículo asociado.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: consulta realizada correctamente.
 - `401 Unauthorized`: token ausente o inválido.
 - `403 Forbidden`: rol no autorizado.
@@ -195,16 +203,18 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Identificador del vehículo. |
 
 **Reglas de negocio:**
+
 - El identificador debe tener formato UUID.
 - Se incluye la información del tipo de vehículo asociado.
 - Si el vehículo no existe, se genera un error `404 Not Found`.
 - A diferencia del listado, esta consulta no filtra los vehículos inactivos.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: vehículo encontrado.
 - `400 Bad Request`: UUID inválido.
 - `401 Unauthorized`: token ausente o inválido.
@@ -236,7 +246,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Campos:**
 
 | Campo | Tipo | Obligatorio | Validación |
-|---|---|---:|---|
+| --- | --- | ---: | --- |
 | `vehicleTypeId` | UUID | Sí | Debe corresponder a un tipo de vehículo existente y activo. |
 | `vehicleStatus` | enum | Sí | Debe ser un estado permitido. |
 | `plate` | string | Sí | Exactamente 6 caracteres; se eliminan espacios externos y se convierte a mayúsculas. |
@@ -247,13 +257,14 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Estados permitidos:**
 
 | Valor enviado por la API | Significado |
-|---|---|
+| --- | --- |
 | `available` | Disponible |
 | `in_service` | En servicio |
 | `maintenance` | En mantenimiento |
 | `out_of_service` | Fuera de servicio |
 
 **Reglas de negocio:**
+
 - El tipo de vehículo debe existir y estar activo.
 - La placa debe ser única.
 - El vehículo se crea activo por defecto.
@@ -261,6 +272,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `201 Created`: vehículo registrado.
 - `400 Bad Request`: datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -280,7 +292,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Identificador del vehículo. |
 
 **Cuerpo de la solicitud:**
@@ -296,6 +308,7 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 Todos los campos son opcionales. Si se envían, deben cumplir las mismas validaciones del registro.
 
 **Reglas de negocio:**
+
 - El vehículo debe existir.
 - Solo se actualizan los campos enviados.
 - Si se cambia el tipo de vehículo, el nuevo tipo debe existir y estar activo.
@@ -303,6 +316,7 @@ Todos los campos son opcionales. Si se envían, deben cumplir las mismas validac
 - La operación se ejecuta mediante el contexto de auditoría.
 
 **Posibles códigos HTTP:**
+
 - `200 OK`: actualización realizada.
 - `400 Bad Request`: UUID o datos inválidos.
 - `401 Unauthorized`: token ausente o inválido.
@@ -339,7 +353,7 @@ El módulo utiliza dos entidades principales:
 ### 7.1. Tipo de vehículo (`vehicle_type`)
 
 | Campo | Columna | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | Identificador UUID. |
 | `codigo` | `code` | Código único del tipo. |
 | `nombre` | `name` | Nombre del tipo. |
@@ -349,7 +363,7 @@ El módulo utiliza dos entidades principales:
 ### 7.2. Vehículo (`vehicle`)
 
 | Campo | Columna | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | Identificador UUID. |
 | `tipoVehiculo` | `vehicle_type_id` | Relación con el tipo de vehículo. |
 | `estado` | `vehicle_status` | Estado operativo. |
@@ -379,7 +393,7 @@ La estructura exacta del registro de auditoría debe documentarse después de re
 El módulo utiliza excepciones de NestJS para comunicar errores:
 
 | Código HTTP | Excepción | Situación |
-|---|---|---|
+| --- | --- | --- |
 | 400 | `BadRequestException` | Datos o parámetros inválidos. |
 | 401 | `UnauthorizedException` | Usuario no autenticado. |
 | 403 | `ForbiddenException` | Usuario sin permisos. |

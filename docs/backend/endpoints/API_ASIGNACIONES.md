@@ -18,7 +18,7 @@ El módulo permite crear, consultar, listar y actualizar asignaciones, así como
 El módulo dispone de cinco endpoints:
 
 | Método | Endpoint | Funcionalidad |
-|---|---|---|
+| --- | --- | --- |
 | GET | `/api/v1/assignments` | Listar asignaciones con filtros y paginación. |
 | GET | `/api/v1/assignments/me` | Listar las asignaciones del conductor autenticado. |
 | GET | `/api/v1/assignments/:id` | Consultar una asignación específica. |
@@ -38,7 +38,7 @@ Todos los endpoints están protegidos mediante:
 ### 3.1. Roles autorizados
 
 | Endpoint | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|:---:|:---:|:---:|
+| --- | :---: | :---: | :---: |
 | GET `/assignments` | Sí | Sí | No |
 | GET `/assignments/me` | No | No | Sí |
 | GET `/assignments/:id` | Sí | Sí | No |
@@ -77,7 +77,7 @@ Permite consultar las asignaciones registradas, aplicar filtros por conductor, c
 **Parámetros de consulta:**
 
 | Parámetro | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `driverId` | UUID | No | Identificador válido de conductor. |
 | `crewId` | UUID | No | Identificador válido de cuadrilla. |
 | `microrouteScheduleId` | UUID | No | Identificador válido de programación. |
@@ -101,7 +101,7 @@ Permite consultar las asignaciones registradas, aplicar filtros por conductor, c
 GET /api/v1/assignments?page=1&limit=20&assignmentStatus=scheduled
 ```
 
-**Respuesta exitosa: 200 OK**
+### Respuesta exitosa del listado de asignaciones: 200 OK
 
 ```json
 {
@@ -133,7 +133,7 @@ El objeto de cada elemento contiene las relaciones cargadas por el servicio. El 
 **Filtros aplicados:**
 
 | Filtro | Condición |
-|---|---|
+| --- | --- |
 | `driverId` | Coincidencia con el conductor. |
 | `crewId` | Coincidencia con la cuadrilla. |
 | `microrouteScheduleId` | Coincidencia con la programación. |
@@ -148,7 +148,7 @@ Los filtros de fecha son límites independientes; no implementan una búsqueda d
 **Errores posibles:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 400 | Parámetros de consulta inválidos. |
 | 401 | JWT ausente, inválido o revocado. |
 | 403 | Rol no autorizado. |
@@ -174,7 +174,7 @@ Utiliza `ConsultarAsignacionesDto`, por lo que admite los mismos filtros y pará
 GET /api/v1/assignments/me?page=1&limit=20
 ```
 
-**Respuesta exitosa: 200 OK**
+### Respuesta exitosa de las asignaciones propias: 200 OK
 
 ```json
 {
@@ -206,7 +206,7 @@ GET /api/v1/assignments/me?page=1&limit=20
 **Errores posibles:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 400 | Parámetros de consulta inválidos. |
 | 401 | JWT ausente, inválido o revocado. |
 | 403 | Rol no autorizado o conductor inactivo. |
@@ -226,7 +226,7 @@ Permite consultar una asignación específica mediante su identificador UUID.
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | `ParseUUIDPipe`. |
 
 **Ejemplo:**
@@ -235,7 +235,7 @@ Permite consultar una asignación específica mediante su identificador UUID.
 GET /api/v1/assignments/uuid-asignacion
 ```
 
-**Respuesta exitosa: 200 OK**
+### Respuesta exitosa de la consulta por identificador: 200 OK
 
 Devuelve la entidad `Asignacion` con las siguientes relaciones:
 
@@ -252,7 +252,7 @@ Si no encuentra el registro, lanza `NotFoundException`.
 **Errores posibles:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 400 | Identificador UUID inválido. |
 | 401 | JWT ausente, inválido o revocado. |
 | 403 | Rol no autorizado. |
@@ -286,7 +286,7 @@ Permite registrar una asignación relacionando un conductor activo, una programa
 **Campos del DTO:**
 
 | Campo | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `driverId` | UUID | Sí | `@IsUUID()`. |
 | `microrouteScheduleId` | UUID | Sí | `@IsUUID()`. |
 | `vehicleId` | UUID | Sí | `@IsUUID()`. |
@@ -330,7 +330,7 @@ Dentro de la operación transaccional:
 **Errores posibles:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 400 | Datos de entrada inválidos. |
 | 401 | JWT ausente, inválido o revocado. |
 | 403 | Rol no autorizado. |
@@ -357,7 +357,7 @@ Permite actualizar parcialmente una asignación existente. Se pueden modificar s
 **Parámetros de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` | UUID | Sí | `ParseUUIDPipe`. |
 
 **Cuerpo de la solicitud:**
@@ -380,7 +380,7 @@ Todos los campos son opcionales.
 **Campos disponibles:**
 
 | Campo | Tipo | Obligatorio | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `driverId` | UUID | No | UUID válido, si se envía. |
 | `microrouteScheduleId` | UUID | No | UUID válido, si se envía. |
 | `vehicleId` | UUID | No | UUID válido, si se envía. |
@@ -407,7 +407,7 @@ Todos los campos son opcionales.
 **Reglas de negocio para las fechas:**
 
 | Regla | Condición |
-|---|---|
+| --- | --- |
 | Fechas programadas | La fecha final debe ser igual o posterior a la fecha inicial. |
 | Fechas reales | Si existe una fecha real de finalización, debe existir una fecha real de inicio. |
 | Orden de fechas reales | La fecha real de finalización debe ser igual o posterior a la fecha real de inicio. |
@@ -415,7 +415,7 @@ Todos los campos son opcionales.
 **Errores posibles:**
 
 | Código | Descripción |
-|---|---|
+| --- | --- |
 | 400 | UUID, DTO o reglas cronológicas inválidas. |
 | 401 | JWT ausente, inválido o revocado. |
 | 403 | Rol no autorizado. |
@@ -460,7 +460,7 @@ El servicio convierte el estado a mayúsculas al construir el filtro de consulta
 Los valores predeterminados son:
 
 | Parámetro | Valor |
-|---|---|
+| --- | --- |
 | `page` | 1 |
 | `limit` | 20 |
 
@@ -473,7 +473,7 @@ La entidad principal es `Asignacion`, que representa la tabla `assignment`.
 ### 6.1. Tabla `assignment`
 
 | Campo en base de datos | Tipo | Descripción |
-|---|---|---|
+| --- | --- | --- |
 | `id` | UUID | Identificador principal. |
 | `driver_id` | Relación/FK | Referencia al conductor. |
 | `microroute_schedule_id` | Relación/FK | Referencia a la programación de microruta. |
@@ -492,7 +492,7 @@ La entidad principal es `Asignacion`, que representa la tabla `assignment`.
 La entidad establece tres relaciones `ManyToOne`, todas obligatorias:
 
 | Relación | Entidad relacionada | Columna |
-|---|---|---|
+| --- | --- | --- |
 | `conductor` | `Conductor` | `driver_id` |
 | `microrutaHorario` | `MicrorutaHorario` | `microroute_schedule_id` |
 | `vehiculo` | `Vehiculo` | `vehicle_id` |
@@ -502,7 +502,7 @@ La entidad establece tres relaciones `ManyToOne`, todas obligatorias:
 El enum `EstadoAsignacion` define:
 
 | Valor utilizado en TypeScript/API | Valor almacenado |
-|---|---|
+| --- | --- |
 | `scheduled` | `SCHEDULED` |
 | `in_progress` | `IN_PROGRESS` |
 | `completed` | `COMPLETED` |
@@ -515,7 +515,7 @@ El `ValueTransformer` realiza la conversión entre los valores de la aplicación
 La entidad declara:
 
 | Nombre | Tipo | Función |
-|---|---|---|
+| --- | --- | --- |
 | `assignment_pkey` | Primary Key | Identifica cada asignación. |
 | `fk_assignment_driver` | Foreign Key | Relaciona la asignación con el conductor. |
 | `fk_assignment_microroute_schedule` | Foreign Key | Relaciona la asignación con la programación. |
@@ -556,7 +556,7 @@ El servicio no inserta directamente registros de auditoría en este código. La 
 El módulo utiliza excepciones de NestJS:
 
 | Excepción | Código HTTP | Situación |
-|---|---|---|
+| --- | --- | --- |
 | `BadRequestException` | 400 | Fechas programadas o reales con orden inválido durante actualización. |
 | `UnauthorizedException` gestionada por el guard | 401 | JWT ausente, inválido o revocado. |
 | `ForbiddenException` | 403 | Rol no autorizado o conductor inactivo en `/me`. |
@@ -584,7 +584,7 @@ npm test -- --runInBand src/asignaciones/asignaciones.service.spec.ts
 **Resultado obtenido el 13 de noviembre de 2026:**
 
 | Indicador | Resultado |
-|---|---:|
+| --- | ---: |
 | Suites aprobadas | 1 |
 | Suites fallidas | 0 |
 | Pruebas aprobadas | 18 |
@@ -638,7 +638,7 @@ npm test -- --runInBand src/asignaciones/asignaciones.service.spec.ts
 ## 11. Archivos de referencia
 
 | Archivo | Responsabilidad |
-|---|---|
+| --- | --- |
 | `src/asignaciones/asignaciones.controller.ts` | Define las rutas HTTP y la autorización. |
 | `src/asignaciones/asignaciones.service.ts` | Contiene la lógica de negocio y las consultas. |
 | `src/asignaciones/asignaciones.module.ts` | Configura el módulo y sus dependencias. |

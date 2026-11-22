@@ -21,7 +21,7 @@ El módulo permite consultar los registros de auditoría mediante endpoints prot
 Los endpoints del módulo están protegidos mediante autenticación JWT y autorización por roles.
 
 | Mecanismo | Responsabilidad |
-|---|---|
+| --- | --- |
 | `JwtAuthGuard` | Verifica la autenticación mediante JWT. |
 | `RolesGuard` | Comprueba que el usuario tenga el rol requerido. |
 | `@Roles(RolUsuario.ADMIN)` | Restringe el acceso al rol ADMIN. |
@@ -35,7 +35,7 @@ Los usuarios sin autenticación válida no pueden acceder al endpoint. Los usuar
 ### 3.1 Consultar registros de auditoría
 
 | Propiedad | Descripción |
-|---|---|
+| --- | --- |
 | Método | GET |
 | Ruta | `/api/v1/audit-logs/:resource` |
 | Autenticación | JWT Bearer |
@@ -50,13 +50,13 @@ Permite consultar los registros históricos de auditoría asociados a un recurso
 **Parámetro de ruta:**
 
 | Parámetro | Tipo | Obligatorio | Descripción |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `resource` | Enum | Sí | Identifica el recurso cuya auditoría se desea consultar. |
 
 **Recursos permitidos:**
 
 | Valor | Tabla asociada |
-|---|---|
+| --- | --- |
 | `user-accounts` | `user_account_log` |
 | `user-data` | `user_data_log` (no está creada por las migraciones del PR #115; la consulta fallará si se usa contra ese esquema sin cambios) |
 | `profiles` | `profile_log` |
@@ -77,7 +77,7 @@ Además, el servicio/entidades documentan el ENUM `log_action`, mientras que las
 **Parámetros de consulta:**
 
 | Parámetro | Tipo | Obligatorio | Valor predeterminado | Validaciones |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `page` | Number | No | 1 | Entero, mínimo 1. |
 | `limit` | Number | No | 50 | Entero, mínimo 1 y máximo 100. |
 
@@ -121,7 +121,7 @@ Archivo: `src/auditoria/dto/consultar-auditoria.dto.ts`
 Este DTO controla los parámetros de paginación recibidos mediante la URL.
 
 | Campo | Decoradores | Comportamiento |
-|---|---|---|
+| --- | --- | --- |
 | `page` | `@Type(() => Number)`, `@IsInt()`, `@Min(1)` | Convierte a número y exige un entero mayor o igual a 1. |
 | `limit` | `@Type(() => Number)`, `@IsInt()`, `@Min(1)`, `@Max(100)` | Convierte a número y exige un entero entre 1 y 100. |
 
@@ -133,7 +133,7 @@ Los valores predeterminados son:
 Ejemplos:
 
 | Valor recibido | Resultado |
-|---|---|
+| --- | --- |
 | `page=1` | Válido |
 | `page=2` | Válido |
 | `page=0` | Inválido |
@@ -221,7 +221,7 @@ El resultado se convierte a número y se incorpora a la respuesta paginada.
 El servicio adapta los nombres de las columnas de la base de datos al formato utilizado en la respuesta de la API.
 
 | Columna en PostgreSQL | Campo en la API |
-|---|---|
+| --- | --- |
 | `id` | `id` |
 | `entity_id` | `entityId` |
 | `actor_id` | `actorId` |
@@ -260,7 +260,7 @@ Se utiliza `set_config` con el tercer argumento en `true`, por lo que los valore
 ## 7. Manejo de errores
 
 | Código HTTP | Situación |
-|---|---|
+| --- | --- |
 | 400 Bad Request | Recurso no permitido o parámetros de paginación inválidos. |
 | 401 Unauthorized | JWT ausente, inválido o revocado. |
 | 403 Forbidden | Usuario autenticado sin el rol ADMIN. |
@@ -287,7 +287,7 @@ Archivo: `src/auditoria/auditoria.service.spec.ts`
 El servicio cuenta con cuatro pruebas unitarias que verifican los siguientes comportamientos:
 
 | Prueba | Comportamiento comprobado |
-|---|---|
+| --- | --- |
 | Consulta de recurso permitido | Comprueba la consulta de la tabla correspondiente y la exclusión de snapshots. |
 | Lista permitida de tablas | Verifica la correspondencia de los diez recursos con sus tablas. |
 | Paginación y resultados vacíos | Comprueba el cálculo del offset y la respuesta cuando no existen registros. |
@@ -300,7 +300,7 @@ Estas pruebas son unitarias y utilizan un `DataSource` simulado. No comprueban l
 ## 10. Archivos relacionados
 
 | Archivo | Responsabilidad |
-|---|---|
+| --- | --- |
 | `src/auditoria/auditoria.module.ts` | Declaración del módulo de Auditoría. |
 | `src/auditoria/auditoria.controller.ts` | Definición de rutas y control de acceso. |
 | `src/auditoria/auditoria.service.ts` | Consultas y transformación de registros. |

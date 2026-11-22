@@ -1,5 +1,3 @@
-# API_AUTENTICACION.md
-
 # API de Autenticación y Control de Acceso – VINTRA
 
 ## 1. Descripción general
@@ -21,7 +19,7 @@ El módulo está desarrollado con NestJS, utiliza JWT para la autenticación, Ar
 ## 2. Endpoints disponibles
 
 | Método | Ruta | Descripción | Autenticación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | POST | `/api/v1/auth/login` | Iniciar sesión y obtener un token JWT | Pública |
 | POST | `/api/v1/auth/logout` | Cerrar sesión y revocar la sesión actual | JWT obligatorio |
 
@@ -42,7 +40,7 @@ No se identificaron endpoints implementados en este controlador para cambiar con
 ### 3.2. Headers
 
 | Header | Valor | Obligatorio |
-|---|---|---|
+| --- | --- | --- |
 | Content-Type | application/json | Sí |
 
 No requiere encabezado Authorization porque es el endpoint público de autenticación.
@@ -59,6 +57,7 @@ No requiere encabezado Authorization porque es el endpoint público de autentica
 ### 3.4. Validaciones
 
 **Campo email:**
+
 - Es obligatorio.
 - Debe ser una cadena de texto.
 - Debe cumplir el formato de correo electrónico.
@@ -67,6 +66,7 @@ No requiere encabezado Authorization porque es el endpoint público de autentica
 - Se convierte a minúsculas.
 
 **Campo password:**
+
 - Es obligatorio.
 - Debe ser una cadena de texto.
 - Longitud máxima: 128 caracteres.
@@ -115,7 +115,7 @@ Los 900 segundos corresponden al valor predeterminado de expiración. El tiempo 
 ### 3.8. Errores documentados
 
 | Código | Significado |
-|---|---|
+| --- | --- |
 | 400 | Solicitud con datos inválidos |
 | 401 | Credenciales incorrectas o cuenta no autorizada para iniciar sesión |
 | 409 | Conflicto de unicidad al registrar la sesión |
@@ -134,7 +134,7 @@ Los 900 segundos corresponden al valor predeterminado de expiración. El tiempo 
 ### 4.2. Headers
 
 | Header | Valor | Obligatorio |
-|---|---|---|
+| --- | --- | --- |
 | Authorization | Bearer `<jwt>` | Sí |
 
 No se requiere un cuerpo de solicitud.
@@ -159,7 +159,7 @@ No devuelve cuerpo de respuesta.
 ### 4.5. Errores
 
 | Código | Significado |
-|---|---|
+| --- | --- |
 | 401 | Token ausente, inválido, expirado o sesión no válida |
 | 404 | No se encuentra una sesión activa correspondiente a la cuenta |
 
@@ -168,7 +168,7 @@ No devuelve cuerpo de respuesta.
 La configuración se encuentra en `jwt.config.ts`.
 
 | Parámetro | Valor o regla |
-|---|---|
+| --- | --- |
 | JWT_SECRET | Obligatorio |
 | Longitud mínima del secreto | 32 bytes |
 | JWT_ACCESS_TOKEN_TTL_SECONDS | Configurable |
@@ -258,7 +258,7 @@ Los roles concretos se definen en la entidad `Perfil`.
 ### Diferencia entre autenticación y autorización
 
 | Concepto | Componente | Pregunta | Error |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Autenticación | JwtAuthGuard | ¿Quién eres? | 401 |
 | Autorización | RolesGuard | ¿Tienes permiso? | 403 |
 
@@ -292,7 +292,7 @@ Tabla: `session`.
 Representa una sesión de usuario.
 
 | Campo | Función |
-|---|---|
+| --- | --- |
 | id | Identificador UUID |
 | cuentaUsuario | Cuenta propietaria de la sesión |
 | hashToken | Hash SHA-256 del JWT |
@@ -311,6 +311,7 @@ Tabla: `password_reset_token`.
 Entidad preparada para representar tokens de recuperación de contraseña.
 
 Incluye:
+
 - Identificador UUID.
 - Cuenta asociada.
 - Hash del token.
@@ -330,6 +331,7 @@ Tabla: `email_validation_token`.
 Entidad preparada para representar tokens de validación de correo electrónico.
 
 Incluye:
+
 - Identificador UUID.
 - Datos del usuario asociados.
 - Correo electrónico.
@@ -346,7 +348,7 @@ No se identificó un flujo de validación de correo conectado a endpoints o serv
 ## 10. DTO relacionados con funcionalidades de cuenta
 
 | DTO | Campos y validaciones identificadas |
-|---|---|
+| --- | --- |
 | IniciarSesionDto | email obligatorio, formato correo, máximo 254; password obligatorio, máximo 128 |
 | CambiarContrasenaDto | currentPassword obligatorio, máximo 128; newPassword obligatorio, entre 12 y 128 caracteres |
 | SolicitarRecuperacionDto | email obligatorio, formato correo, máximo 254, normalizado |
@@ -388,7 +390,7 @@ npm test -- --runInBand src/autenticacion
 ### Archivos de pruebas
 
 | Archivo | Cobertura identificada |
-|---|---|
+| --- | --- |
 | autenticacion.controller.spec.ts | Ruta de inicio de sesión, respuesta HTTP y validación del cuerpo |
 | autenticacion.service.spec.ts | Inicio exitoso, credenciales incorrectas, cuentas inactivas o bloqueadas y correos ambiguos |
 | jwt-auth.guard.spec.ts | JWT válido, token ausente, inválido, expirado y mal formado |

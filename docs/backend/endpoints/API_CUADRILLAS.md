@@ -31,7 +31,7 @@ El esquema de autenticación utiliza Bearer Token.
 ### 2.1. Roles utilizados
 
 | Rol | Descripción |
-|---|---|
+| --- | --- |
 | `ADMIN` | Administrador del sistema. |
 | `OPERATIONS_MANAGER` | Responsable de la gestión operativa. |
 | `DRIVER` | Conductor registrado en el sistema. |
@@ -39,7 +39,7 @@ El esquema de autenticación utiliza Bearer Token.
 ### 2.2. Permisos por operación
 
 | Operación | ADMIN | OPERATIONS_MANAGER | DRIVER |
-|---|---:|---:|---:|
+| --- | ---: | ---: | ---: |
 | Listar cuadrillas | Sí | Sí | Sí |
 | Consultar cuadrilla | Sí | Sí | Sí |
 | Crear cuadrilla | Sí | Sí | No |
@@ -206,7 +206,7 @@ Si el integrante no existe, devuelve `NotFoundException` con el mensaje:
 ## 4. Parámetros de ruta
 
 | Parámetro | Tipo | Descripción | Validación |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `id` en `/crews/:id` | UUID | Identificador de cuadrilla. | `ParseUUIDPipe`. |
 | `id` en `/crew-members/:id` | UUID | Identificador de integrante. | `ParseUUIDPipe`. |
 
@@ -219,7 +219,7 @@ Los DTOs definen la estructura y las reglas de validación de los datos recibido
 Archivo: `dto/crear-cuadrilla.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `name` | String | `@Transform`, `@IsString`, `@IsNotEmpty`, `@MinLength(1)`. |
 
 El valor se recorta con `trim()` antes de validarse. Es obligatorio y debe contener al menos un carácter.
@@ -229,7 +229,7 @@ El valor se recorta con `trim()` antes de validarse. Es obligatorio y debe conte
 Archivo: `dto/actualizar-cuadrilla.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `name` | String | `@IsOptional`, `@Transform`, `@IsString`, `@MinLength(1)`. |
 | `isActive` | Boolean | `@IsOptional`, `@IsBoolean`. |
 
@@ -240,7 +240,7 @@ Los dos campos son opcionales. Si se proporciona `name`, se eliminan los espacio
 Archivo: `dto/crear-integrante-cuadrilla.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `crewId` | String | `@IsUUID`. |
 | `fullName` | String | `@Transform`, `@IsString`, `@MinLength(1)`. |
 
@@ -253,7 +253,7 @@ El UUID debe tener formato válido y el nombre debe contener al menos un caráct
 Archivo: `dto/actualizar-integrante-cuadrilla.dto.ts`
 
 | Campo | Tipo | Validaciones |
-|---|---|---|
+| --- | --- | --- |
 | `crewId` | UUID o null | `@IsOptional`, `@IsUUID`. |
 | `fullName` | String | `@IsOptional`, `@Transform`, `@IsString`, `@MinLength(1)`. |
 | `isActive` | Boolean | `@IsOptional`, `@IsBoolean`. |
@@ -313,7 +313,7 @@ Archivo: `entidades/cuadrilla.entity.ts`
 Tabla asociada: `crew`.
 
 | Propiedad TypeScript | Columna | Tipo |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | UUID |
 | `nombre` | `name` | VARCHAR(100) |
 | `activo` | `is_active` | BOOLEAN |
@@ -351,7 +351,7 @@ Archivo: `entidades/integrante-cuadrilla.entity.ts`
 Tabla asociada: `crew_member`.
 
 | Propiedad TypeScript | Columna | Tipo |
-|---|---|---|
+| --- | --- | --- |
 | `id` | `id` | UUID |
 | `cuadrilla` | `crew_id` | Relación UUID, nullable |
 | `nombreCompleto` | `full_name` | VARCHAR(120) |
@@ -422,7 +422,7 @@ La utilización de este servicio no significa que el propio `CuadrillasService` 
 ## 10. Manejo de errores
 
 | Código HTTP | Situación |
-|---|---|
+| --- | --- |
 | 400 | UUID inválido, cuerpo de solicitud incorrecto o error de validación. |
 | 401 | JWT ausente, inválido o revocado. |
 | 403 | Rol sin autorización para la operación. |
@@ -431,14 +431,14 @@ La utilización de este servicio no significa que el propio `CuadrillasService` 
 
 Los errores 400, 404 y 409 aparecen según la documentación Swagger declarada en cada endpoint. No se deben interpretar como confirmación de que todos los casos posibles han sido probados.
 
- ## 11. Pruebas unitarias
+## 11. Pruebas unitarias
 
 **Archivo:** `src/cuadrillas/cuadrillas.service.spec.ts`
 
 Durante la revisión se identificó un archivo de pruebas unitarias para `CuadrillasService`, con 13 casos distribuidos entre las siguientes operaciones:
 
 | Método | Casos | Verificaciones |
-|---|---:|---|
+| --- | ---: | --- |
 | `listar` | 1 | Ordenamiento de cuadrillas por nombre. |
 | `obtener` | 2 | Consulta por identificador y manejo de registros inexistentes. |
 | `crear` | 1 | Creación de cuadrillas activas y ejecución dentro del contexto de auditoría. |
@@ -446,7 +446,8 @@ Durante la revisión se identificó un archivo de pruebas unitarias para `Cuadri
 | `listarIntegrantes` | 1 | Consulta de integrantes con su relación de cuadrilla y ordenamiento por nombre. |
 | `crearIntegrante` | 2 | Creación en cuadrillas activas y rechazo de cuadrillas inexistentes o inactivas. |
 | `actualizarIntegrante` | 4 | Actualización parcial, desasignación, reasignación y manejo de registros inexistentes o cuadrillas inactivas. |
-**Total identificado: 13 casos de prueba.**
+
+**Total identificado:** 13 casos de prueba.
 
 ### Alcance y limitaciones
 
@@ -454,8 +455,7 @@ Durante la revisión se identificó un archivo de pruebas unitarias para `Cuadri
 - No  hay pruebas específicas de eliminación física ni de la regla `ON DELETE CASCADE`.
 - No se verifica la persistencia efectiva de los registros de auditoría.
 - No hay archivos de pruebas específicos para `CuadrillasController` ni para los DTO.
-- 
-
+-
 
 ## 12. Estructura de archivos
 
@@ -473,7 +473,8 @@ src/
     ├── cuadrillas.module.ts
     ├── cuadrillas.service.ts
     └── cuadrillas.service.spec.ts
-```
+
+```text
 
 ## 13. Configuración del módulo
 
@@ -506,6 +507,5 @@ Finalmente, exporta `CuadrillasService` y `TypeOrmModule` para permitir su utili
 ---
 
 **Estado de la documentación:** análisis del controlador, servicio, DTOs, entidades, módulo y pruebas unitarias completado. Se identificaron 13 casos de prueba para `CuadrillasService`. Alineación del esquema de base de datos sujeta a la aprobación de las migraciones.
----
 
 **Estado de la documentación:** análisis del controlador, servicio, DTOs, entidades y módulo completado. Pruebas unitarias propias no encontradas. Esquema de base de datos sujeto a aprobación de migraciones.
