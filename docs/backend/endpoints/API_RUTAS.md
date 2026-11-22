@@ -147,11 +147,11 @@ El ejemplo representa la estructura de salida de la consulta; los valores son il
 
 **Reglas de negocio:**
 
-1. Si no se envían filtros, se consultan todos los barrios.
-2. La búsqueda por nombre y comuna utiliza coincidencias parciales.
-3. Los resultados se ordenan por nombre ascendente.
-4. La paginación predeterminada utiliza página 1 y límite 20.
-5. El servicio utiliza `findAndCount()` para obtener registros y cantidad total.
+$11. Si no se envían filtros, se consultan todos los barrios.
+$11. La búsqueda por nombre y comuna utiliza coincidencias parciales.
+$11. Los resultados se ordenan por nombre ascendente.
+$11. La paginación predeterminada utiliza página 1 y límite 20.
+$11. El servicio utiliza `findAndCount()` para obtener registros y cantidad total.
 
 **Respuestas HTTP:**
 
@@ -538,7 +538,7 @@ GET /api/v1/microroutes?macrorouteId=550e8400-e29b-41d4-a716-446655440000&search
 3. Ordena los resultados por código ascendente.
 4. Si se envía `macrorouteId`, filtra por el identificador de la macroruta.
 5. Si se envía `search`, busca coincidencias en nombre o código mediante `ILIKE`.
-6. 1. Si `includeGeometry` es `false`, selecciona explícitamente los campos básicos de la microruta y los datos de identificación de su macroruta asociada. Se omite la geometría de ambas entidades en esa consulta.
+6. Si `includeGeometry` es `false`, selecciona explícitamente los campos básicos de la microruta y los datos de identificación de su macroruta asociada. Se omite la geometría de ambas entidades en esa consulta.
 7. La paginación predeterminada utiliza página 1 y límite 20.
 8. El servicio devuelve `items`, `total`, `page` y `limit`.
 

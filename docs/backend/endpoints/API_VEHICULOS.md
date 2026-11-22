@@ -1,9 +1,9 @@
 # API de vehículos — VINTRA
 
-**Estado:** Borrador técnico  
-**Módulo:** Vehículos  
-**Base de rutas:** `/api/v1`  
-**Autenticación:** JWT Bearer  
+**Estado:** Borrador técnico
+**Módulo:** Vehículos
+**Base de rutas:** `/api/v1`
+**Autenticación:** JWT Bearer
 **Última revisión:** 12 de noviembre de 2026
 
 ---
@@ -61,9 +61,9 @@ Los roles utilizados en el código son:
 
 ### 4.1. Listar tipos de vehículos
 
-**Método:** `GET`  
-**Ruta:** `/api/v1/vehicle-types`  
-**Autenticación:** JWT  
+**Método:** `GET`
+**Ruta:** `/api/v1/vehicle-types`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`, `DRIVER`
 
 **Descripción:** Consulta los tipos de vehículos que se encuentran activos.
@@ -85,9 +85,9 @@ Los roles utilizados en el código son:
 
 ### 4.2. Crear tipo de vehículo
 
-**Método:** `POST`  
-**Ruta:** `/api/v1/vehicle-types`  
-**Autenticación:** JWT  
+**Método:** `POST`
+**Ruta:** `/api/v1/vehicle-types`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`
 
 **Descripción:** Registra un nuevo tipo de vehículo.
@@ -126,9 +126,9 @@ Los roles utilizados en el código son:
 
 ### 4.3. Actualizar tipo de vehículo
 
-**Método:** `PATCH`  
-**Ruta:** `/api/v1/vehicle-types/:id`  
-**Autenticación:** JWT  
+**Método:** `PATCH`
+**Ruta:** `/api/v1/vehicle-types/:id`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`
 
 **Descripción:** Actualiza parcialmente un tipo de vehículo existente.
@@ -170,9 +170,9 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 
 ### 5.1. Listar vehículos
 
-**Método:** `GET`  
-**Ruta:** `/api/v1/vehicles`  
-**Autenticación:** JWT  
+**Método:** `GET`
+**Ruta:** `/api/v1/vehicles`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`, `DRIVER`
 
 **Descripción:** Consulta los vehículos activos registrados en el sistema, incluyendo la relación con su tipo de vehículo.
@@ -193,9 +193,9 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 
 ### 5.2. Consultar vehículo por ID
 
-**Método:** `GET`  
-**Ruta:** `/api/v1/vehicles/:id`  
-**Autenticación:** JWT  
+**Método:** `GET`
+**Ruta:** `/api/v1/vehicles/:id`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`, `DRIVER`
 
 **Descripción:** Consulta un vehículo por su identificador UUID.
@@ -223,9 +223,9 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 
 ### 5.3. Registrar vehículo
 
-**Método:** `POST`  
-**Ruta:** `/api/v1/vehicles`  
-**Autenticación:** JWT  
+**Método:** `POST`
+**Ruta:** `/api/v1/vehicles`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`
 
 **Descripción:** Registra un vehículo y lo relaciona con un tipo de vehículo existente.
@@ -282,9 +282,9 @@ Todos los campos son opcionales, pero los que se envíen deben cumplir las valid
 
 ### 5.4. Actualizar vehículo
 
-**Método:** `PATCH`  
-**Ruta:** `/api/v1/vehicles/:id`  
-**Autenticación:** JWT  
+**Método:** `PATCH`
+**Ruta:** `/api/v1/vehicles/:id`
+**Autenticación:** JWT
 **Roles:** `ADMIN`, `OPERATIONS_MANAGER`
 
 **Descripción:** Actualiza parcialmente la información de un vehículo existente.
