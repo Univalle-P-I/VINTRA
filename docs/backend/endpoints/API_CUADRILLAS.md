@@ -1,8 +1,8 @@
 # API de Cuadrillas e Integrantes
 
-**Archivo:** `docs/backend/API_CUADRILLAS.md`  
-**Módulo:** `src/cuadrillas`  
-**Prefijo de rutas:** `/api/v1`  
+**Archivo:** `docs/backend/API_CUADRILLAS.md`
+**Módulo:** `src/cuadrillas`
+**Prefijo de rutas:** `/api/v1`
 **Tecnología:** NestJS, TypeORM y PostgreSQL.
 
 ## 1. Descripción general

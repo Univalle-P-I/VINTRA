@@ -1,9 +1,9 @@
 
 # API_TURNOS.md
 
-**Proyecto:** VINTRA – Sistema de gestión de recolección de residuos sólidos  
-**Módulo:** Turnos y horarios  
-**Ubicación:** `backend/src/turnos/`  
+**Proyecto:** VINTRA – Sistema de gestión de recolección de residuos sólidos
+**Módulo:** Turnos y horarios
+**Ubicación:** `backend/src/turnos/`
 **Estado:** Endpoints y lógica del servicio documentados a partir del código inspeccionado. Las pruebas unitarias cuentan con resultados reportados previamente. La integración con la base de datos está pendiente de validación.
 
 ---

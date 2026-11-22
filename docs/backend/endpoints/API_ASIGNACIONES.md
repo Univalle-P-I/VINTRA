@@ -1,8 +1,8 @@
 # API_ASIGNACIONES.md
 
-**Proyecto:** VINTRA – Sistema de gestión de recolección de residuos  
-**Módulo:** Asignaciones  
-**Ruta base:** `/api/v1/assignments`  
+**Proyecto:** VINTRA – Sistema de gestión de recolección de residuos
+**Módulo:** Asignaciones
+**Ruta base:** `/api/v1/assignments`
 **Última revisión:** 13 de noviembre de 2026
 
 ---
@@ -65,9 +65,9 @@ No se identificaron encabezados personalizados adicionales en el controlador.
 
 ### 4.1. Listar asignaciones
 
-**Método:** GET  
-**Ruta:** `/api/v1/assignments`  
-**Autenticación:** JWT obligatorio.  
+**Método:** GET
+**Ruta:** `/api/v1/assignments`
+**Autenticación:** JWT obligatorio.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:**
@@ -155,9 +155,9 @@ Los filtros de fecha son límites independientes; no implementan una búsqueda d
 
 ### 4.2. Listar asignaciones del conductor autenticado
 
-**Método:** GET  
-**Ruta:** `/api/v1/assignments/me`  
-**Autenticación:** JWT obligatorio.  
+**Método:** GET
+**Ruta:** `/api/v1/assignments/me`
+**Autenticación:** JWT obligatorio.
 **Rol:** DRIVER.
 
 **Descripción:**
@@ -214,9 +214,9 @@ GET /api/v1/assignments/me?page=1&limit=20
 
 ### 4.3. Consultar una asignación por identificador
 
-**Método:** GET  
-**Ruta:** `/api/v1/assignments/:id`  
-**Autenticación:** JWT obligatorio.  
+**Método:** GET
+**Ruta:** `/api/v1/assignments/:id`
+**Autenticación:** JWT obligatorio.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:**
@@ -260,10 +260,10 @@ Si no encuentra el registro, lanza `NotFoundException`.
 
 ### 4.4. Crear una asignación
 
-**Método:** POST  
-**Ruta:** `/api/v1/assignments`  
-**Autenticación:** JWT obligatorio.  
-**Roles:** ADMIN, OPERATIONS_MANAGER.  
+**Método:** POST
+**Ruta:** `/api/v1/assignments`
+**Autenticación:** JWT obligatorio.
+**Roles:** ADMIN, OPERATIONS_MANAGER.
 **Código de respuesta:** 201 Created.
 
 **Descripción:**
@@ -345,9 +345,9 @@ Esta validación depende de que la restricción correspondiente exista efectivam
 
 ### 4.5. Actualizar una asignación
 
-**Método:** PATCH  
-**Ruta:** `/api/v1/assignments/:id`  
-**Autenticación:** JWT obligatorio.  
+**Método:** PATCH
+**Ruta:** `/api/v1/assignments/:id`
+**Autenticación:** JWT obligatorio.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:**

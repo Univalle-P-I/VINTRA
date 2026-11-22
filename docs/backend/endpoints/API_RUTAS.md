@@ -1,8 +1,8 @@
 # API de Rutas – VINTRA
 
-**Módulo:** Rutas  
-**Base URL:** `/api/v1`  
-**Última revisión:** 13 de noviembre de 2026  
+**Módulo:** Rutas
+**Base URL:** `/api/v1`
+**Última revisión:** 13 de noviembre de 2026
 **Estado:** Documentación basada en la implementación actual del backend. Las migraciones relacionadas continúan pendientes de aprobación.
 
 ---
@@ -95,10 +95,10 @@ La autorización se define mediante `@Roles()` en el controlador y se aplica con
 
 #### 4.1.1. Listar barrios
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/neighborhoods`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene un listado paginado de barrios. Permite filtrar por nombre y comuna.
@@ -164,10 +164,10 @@ $11. El servicio utiliza `findAndCount()` para obtener registros y cantidad tota
 
 #### 4.1.2. Consultar barrio por ID
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/neighborhoods/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene la información de un barrio mediante su identificador UUID.
@@ -218,10 +218,10 @@ GET /api/v1/neighborhoods/550e8400-e29b-41d4-a716-446655440000
 
 #### 4.1.3. Crear barrio
 
-**Método:** POST  
+**Método:** POST
 **Ruta:** `/api/v1/neighborhoods`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Registra un barrio con su nombre, comuna opcional y geometría territorial.
@@ -271,10 +271,10 @@ GET /api/v1/neighborhoods/550e8400-e29b-41d4-a716-446655440000
 
 #### 4.1.4. Actualizar barrio
 
-**Método:** PATCH  
+**Método:** PATCH
 **Ruta:** `/api/v1/neighborhoods/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Actualiza uno o varios campos de un barrio existente.
@@ -325,10 +325,10 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 
 #### 4.2.1. Listar macrorutas
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/macroroutes`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene todas las macrorutas registradas.
@@ -370,10 +370,10 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 
 #### 4.2.2. Consultar macroruta por ID
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/macroroutes/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene una macroruta mediante su identificador UUID.
@@ -402,10 +402,10 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 
 #### 4.2.3. Crear macroruta
 
-**Método:** POST  
+**Método:** POST
 **Ruta:** `/api/v1/macroroutes`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Registra una macroruta con código, nombre y geometría.
@@ -454,10 +454,10 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 
 #### 4.2.4. Actualizar macroruta
 
-**Método:** PATCH  
+**Método:** PATCH
 **Ruta:** `/api/v1/macroroutes/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Actualiza parcialmente una macroruta existente.
@@ -505,10 +505,10 @@ El DTO utiliza `PartialType(CrearBarrioDto)`, por lo que todos los campos de cre
 
 #### 4.3.1. Listar microrutas
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/microroutes`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene microrutas con posibilidad de filtrar por macroruta, buscar por código o nombre y controlar la inclusión de la geometría.
@@ -577,10 +577,10 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 
 #### 4.3.2. Consultar microruta por ID
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/microroutes/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene una microruta por su identificador UUID e incluye la relación con su macroruta.
@@ -610,10 +610,10 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 
 #### 4.3.3. Crear microruta
 
-**Método:** POST  
+**Método:** POST
 **Ruta:** `/api/v1/microroutes`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Crea una microruta y la relaciona con una macroruta existente.
@@ -664,10 +664,10 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 
 #### 4.3.4. Actualizar microruta
 
-**Método:** PATCH  
+**Método:** PATCH
 **Ruta:** `/api/v1/microroutes/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Actualiza los datos de una microruta, incluyendo la posibilidad de cambiar su macroruta asociada.
@@ -719,10 +719,10 @@ La estructura ilustrada corresponde a una consulta con `includeGeometry=false`; 
 
 #### 4.4.1. Listar asociaciones microruta-barrio
 
-**Método:** GET  
+**Método:** GET
 **Ruta:** `/api/v1/microroute-neighborhoods`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER, DRIVER.
 
 **Descripción:** Obtiene las asociaciones entre microrutas y barrios. Puede filtrar por una microruta específica.
@@ -758,10 +758,10 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 
 #### 4.4.2. Crear asociación microruta-barrio
 
-**Método:** POST  
+**Método:** POST
 **Ruta:** `/api/v1/microroute-neighborhoods`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Asocia un barrio a una microruta y establece su orden de visita.
@@ -810,10 +810,10 @@ GET /api/v1/microroute-neighborhoods?microrouteId=550e8400-e29b-41d4-a716-446655
 
 #### 4.4.3. Actualizar asociación microruta-barrio
 
-**Método:** PATCH  
+**Método:** PATCH
 **Ruta:** `/api/v1/microroute-neighborhoods/:id`
 
-**Autenticación:** JWT requerido.  
+**Autenticación:** JWT requerido.
 **Roles:** ADMIN, OPERATIONS_MANAGER.
 
 **Descripción:** Modifica una asociación existente. Permite cambiar la microruta, el barrio o el orden de visita.

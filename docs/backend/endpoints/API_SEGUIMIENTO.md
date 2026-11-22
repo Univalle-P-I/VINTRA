@@ -2,12 +2,12 @@
 
 ## 1. Información general
 
-**Módulo:** Seguimiento  
-**Entidad principal:** `PosicionVehiculo`  
-**Tabla asociada:** `vehicle_position`  
-**Ruta base:** `/api/v1/vehicle-positions`  
-**Autenticación:** JWT Bearer  
-**Autorización:** Control de acceso basado en roles (RBAC).  
+**Módulo:** Seguimiento
+**Entidad principal:** `PosicionVehiculo`
+**Tabla asociada:** `vehicle_position`
+**Ruta base:** `/api/v1/vehicle-positions`
+**Autenticación:** JWT Bearer
+**Autorización:** Control de acceso basado en roles (RBAC).
 **Estado de pruebas unitarias:** 9 aprobadas de 9 ejecutadas.
 
 ### Objetivo
