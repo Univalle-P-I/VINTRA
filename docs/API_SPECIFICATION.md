@@ -2,7 +2,7 @@
 
 ## Estado y convenciones
 
-Contrato propuesto para discutir con frontend y backend. El issue #66 pide cerrar rutas, JSON, errores, validaciones, permisos y OpenAPI. Los endpoints de salud descritos abajo están implementados en [`HealthController`](../backend/src/health.controller.ts); los endpoints de negocio siguen siendo propuestas.
+Contrato propuesto para discutir con frontend y backend. El issue #66 pide cerrar rutas, JSON, errores, validaciones, permisos y OpenAPI. Los endpoints de salud descritos abajo están implementados en [`HealthController`](../backend/src/health/health.controller.ts); los endpoints de negocio siguen siendo propuestas.
 
 - Prefijo sugerido: `/api/v1`; publicar OpenAPI desde la aplicación y versionar cambios incompatibles.
 - JSON UTF-8. Fechas en ISO 8601 con zona/offset explícito; la zona operativa debe aprobarse. IDs opacos y estables, sin exponer detalles de base.
