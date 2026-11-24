@@ -1,7 +1,9 @@
 
 services:
-  postgres:
-    image: postgres:16
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -12,9 +14,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   backend:
     build:
@@ -22,7 +24,7 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: 3002
-      DB_HOST: postgres
+      DB_HOST: database
       DB_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -31,9 +33,9 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_ACCESS_TOKEN_TTL: ${JWT_ACCESS_TOKEN_TTL:-15m}
     ports:
-      - "${IP:-127.0.0.1}:${BACKEND_PORT:-3003}:3002"
+      - "${IP:-127.0.0.1}:${BACKEND_PORT:-3002}:3002"
     depends_on:
-      postgres:
+      database:
         condition: service_healthy
     healthcheck:
         test:
