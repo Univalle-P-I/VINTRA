@@ -1,0 +1,8 @@
+BEGIN;
+
+CREATE OR REPLACE TRIGGER trg_vehicle_type_audit
+AFTER INSERT OR UPDATE OR DELETE ON vehicle_type
+FOR EACH ROW
+EXECUTE FUNCTION fn_audit_log();
+
+COMMIT;
