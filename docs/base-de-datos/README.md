@@ -729,7 +729,7 @@ Aparte de la auditoría, [`database/triggers/100_function_updated_at.sql`](../..
 
 ```env
 POSTGRES_DB=vintra
-POSTGRES_USER=vintra_app
+POSTGRES_USER=vintra_user
 POSTGRES_PASSWORD=cambia_esta_contraseña
 POSTGRES_PORT=5432
 ```
@@ -783,7 +783,7 @@ En PowerShell, la redirección `<` no existe. La alternativa es:
 ```powershell
 foreach ($dir in "migrations","seeders","triggers") {
   Get-ChildItem "database\$dir\*.sql" | Sort-Object Name | ForEach-Object {
-    Get-Content $_.FullName -Raw -Encoding UTF8 | docker compose exec -T database psql -v ON_ERROR_STOP=1 -U vintra_app -d vintra
+    Get-Content $_.FullName -Raw -Encoding UTF8 | docker compose exec -T database psql -v ON_ERROR_STOP=1 -U vintra_user -d vintra
   }
 }
 ```
@@ -796,10 +796,10 @@ Este procedimiento es también la **reconstrucción sin respaldo** (desarrollo y
 
 ```bash
 # Entrar a la consola SQL
-docker compose exec database psql -U vintra_app -d vintra
+docker compose exec database psql -U vintra_user -d vintra
 
 # Verificar PostGIS
-docker compose exec database psql -U vintra_app -d vintra -c "SELECT postgis_full_version();"
+docker compose exec database psql -U vintra_user -d vintra -c "SELECT postgis_full_version();"
 
 # Reiniciar desde cero (borra todos los datos locales)
 docker compose down -v && docker compose up -d
