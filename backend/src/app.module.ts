@@ -14,6 +14,7 @@ import { CuadrillasModule } from './cuadrillas/cuadrillas.module';
 import { PersonalModule } from './personal/personal.module';
 import { RutasModule } from './rutas/rutas.module';
 import { UsersModule } from './users/users.module';
+import { VehiculosModule } from './vehiculos/vehiculos.module';
 
 export function createDatabaseOptions(
   config: ConfigService,
@@ -47,6 +48,7 @@ export function createDatabaseOptions(
     PersonalModule,
     CuadrillasModule,
     RutasModule,
+    VehiculosModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
