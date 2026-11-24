@@ -20,13 +20,33 @@ describe('LoginPage', () => {
     expect(screen.getByText('Ciudadano')).toBeInTheDocument()
   })
 
-  it('muestra el mensaje inicial de credenciales incorrectas', () => {
+  it('no muestra errores antes de enviar el formulario', () => {
     render(<LoginPage onHome={vi.fn()} onLogin={vi.fn()} />)
 
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(
-      screen.getByText('Credenciales incorrectas'),
-    ).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('ofrece tres perfiles activos y deja Ciudadano como próximamente', () => {
+    render(<LoginPage onHome={vi.fn()} onLogin={vi.fn()} />)
+
+    const radios = screen.getAllByRole('radio')
+    expect(radios).toHaveLength(4)
+    expect(screen.getByRole('radio', { name: /Jefe de operaciones/ })).toBeEnabled()
+    expect(screen.getByRole('radio', { name: /Ciudadano/ })).toBeDisabled()
+    expect(screen.getByText('Próximamente')).toBeInTheDocument()
+  })
+
+  it('envía el perfil elegido al iniciar sesión', async () => {
+    const user = userEvent.setup()
+    const onLogin = vi.fn()
+    render(<LoginPage onHome={vi.fn()} onLogin={onLogin} />)
+
+    await user.type(screen.getByLabelText(/usuario o correo/i), 'jefe@example.org')
+    await user.type(screen.getByLabelText(/contraseña/i), 'clave')
+    await user.click(screen.getByRole('radio', { name: /Jefe de operaciones/ }))
+    await user.click(screen.getByRole('button', { name: /iniciar sesión/i }))
+
+    expect(onLogin).toHaveBeenCalledExactlyOnceWith('ops')
   })
 
   it('muestra un mensaje cuando el correo está vacío', async () => {
@@ -71,9 +91,11 @@ describe('LoginPage', () => {
 
     render(<LoginPage onHome={vi.fn()} onLogin={onLogin} />)
 
+    await user.type(screen.getByLabelText(/usuario o correo/i), 'usuario@example.org')
+    await user.type(screen.getByLabelText(/contraseña/i), 'clave')
     await user.click(screen.getByRole('button', { name: /iniciar sesión/i }))
 
-    expect(onLogin).toHaveBeenCalledOnce()
+    expect(onLogin).toHaveBeenCalledExactlyOnceWith('admin')
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
@@ -90,5 +112,30 @@ describe('LoginPage', () => {
     )
 
     expect(onHome).toHaveBeenCalledOnce()
+  })
+
+  it('permite mostrar y ocultar la contraseña', async () => {
+    const user = userEvent.setup()
+    render(<LoginPage onHome={vi.fn()} onLogin={vi.fn()} />)
+
+    const input = screen.getByLabelText(/contraseña/i)
+    expect(input).toHaveAttribute('type', 'password')
+
+    await user.click(screen.getByRole('button', { name: 'Mostrar' }))
+    expect(input).toHaveAttribute('type', 'text')
+
+    await user.click(screen.getByRole('button', { name: 'Ocultar' }))
+    expect(input).toHaveAttribute('type', 'password')
+  })
+
+  it('marca como inválido el campo vacío al fallar la validación', async () => {
+    const user = userEvent.setup()
+    render(<LoginPage onHome={vi.fn()} onLogin={vi.fn()} />)
+
+    await user.type(screen.getByLabelText(/usuario o correo/i), 'alguien@example.org')
+    await user.click(screen.getByRole('button', { name: /iniciar sesión/i }))
+
+    expect(screen.getByLabelText(/contraseña/i)).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByLabelText(/usuario o correo/i)).not.toHaveAttribute('aria-invalid')
   })
 })
