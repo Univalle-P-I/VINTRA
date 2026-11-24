@@ -7,7 +7,7 @@ API REST base con NestJS. `GET /health` confirma que responde el backend y `GET 
 Desde la raíz del repositorio, copia `.env.example` a `.env` y arranca PostgreSQL:
 
 ```powershell
-docker compose up -d postgres
+docker compose up -d database
 cd backend
 npm ci
 $env:CORS_ORIGIN = 'http://localhost:5173'
