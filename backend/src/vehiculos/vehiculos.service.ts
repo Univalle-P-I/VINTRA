@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 
 import {
   assertValidStatusTransition,
@@ -20,12 +20,37 @@ import { ConsultarVehiculosDto } from './dto/consultar-vehiculos.dto';
 import { CrearTipoVehiculoDto } from './dto/crear-tipo-vehiculo.dto';
 import { CrearVehiculoDto } from './dto/crear-vehiculo.dto';
 import { TipoVehiculo } from './entidades/tipo-vehiculo.entity';
-import { VehiculoAuditLog } from './entidades/vehiculo-audit-log.entity';
 import { EstadoVehiculo, Vehiculo } from './entidades/vehiculo.entity';
 
 export type VehiculoConDisponibilidad = Vehiculo & {
   esAsignable: boolean;
 };
+
+function parseBooleanFilter(value: unknown): boolean | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return undefined;
+}
+
+function parsePositiveInt(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return undefined;
+  }
+  return parsed;
+}
 
 @Injectable()
 export class VehiculosService {
@@ -34,8 +59,6 @@ export class VehiculosService {
     private readonly tipoRepository: Repository<TipoVehiculo>,
     @InjectRepository(Vehiculo)
     private readonly vehiculoRepository: Repository<Vehiculo>,
-    @InjectRepository(VehiculoAuditLog)
-    private readonly auditLogRepository: Repository<VehiculoAuditLog>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -57,36 +80,18 @@ export class VehiculosService {
   ): Promise<TipoVehiculo> {
     try {
       return await this.dataSource.transaction(async (manager) => {
+        await this.setAuditContext(manager, actorId, requestIp);
         const repository = manager.getRepository(TipoVehiculo);
-        const saved = await repository.save(
+        return repository.save(
           repository.create({
             codigo: dto.code,
             nombre: dto.name,
             activo: dto.isActive ?? true,
           }),
         );
-
-        const auditRepo = manager.getRepository(VehiculoAuditLog);
-        await auditRepo.save(
-          auditRepo.create({
-            actor: actorId,
-            action: 'CREATE',
-            entity: 'vehicle_type',
-            entityId: saved.id,
-            oldValues: null,
-            newValues: {
-              code: saved.codigo,
-              name: saved.nombre,
-              isActive: saved.activo,
-            },
-            requestIp: requestIp || null,
-          }),
-        );
-
-        return saved;
       });
     } catch (error) {
-      this.throwIfUniqueViolation(error, 'Ya existe un tipo con ese cÃ³digo.');
+      this.throwIfUniqueViolation(error, 'Ya existe un tipo con ese código.');
       throw error;
     }
   }
@@ -99,45 +104,21 @@ export class VehiculosService {
   ): Promise<TipoVehiculo> {
     try {
       return await this.dataSource.transaction(async (manager) => {
+        await this.setAuditContext(manager, actorId, requestIp);
         const repository = manager.getRepository(TipoVehiculo);
         const type = await repository.findOneBy({ id });
         if (!type) {
-          throw new NotFoundException('El tipo de vehÃ­culo no existe.');
+          throw new NotFoundException('El tipo de vehículo no existe.');
         }
-
-        const oldValues = {
-          code: type.codigo,
-          name: type.nombre,
-          isActive: type.activo,
-        };
 
         if (dto.code !== undefined) type.codigo = dto.code;
         if (dto.name !== undefined) type.nombre = dto.name;
         if (dto.isActive !== undefined) type.activo = dto.isActive;
 
-        const saved = await repository.save(type);
-
-        const auditRepo = manager.getRepository(VehiculoAuditLog);
-        await auditRepo.save(
-          auditRepo.create({
-            actor: actorId,
-            action: 'UPDATE',
-            entity: 'vehicle_type',
-            entityId: saved.id,
-            oldValues,
-            newValues: {
-              code: saved.codigo,
-              name: saved.nombre,
-              isActive: saved.activo,
-            },
-            requestIp: requestIp || null,
-          }),
-        );
-
-        return saved;
+        return repository.save(type);
       });
     } catch (error) {
-      this.throwIfUniqueViolation(error, 'Ya existe un tipo con ese cÃ³digo.');
+      this.throwIfUniqueViolation(error, 'Ya existe un tipo con ese código.');
       throw error;
     }
   }
@@ -150,13 +131,16 @@ export class VehiculosService {
       .leftJoinAndSelect('vehiculo.tipoVehiculo', 'tipoVehiculo')
       .orderBy('vehiculo.placa', 'ASC');
 
-    if (query.onlyAssignable) {
+    const onlyAssignable = parseBooleanFilter(query.onlyAssignable);
+    const isActive = parseBooleanFilter(query.isActive);
+
+    if (onlyAssignable === true) {
       qb.andWhere('vehiculo.activo = :activo', { activo: true });
       qb.andWhere('vehiculo.estado = :estadoDisponible', {
         estadoDisponible: EstadoVehiculo.DISPONIBLE,
       });
-    } else if (query.isActive !== undefined) {
-      qb.andWhere('vehiculo.activo = :activo', { activo: query.isActive });
+    } else if (isActive !== undefined) {
+      qb.andWhere('vehiculo.activo = :activo', { activo: isActive });
     } else {
       qb.andWhere('vehiculo.activo = :activo', { activo: true });
     }
@@ -174,14 +158,16 @@ export class VehiculosService {
 
     if (query.plate) {
       qb.andWhere('UPPER(vehiculo.placa) LIKE :plate', {
-        plate: `%${query.plate}%`,
+        plate: `%${query.plate.trim().toUpperCase()}%`,
       });
     }
 
-    if (query.page !== undefined || query.limit !== undefined) {
-      const page = query.page ?? 1;
-      const limit = query.limit ?? 20;
-      qb.skip((page - 1) * limit).take(limit);
+    const page = parsePositiveInt(query.page);
+    const limit = parsePositiveInt(query.limit);
+    if (page !== undefined || limit !== undefined) {
+      const resolvedPage = page ?? 1;
+      const resolvedLimit = limit ?? 20;
+      qb.skip((resolvedPage - 1) * resolvedLimit).take(resolvedLimit);
     }
 
     const items = await qb.getMany();
@@ -194,10 +180,11 @@ export class VehiculosService {
       relations: { tipoVehiculo: true },
     });
     if (!vehicle) {
-      throw new NotFoundException('El vehÃ­culo no existe.');
+      throw new NotFoundException('El vehículo no existe.');
     }
     return this.withAvailability(vehicle);
   }
+
   async crear(
     dto: CrearVehiculoDto,
     actorId: string,
@@ -209,7 +196,7 @@ export class VehiculosService {
         throw new BadRequestException({
           code: 'FAILURE_REASON_REQUIRED',
           message:
-            'Para registrar un vehÃ­culo inhabilitado (out_of_service) debe indicar un motivo descriptivo (mÃ­nimo 5 caracteres).',
+            'Para registrar un vehículo inhabilitado (out_of_service) debe indicar un motivo descriptivo (mínimo 5 caracteres).',
         });
       }
     }
@@ -219,14 +206,15 @@ export class VehiculosService {
     });
     if (!type) {
       throw new NotFoundException(
-        'El tipo de vehÃ­culo no existe o estÃ¡ inactivo.',
+        'El tipo de vehículo no existe o está inactivo.',
       );
     }
 
     try {
       const saved = await this.dataSource.transaction(async (manager) => {
+        await this.setAuditContext(manager, actorId, requestIp);
         const repository = manager.getRepository(Vehiculo);
-        const created = await repository.save(
+        return repository.save(
           repository.create({
             tipoVehiculo: type,
             estado: dto.vehicleStatus,
@@ -236,34 +224,11 @@ export class VehiculosService {
             activo: dto.isActive ?? true,
           }),
         );
-
-        const auditRepo = manager.getRepository(VehiculoAuditLog);
-        await auditRepo.save(
-          auditRepo.create({
-            actor: actorId,
-            action: 'CREATE',
-            entity: 'vehicle',
-            entityId: created.id,
-            oldValues: null,
-            newValues: {
-              plate: created.placa,
-              vehicleTypeId: type.id,
-              vehicleStatus: created.estado,
-              capacityKg: created.capacidadKg,
-              capacityYd3: created.capacidadYd3,
-              isActive: created.activo,
-              ...(dto.reason ? { reason: dto.reason.trim() } : {}),
-            },
-            requestIp: requestIp || null,
-          }),
-        );
-
-        return created;
       });
 
       return this.withAvailability(saved);
     } catch (error) {
-      this.throwIfUniqueViolation(error, 'Ya existe un vehÃ­culo con esa placa.');
+      this.throwIfUniqueViolation(error, 'Ya existe un vehículo con esa placa.');
       throw error;
     }
   }
@@ -275,13 +240,14 @@ export class VehiculosService {
     requestIp: string,
   ): Promise<VehiculoConDisponibilidad> {
     const updated = await this.dataSource.transaction(async (manager) => {
+      await this.setAuditContext(manager, actorId, requestIp);
       const repository = manager.getRepository(Vehiculo);
       const vehicle = await repository.findOne({
         where: { id },
         relations: { tipoVehiculo: true },
       });
       if (!vehicle) {
-        throw new NotFoundException('El vehÃ­culo no existe.');
+        throw new NotFoundException('El vehículo no existe.');
       }
 
       assertValidStatusTransition({
@@ -290,36 +256,10 @@ export class VehiculosService {
         reason: dto.reason,
       });
 
-      const previousStatus = vehicle.estado;
-      const previousAssignable = isVehicleAssignable(vehicle);
-
       vehicle.estado = dto.vehicleStatus;
       vehicle.actualizadoEn = new Date();
 
-      const saved = await repository.save(vehicle);
-      const nextAssignable = isVehicleAssignable(saved);
-
-      const auditRepo = manager.getRepository(VehiculoAuditLog);
-      await auditRepo.save(
-        auditRepo.create({
-          actor: actorId,
-          action: 'STATUS_CHANGE',
-          entity: 'vehicle',
-          entityId: saved.id,
-          oldValues: {
-            vehicleStatus: previousStatus,
-            esAsignable: previousAssignable,
-          },
-          newValues: {
-            vehicleStatus: saved.estado,
-            esAsignable: nextAssignable,
-            ...(dto.reason ? { reason: dto.reason.trim() } : {}),
-          },
-          requestIp: requestIp || null,
-        }),
-      );
-
-      return saved;
+      return repository.save(vehicle);
     });
 
     return this.withAvailability(updated);
@@ -333,24 +273,15 @@ export class VehiculosService {
   ): Promise<VehiculoConDisponibilidad> {
     try {
       const updated = await this.dataSource.transaction(async (manager) => {
+        await this.setAuditContext(manager, actorId, requestIp);
         const repository = manager.getRepository(Vehiculo);
         const vehicle = await repository.findOne({
           where: { id },
           relations: { tipoVehiculo: true },
         });
         if (!vehicle) {
-          throw new NotFoundException('El vehÃ­culo no existe.');
+          throw new NotFoundException('El vehículo no existe.');
         }
-
-        const oldValues = {
-          vehicleTypeId: vehicle.tipoVehiculo?.id ?? null,
-          vehicleStatus: vehicle.estado,
-          plate: vehicle.placa,
-          capacityKg: vehicle.capacidadKg,
-          capacityYd3: vehicle.capacidadYd3,
-          isActive: vehicle.activo,
-          esAsignable: isVehicleAssignable(vehicle),
-        };
 
         if (dto.vehicleStatus !== undefined) {
           assertValidStatusTransition({
@@ -367,7 +298,7 @@ export class VehiculosService {
           });
           if (!type) {
             throw new NotFoundException(
-              'El tipo de vehÃ­culo no existe o estÃ¡ inactivo.',
+              'El tipo de vehículo no existe o está inactivo.',
             );
           }
           vehicle.tipoVehiculo = type;
@@ -381,38 +312,33 @@ export class VehiculosService {
         if (dto.isActive !== undefined) vehicle.activo = dto.isActive;
         vehicle.actualizadoEn = new Date();
 
-        const saved = await repository.save(vehicle);
-
-        const auditRepo = manager.getRepository(VehiculoAuditLog);
-        await auditRepo.save(
-          auditRepo.create({
-            actor: actorId,
-            action:
-              dto.vehicleStatus !== undefined ? 'STATUS_CHANGE' : 'UPDATE',
-            entity: 'vehicle',
-            entityId: saved.id,
-            oldValues,
-            newValues: {
-              vehicleTypeId: saved.tipoVehiculo?.id ?? null,
-              vehicleStatus: saved.estado,
-              plate: saved.placa,
-              capacityKg: saved.capacidadKg,
-              capacityYd3: saved.capacidadYd3,
-              isActive: saved.activo,
-              esAsignable: isVehicleAssignable(saved),
-              ...(dto.reason ? { reason: dto.reason.trim() } : {}),
-            },
-            requestIp: requestIp || null,
-          }),
-        );
-
-        return saved;
+        return repository.save(vehicle);
       });
 
       return this.withAvailability(updated);
     } catch (error) {
-      this.throwIfUniqueViolation(error, 'Ya existe un vehÃ­culo con esa placa.');
+      this.throwIfUniqueViolation(error, 'Ya existe un vehículo con esa placa.');
       throw error;
+    }
+  }
+
+  private async setAuditContext(
+    manager: EntityManager,
+    actorId: string,
+    requestIp: string,
+  ): Promise<void> {
+    if (typeof manager.query !== 'function') {
+      return;
+    }
+    if (actorId) {
+      await manager.query(`SELECT set_config('app.current_user_id', $1, true)`, [
+        actorId,
+      ]);
+    }
+    if (requestIp) {
+      await manager.query(`SELECT set_config('app.request_ip', $1, true)`, [
+        requestIp,
+      ]);
     }
   }
 
