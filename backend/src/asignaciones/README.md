@@ -29,3 +29,13 @@ Se bloquean con `FOR UPDATE`, en este orden fijo (evita interbloqueos): programa
 - `day_of_week` usa 1 = lunes … 7 = domingo.
 - Los intervalos son `[inicio, fin)`: una asignación que empieza justo cuando termina otra no se cruza.
 - `Vehiculo`, `Horario` y `ProgramacionMicroruta` son mapeos mínimos; reemplazar por las entidades de #75/#79 cuando lleguen a develop.
+
+## Fuera de alcance (pendiente de otras tareas)
+
+- **Compatibilidad entre conductor, vehículo y microruta:** el esquema actual no define ninguna regla (solo existe `vehicle_type`, sin relación con la microruta ni con requisitos del conductor). Se aplicará cuando VIN-006 (#58) la defina.
+- **Disponibilidad por turnos:** las migraciones no incluyen tabla de turnos; depende de VIN-024 (#76).
+- **Reasignación tras cancelar:** la restricción `uq_assignment_schedule_start` de la base de datos incluye asignaciones canceladas. Pendiente de ajuste en BD (índice único parcial).
+
+## Prueba contra PostgreSQL
+
+`backend/test/asignaciones.e2e-spec.ts` prueba asignaciones y solicitudes simultáneas contra la base real. Solo corre con `RUN_DB_E2E=true` y el esquema de `database/migrations` aplicado (requiere PostGIS). El CI actual usa `postgres:16` sin PostGIS, por lo que la omite.
