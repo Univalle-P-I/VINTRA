@@ -1,0 +1,8 @@
+BEGIN;
+
+CREATE OR REPLACE TRIGGER trg_btura_neighborhood_audit
+AFTER INSERT OR UPDATE OR DELETE ON btura_neighborhood
+FOR EACH ROW
+EXECUTE FUNCTION fn_audit_log();
+
+COMMIT;
