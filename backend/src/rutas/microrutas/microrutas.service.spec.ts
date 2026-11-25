@@ -16,10 +16,9 @@ import { crearValidationPipe } from '../../common/validacion';
 
 describe('MicrorutasService', () => {
   const repositorioMicrorutas = {
+    createQueryBuilder: jest.fn(() => queryBuilder),
     find: jest.fn(),
     findOne: jest.fn(),
-    create: jest.fn((datos: Partial<Microruta>) => datos as Microruta),
-    save: jest.fn(),
   };
   const repositorioMicrorutaBarrios = {
     find: jest.fn(),
@@ -27,6 +26,18 @@ describe('MicrorutasService', () => {
       (datos: Partial<MicrorutaBarrio>) => datos as MicrorutaBarrio,
     ),
     save: jest.fn(),
+  };
+  const queryBuilder = {
+    insert: jest.fn().mockReturnThis(),
+    into: jest.fn().mockReturnThis(),
+    values: jest.fn().mockReturnThis(),
+    setParameter: jest.fn().mockReturnThis(),
+    returning: jest.fn().mockReturnThis(),
+    execute: jest.fn(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    getRawAndEntities: jest.fn(),
   };
   const repositorioMacrorutas = {
     findOne: jest.fn(),
@@ -37,6 +48,22 @@ describe('MicrorutasService', () => {
 
   let moduleRef: TestingModule;
   let servicio: MicrorutasService;
+  const geom = {
+    type: 'MultiLineString',
+    coordinates: [
+      [
+        [-76.53, 3.43],
+        [-76.52, 3.44],
+      ],
+    ],
+  };
+
+  function mockDetalle(microruta: Microruta): void {
+    queryBuilder.getRawAndEntities.mockResolvedValue({
+      entities: [microruta],
+      raw: [{ geom_json: geom }],
+    });
+  }
 
   beforeAll(async () => {
     moduleRef = await Test.createTestingModule({
@@ -69,15 +96,21 @@ describe('MicrorutasService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    repositorioMicrorutaBarrios.find.mockResolvedValue([]);
   });
 
   it('falla con 404 si la macroruta no existe y no guarda la microruta', async () => {
     repositorioMacrorutas.findOne.mockResolvedValue(null);
 
     await expect(
-      servicio.crear({ macrorutaId: 'macro-id', nombre: 'Ruta' }),
+      servicio.crear({
+        macrorutaId: 'macro-id',
+        nombre: 'Ruta',
+        codigo: 'm-001',
+        geom,
+      }),
     ).rejects.toBeInstanceOf(NotFoundException);
-    expect(repositorioMicrorutas.save).not.toHaveBeenCalled();
+    expect(queryBuilder.execute).not.toHaveBeenCalled();
   });
 
   it('lista las microrutas desde el repositorio', async () => {
@@ -91,20 +124,75 @@ describe('MicrorutasService', () => {
   it('crea una microruta con macroruta válida y asigna sus campos iniciales', async () => {
     const macroruta = { id: 'macro-id' } as Macroruta;
     repositorioMacrorutas.findOne.mockResolvedValue(macroruta);
+    queryBuilder.execute.mockResolvedValue({ raw: [{ id: 'micro-id' }] });
+    const entidad = {
+      id: 'micro-id',
+      nombre: 'Ruta',
+      codigo: 'm-001',
+      macroruta,
+      activo: true,
+    } as Microruta;
+    mockDetalle(entidad);
 
-    await servicio.crear({
+    const creada = await servicio.crear({
       macrorutaId: macroruta.id,
       nombre: 'Ruta',
+      codigo: 'm-001',
+      geom,
     });
 
-    expect(repositorioMicrorutas.save).toHaveBeenCalledWith(
+    expect(queryBuilder.values).toHaveBeenCalledWith(
       expect.objectContaining({
         nombre: 'Ruta',
-        macroruta,
+        codigo: 'm-001',
+        macroruta: { id: macroruta.id },
         activo: true,
-        creadoEn: expect.any(Date),
-        actualizadoEn: expect.any(Date),
+        geom: expect.any(Function),
       }),
+    );
+    expect(queryBuilder.setParameter).toHaveBeenCalledWith(
+      'geom',
+      JSON.stringify(geom),
+    );
+    expect(creada).toEqual(expect.objectContaining({ geom }));
+    expect(creada).not.toHaveProperty('barrios');
+  });
+
+  it('responde 409 cuando el código de microruta ya existe', async () => {
+    const macroruta = { id: 'macro-id' } as Macroruta;
+    repositorioMacrorutas.findOne.mockResolvedValue(macroruta);
+    queryBuilder.execute.mockRejectedValue(
+      new QueryFailedError('INSERT', [], { code: '23505' }),
+    );
+
+    await expect(
+      servicio.crear({
+        macrorutaId: macroruta.id,
+        nombre: 'Ruta',
+        codigo: 'm-001',
+        geom,
+      }),
+    ).rejects.toThrow(
+      new ConflictException('El código de la microruta ya existe.'),
+    );
+  });
+
+  it('responde 400 cuando PostGIS rechaza la geometría de microruta', async () => {
+    const macroruta = { id: 'macro-id' } as Macroruta;
+    repositorioMacrorutas.findOne.mockResolvedValue(macroruta);
+    queryBuilder.execute.mockRejectedValue(
+      new QueryFailedError('INSERT', [], { code: '22P02' }),
+    );
+
+    await expect(
+      servicio.crear({
+        macrorutaId: macroruta.id,
+        nombre: 'Ruta',
+        codigo: 'm-001',
+        geom,
+      }),
+    ).rejects.toThrow(
+      new BadRequestException('geom no es un GeoJSON válido.'),
     );
   });
 
@@ -118,7 +206,7 @@ describe('MicrorutasService', () => {
       { ordenVisita: 1, barrio: { id: 'barrio-1' } },
       { ordenVisita: 2, barrio: { id: 'barrio-2' } },
     ] as MicrorutaBarrio[];
-    repositorioMicrorutas.findOne.mockResolvedValue(microruta);
+    mockDetalle(microruta);
     repositorioMicrorutaBarrios.find.mockResolvedValue(relaciones);
 
     const detalle = await servicio.obtener(microruta.id);
@@ -135,7 +223,10 @@ describe('MicrorutasService', () => {
   });
 
   it('falla con 404 al pedir el detalle de una microruta inexistente', async () => {
-    repositorioMicrorutas.findOne.mockResolvedValue(null);
+    queryBuilder.getRawAndEntities.mockResolvedValue({
+      entities: [],
+      raw: [],
+    });
 
     await expect(servicio.obtener('desconocida')).rejects.toBeInstanceOf(
       NotFoundException,
@@ -218,6 +309,7 @@ describe('MicrorutasService', () => {
     repositorioMicrorutaBarrios.find
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([{ barrio, ordenVisita: 1 }]);
+    mockDetalle(microruta);
 
     const detalle = await servicio.asociarBarrios('micro-id', {
       barrios: [{ barrioId: barrio.id, ordenVisita: 1 }],
@@ -242,6 +334,7 @@ describe('MicrorutasService', () => {
     repositorioMicrorutaBarrios.find
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([{ barrio, ordenVisita: 1 }]);
+    mockDetalle(microruta);
 
     await servicio.asociarBarrios('micro-id', {
       barrios: [{ barrioId: barrioId.toUpperCase(), ordenVisita: 1 }],
@@ -371,7 +464,7 @@ describe('MicrorutasService', () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
-  it('rechaza propiedades desconocidas, incluida geom', async () => {
+  it('rechaza propiedades desconocidas y acepta geom como campo del DTO', async () => {
     const validationPipe = crearValidationPipe();
 
     await expect(
@@ -379,10 +472,33 @@ describe('MicrorutasService', () => {
         {
           macrorutaId: '09b2c3dc-0035-4e29-aa18-d9a4e803191d',
           nombre: 'Ruta',
-          geom: 'no aceptada',
+          codigo: 'm-001',
+          geom,
+          extra: true,
         },
         { type: 'body', metatype: CrearMicrorutaDto },
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('acepta codigo y geom válidos en el DTO de creación', async () => {
+    const validationPipe = crearValidationPipe();
+
+    await expect(
+      validationPipe.transform(
+        {
+          macrorutaId: '09b2c3dc-0035-4e29-aa18-d9a4e803191d',
+          nombre: 'Ruta',
+          codigo: 'm-001',
+          geom,
+        },
+        { type: 'body', metatype: CrearMicrorutaDto },
+      ),
+    ).resolves.toEqual({
+      macrorutaId: '09b2c3dc-0035-4e29-aa18-d9a4e803191d',
+      nombre: 'Ruta',
+      codigo: 'm-001',
+      geom,
+    });
   });
 });

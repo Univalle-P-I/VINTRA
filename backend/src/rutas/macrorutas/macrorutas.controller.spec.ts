@@ -11,7 +11,11 @@ describe('MacrorutasController', () => {
     const controller = new MacrorutasController(
       servicio as unknown as MacrorutasService,
     );
-    const dto = { nombre: 'Centro' };
+    const dto = {
+      nombre: 'Centro',
+      codigo: 'M-001',
+      geom: { type: 'MultiLineString', coordinates: [] },
+    };
 
     expect(controller.crear(dto)).toBe('creada');
     expect(servicio.crear).toHaveBeenCalledWith(dto);

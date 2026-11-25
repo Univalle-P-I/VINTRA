@@ -14,7 +14,12 @@ describe('MicrorutasController', () => {
     const controller = new MicrorutasController(
       servicio as unknown as MicrorutasService,
     );
-    const crearDto = { macrorutaId: 'macro-id', nombre: 'Ruta' };
+    const crearDto = {
+      macrorutaId: 'macro-id',
+      nombre: 'Ruta',
+      codigo: 'm-001',
+      geom: { type: 'MultiLineString', coordinates: [] },
+    };
     const asociarDto = { barrios: [{ barrioId: 'barrio-id', ordenVisita: 1 }] };
 
     expect(controller.crear(crearDto as CrearMicrorutaDto)).toBe('creada');
