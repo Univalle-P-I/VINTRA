@@ -1,9 +1,17 @@
-/**
- * Contrato de entrada para registrar un miembro de cuadrilla.
- * Sin validaciones por ahora: se agregan con la implementación funcional (VIN-024).
- * PROVISIONAL: campos sujetos al esquema de la PR #115.
- */
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+
+/** Contrato de entrada para registrar un miembro de cuadrilla (tabla `crew_member`). */
 export class CreateCrewMemberDto {
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
   fullName!: string;
+
+  @IsOptional()
+  @IsUUID()
   crewId?: string;
 }
