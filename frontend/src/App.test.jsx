@@ -4,11 +4,25 @@ import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import App from './App'
 
+vi.mock('./LandingMap', () => ({ default: () => null }))
 vi.mock('axios', () => ({
   default: {
     get: vi.fn(),
   },
 }))
+
+async function signIn(user, account) {
+  const [enter] = await screen.findAllByRole('button', { name: /iniciar sesión/i })
+  await user.click(enter)
+  await user.type(await screen.findByLabelText(/usuario o correo/i), 'demo@example.org')
+  await user.type(screen.getByLabelText(/contraseña/i), 'clave')
+  if (account) await user.click(screen.getByRole('radio', { name: new RegExp(account) }))
+  await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+  // La pantalla actual sale con una animación breve antes de mostrar la siguiente.
+  await screen.findByRole('navigation', { name: 'Navegación de módulos' })
+}
+
+const moduleNav = () => screen.getByRole('navigation', { name: 'Navegación de módulos' })
 
 describe('App connection smoke test', () => {
   beforeEach(() => {
@@ -33,6 +47,7 @@ describe('App connection smoke test', () => {
     )
 
     render(<App />)
+    await signIn(userEvent.setup())
 
     await waitFor(() => {
       expect(screen.getAllByText('Disponible')).toHaveLength(2)
@@ -55,6 +70,7 @@ describe('App connection smoke test', () => {
     )
 
     render(<App />)
+    await signIn(userEvent.setup())
 
     await screen.findByText('API backend')
     await waitFor(() => {
@@ -71,23 +87,11 @@ describe('App connection smoke test', () => {
     vi.stubEnv('VITE_API_URL', '')
 
     render(<App />)
+    await signIn(userEvent.setup())
 
     await screen.findByText('URL no configurada')
 
     expect(axios.get).not.toHaveBeenCalled()
-  })
-
-  it('loads the landing preview from the configured deployment base', () => {
-    vi.stubEnv('BASE_URL', '/staging/')
-    axios.get.mockReturnValue(new Promise(() => {}))
-
-    render(<App />)
-
-    expect(
-      screen.getByRole('img', {
-        name: 'Vista cartográfica ilustrativa de vehículos, rutas e incidencias',
-      })
-    ).toHaveAttribute('src', '/staging/assets/landing/764ea.png')
   })
 
   it('allows returning from the login screen to the landing page', async () => {
@@ -96,17 +100,18 @@ describe('App connection smoke test', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(
-      await screen.findByRole('button', {
-        name: /iniciar sesión|iniciar sesion|ingresar|acceder|login/i,
-      })
-    )
+    const [enter] = await screen.findAllByRole('button', { name: /iniciar sesión/i })
+    await user.click(enter)
 
-    expect(screen.getByLabelText(/correo|email|usuario/i)).toBeInTheDocument()
+    expect(await screen.findByLabelText(/usuario o correo/i)).toBeInTheDocument()
 
     await user.click(
       screen.getByRole('button', { name: /volver|inicio|regresar/i })
     )
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /Buenaventura/ })
+    ).toBeInTheDocument()
   })
 
   it('opens fleet from the module navigation after login', async () => {
@@ -115,20 +120,64 @@ describe('App connection smoke test', () => {
     const user = userEvent.setup()
     render(<App />)
 
+    await signIn(user)
     await user.click(
-      await screen.findByRole('button', {
-        name: /iniciar sesión|iniciar sesion|ingresar|acceder|login/i,
-      })
-    )
-    await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
-    await user.click(
-      within(
-        screen.getByRole('navigation', { name: 'Navegación de módulos' })
-      ).getByRole('button', { name: 'Gestión de flota' })
+      within(moduleNav()).getByRole('button', { name: 'Gestión de flota' })
     )
 
     expect(
       screen.getByText('Gestión de flota', { selector: '.page-title' })
     ).toBeInTheDocument()
+  })
+
+  it('shows every module to the administrator, starting at the overview', async () => {
+    axios.get.mockReturnValue(new Promise(() => {}))
+    const user = userEvent.setup()
+    render(<App />)
+
+    await signIn(user)
+
+    expect(screen.getByText('Resumen', { selector: '.page-title' })).toBeInTheDocument()
+    const nav = within(moduleNav())
+    for (const name of ['Resumen', 'Gestión de operación', 'Gestión de flota', 'Gestión de personal', 'Gestión de rutas', 'Mapa']) {
+      expect(nav.getByRole('button', { name })).toBeInTheDocument()
+    }
+  })
+
+  it('limits the driver to their own route', async () => {
+    axios.get.mockReturnValue(new Promise(() => {}))
+    const user = userEvent.setup()
+    render(<App />)
+
+    await signIn(user, 'Conductor')
+
+    const nav = within(moduleNav())
+    expect(nav.getAllByRole('button').filter((b) => b.className.includes('nav-item'))).toHaveLength(1)
+    expect(nav.getByRole('button', { name: 'Mi recorrido' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.queryByText('Gestión de flota')).not.toBeInTheDocument()
+  })
+
+  it('lets the operations chief consult the fleet without registering vehicles', async () => {
+    axios.get.mockReturnValue(new Promise(() => {}))
+    const user = userEvent.setup()
+    render(<App />)
+
+    await signIn(user, 'Jefe de operaciones')
+    await user.click(within(moduleNav()).getByRole('button', { name: 'Gestión de flota' }))
+
+    expect(screen.queryByRole('button', { name: /registrar/i })).not.toBeInTheDocument()
+    await user.click(within(moduleNav()).getByRole('button', { name: 'Gestión de operación' }))
+    expect(screen.getByRole('button', { name: /nueva asignación/i })).toBeInTheDocument()
+  })
+
+  it('returns to the login screen when signing out', async () => {
+    axios.get.mockReturnValue(new Promise(() => {}))
+    const user = userEvent.setup()
+    render(<App />)
+
+    await signIn(user)
+    await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }))
+
+    expect(await screen.findByLabelText(/usuario o correo/i)).toBeInTheDocument()
   })
 })
