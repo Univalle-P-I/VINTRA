@@ -9,6 +9,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -31,6 +32,7 @@ export class MicrorutasController {
     type: MicrorouteCreatedResponseDto,
   })
   @ApiBadRequestResponse({ description: 'Solicitud inválida.' })
+  @ApiConflictResponse({ description: 'El código de la microruta ya existe.' })
   @ApiNotFoundResponse({ description: 'Macroruta no encontrada.' })
   crear(@Body() dto: CrearMicrorutaDto) {
     return this.microrutasService.crear(dto);

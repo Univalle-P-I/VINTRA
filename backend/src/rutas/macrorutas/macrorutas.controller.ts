@@ -9,11 +9,13 @@ import {
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { CrearMacrorutaDto } from './dto/crear-macroruta.dto';
+import { MacrorouteDetailResponseDto } from './dto/macroroute-detail-response.dto';
 import { MacrorouteResponseDto } from './dto/macroroute-response.dto';
 import { MacrorutasService } from './macrorutas.service';
 
@@ -25,9 +27,10 @@ export class MacrorutasController {
   @Post()
   @ApiCreatedResponse({
     description: 'Macroruta creada.',
-    type: MacrorouteResponseDto,
+    type: MacrorouteDetailResponseDto,
   })
   @ApiBadRequestResponse({ description: 'Solicitud inválida.' })
+  @ApiConflictResponse({ description: 'El código de la macroruta ya existe.' })
   crear(@Body() dto: CrearMacrorutaDto) {
     return this.macrorutasService.crear(dto);
   }
@@ -46,7 +49,7 @@ export class MacrorutasController {
   @Get(':id')
   @ApiOkResponse({
     description: 'Detalle de macroruta.',
-    type: MacrorouteResponseDto,
+    type: MacrorouteDetailResponseDto,
   })
   @ApiBadRequestResponse({ description: 'El identificador no es un UUID válido.' })
   @ApiNotFoundResponse({ description: 'Macroruta no encontrada.' })

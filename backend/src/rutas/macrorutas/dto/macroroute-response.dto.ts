@@ -7,6 +7,9 @@ export class MacrorouteResponseDto {
   @ApiProperty({ type: String })
   nombre: string;
 
+  @ApiProperty({ type: String, maxLength: 30 })
+  codigo: string;
+
   @ApiProperty({ type: Boolean })
   activo: boolean;
 
