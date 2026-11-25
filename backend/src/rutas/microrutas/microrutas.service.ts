@@ -15,10 +15,19 @@ import { Microruta } from './entities/microruta.entity';
 
 export type MicrorutaDetalle = Pick<
   Microruta,
-  'id' | 'macroruta' | 'nombre' | 'activo' | 'actualizadoEn' | 'creadoEn'
+  | 'id'
+  | 'macroruta'
+  | 'nombre'
+  | 'codigo'
+  | 'geom'
+  | 'activo'
+  | 'actualizadoEn'
+  | 'creadoEn'
 > & {
   barrios: MicrorutaBarrio[];
 };
+
+type MicrorutaCreada = Omit<MicrorutaDetalle, 'barrios'>;
 
 @Injectable()
 export class MicrorutasService {
@@ -33,7 +42,7 @@ export class MicrorutasService {
     private readonly barriosRepository: Repository<Barrio>,
   ) {}
 
-  async crear(dto: CrearMicrorutaDto): Promise<Microruta> {
+  async crear(dto: CrearMicrorutaDto): Promise<MicrorutaCreada> {
     const macroruta = await this.macrorutasRepository.findOne({
       where: { id: dto.macrorutaId },
     });
@@ -42,16 +51,36 @@ export class MicrorutasService {
       throw new NotFoundException('Macroruta no encontrada.');
     }
 
-    const ahora = new Date();
-    const microruta = this.microrutasRepository.create({
-      nombre: dto.nombre,
-      macroruta,
-      activo: true,
-      creadoEn: ahora,
-      actualizadoEn: ahora,
-    });
+    let id: string;
+    try {
+      const resultado = await this.microrutasRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Microruta)
+        .values({
+          nombre: dto.nombre,
+          codigo: dto.codigo,
+          macroruta: { id: dto.macrorutaId },
+          activo: true,
+          geom: () => 'ST_SetSRID(ST_GeomFromGeoJSON(:geom), 4326)',
+        })
+        .setParameter('geom', JSON.stringify(dto.geom))
+        .returning('id')
+        .execute();
+      const idInsertado = resultado.raw?.[0]?.id;
 
-    return this.microrutasRepository.save(microruta);
+      if (typeof idInsertado !== 'string') {
+        throw new Error(
+          'No se obtuvo el identificador de la microruta creada.',
+        );
+      }
+      id = idInsertado;
+    } catch (error) {
+      this.lanzarErrorDeCreacion(error);
+    }
+
+    const { barrios: _barrios, ...creada } = await this.obtener(id);
+    return creada;
   }
 
   listar(): Promise<Microruta[]> {
@@ -59,15 +88,19 @@ export class MicrorutasService {
   }
 
   async obtener(id: string): Promise<MicrorutaDetalle> {
-    const microruta = await this.microrutasRepository.findOne({
-      where: { id },
-      relations: { macroruta: true },
-    });
+    const { entities, raw } = await this.microrutasRepository
+      .createQueryBuilder('microruta')
+      .leftJoinAndSelect('microruta.macroruta', 'macroruta')
+      .addSelect('ST_AsGeoJSON(microruta.geom)::json', 'geom_json')
+      .where('microruta.id = :id', { id })
+      .getRawAndEntities();
+    const microruta = entities[0];
 
     if (!microruta) {
       throw new NotFoundException('Microruta no encontrada.');
     }
 
+    microruta.geom = raw[0]?.geom_json;
     const barrios = await this.microrutaBarrioRepository.find({
       where: { microruta: { id } },
       relations: { barrio: true },
@@ -78,6 +111,8 @@ export class MicrorutasService {
       id: microruta.id,
       macroruta: microruta.macroruta,
       nombre: microruta.nombre,
+      codigo: microruta.codigo,
+      geom: microruta.geom,
       activo: microruta.activo,
       actualizadoEn: microruta.actualizadoEn,
       creadoEn: microruta.creadoEn,
@@ -193,5 +228,21 @@ export class MicrorutasService {
     }
 
     return this.obtener(id);
+  }
+
+  private lanzarErrorDeCreacion(error: unknown): never {
+    if (error instanceof QueryFailedError) {
+      const codigo = error.driverError.code;
+
+      if (codigo === '23505') {
+        throw new ConflictException('El código de la microruta ya existe.');
+      }
+
+      if (['22023', 'XX000', '22P02'].includes(codigo)) {
+        throw new BadRequestException('geom no es un GeoJSON válido.');
+      }
+    }
+
+    throw error;
   }
 }
