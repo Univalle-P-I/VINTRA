@@ -65,14 +65,20 @@ export class VehiculosController {
 
   @Get('vehicles')
   @Roles(roles.ADMIN, roles.OPERATOR, roles.DRIVER)
-  listar(@Query() query: ConsultarVehiculosDto) {
-    return this.vehiculosService.listar(query);
+  listar(
+    @Query() query: ConsultarVehiculosDto,
+    @CurrentUser() actor?: AuthenticatedUser,
+  ) {
+    return this.vehiculosService.listar(query, actor);
   }
 
   @Get('vehicles/:id')
   @Roles(roles.ADMIN, roles.OPERATOR, roles.DRIVER)
-  obtener(@Param('id', ParseUUIDPipe) id: string) {
-    return this.vehiculosService.obtener(id);
+  obtener(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() actor?: AuthenticatedUser,
+  ) {
+    return this.vehiculosService.obtener(id, actor);
   }
 
   @Post('vehicles')

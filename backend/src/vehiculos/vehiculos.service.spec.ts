@@ -1,7 +1,8 @@
-﻿import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+﻿import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { roles } from '../common/enums/roles.enum';
 import { TipoVehiculo } from './entidades/tipo-vehiculo.entity';
 import { EstadoVehiculo, Vehiculo } from './entidades/vehiculo.entity';
 import { VehiculosService } from './vehiculos.service';
@@ -52,6 +53,11 @@ describe('VehiculosService', () => {
     expect(await service.listar({ isActive: false, status: EstadoVehiculo.MANTENIMIENTO, vehicleTypeId: tipoMock.id, plate: 'abc' })).toHaveLength(1);
     vehiculoRepoMock.findOne.mockResolvedValueOnce(vehiculoMock);
     await expect(service.obtener(vehiculoMock.id)).resolves.toMatchObject({ esAsignable: true });
+    await expect(service.listar({ isActive: false }, { roles: [roles.DRIVER] })).rejects.toThrow(ForbiddenException);
+    vehiculoRepoMock.findOne.mockResolvedValueOnce({ ...vehiculoMock, activo: false });
+    await expect(service.obtener(vehiculoMock.id, { roles: [roles.DRIVER] })).rejects.toThrow(ForbiddenException);
+    vehiculoRepoMock.findOne.mockResolvedValueOnce({ ...vehiculoMock, activo: false });
+    await expect(service.obtener(vehiculoMock.id, { roles: [roles.ADMIN] })).resolves.toMatchObject({ activo: false });
     vehiculoRepoMock.findOne.mockResolvedValueOnce(null);
     await expect(service.obtener('none')).rejects.toThrow(NotFoundException);
   });

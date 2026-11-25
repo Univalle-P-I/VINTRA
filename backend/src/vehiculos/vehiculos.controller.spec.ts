@@ -57,9 +57,9 @@ describe('VehiculosController', () => {
     ).resolves.toEqual({ id: 't1' });
     expect(controller.listarEstados()).toEqual([]);
     await expect(
-      controller.listar({ status: EstadoVehiculo.DISPONIBLE }),
+      controller.listar({ status: EstadoVehiculo.DISPONIBLE }, actor),
     ).resolves.toEqual([]);
-    await expect(controller.obtener('v1')).resolves.toEqual({ id: 'v1' });
+    await expect(controller.obtener('v1', actor)).resolves.toEqual({ id: 'v1' });
     await expect(
       controller.crear(
         {

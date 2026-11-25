@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: VINTRA API
+  version: 1.0.0
+  description: Contrato REST de VINTRA para consulta, filtrado, paginación y gestión operativa de vehículos.
+servers:
+  - url: http://localhost:3002
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    VehicleStatus:
+      type: string
+      enum: [available, in_service, maintenance, out_of_service]
+paths:
+  /api/v1/vehicles:
+    get:
+      summary: Lista vehículos con filtros combinables y paginación opcional
+      description: Por defecto retorna vehículos activos. Los usuarios con rol DRIVER no pueden consultar vehículos inactivos (isActive=false retorna 403 Forbidden).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/VehicleStatus'
+        - name: vehicleStatus
+          in: query
+          schema:
+            $ref: '#/components/schemas/VehicleStatus'
+        - name: vehicleTypeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: plate
+          in: query
+          schema:
+            type: string
+            maxLength: 6
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+            default: true
+        - name: onlyAssignable
+          in: query
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Listado de vehículos ordenado ascendentemente por placa
+        '400':
+          description: Parámetros de consulta inválidos
+        '401':
+          description: No autenticado
+        '403':
+          description: Rol sin permiso o DRIVER intentando consultar vehículos inactivos
+  /api/v1/vehicles/{vehicleId}:
+    get:
+      summary: Obtiene el detalle de un vehículo por UUID
+      description: Si el vehículo está inactivo (activo = false), un usuario con rol DRIVER recibe 403 Forbidden.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: vehicleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Detalle del vehículo
+        '400':
+          description: UUID inválido
+        '401':
+          description: No autenticado
+        '403':
+          description: Rol DRIVER intentando consultar un vehículo inactivo
+        '404':
+          description: Vehículo no encontrado

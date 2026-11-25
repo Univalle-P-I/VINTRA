@@ -56,15 +56,11 @@ Ejemplo de esquema genérico para vehículos, que el issue #66 propone como ejem
 
 ### `GET /api/v1/vehicles`
 
-Consulta vehículos; parámetros candidatos `status`, `type`, `cursor`/`page` definidos al aprobar paginación. Permiso sugerido: `vehicles:read` según #70.
+Consulta el listado de vehículos ordenado ascendentemente por `placa`, con filtros combinables y paginación opcional. Contrato formal en [`docs/openapi.yaml`](./openapi.yaml). Roles permitidos: `ADMIN`, `OP`, `DRIVER`.
 
-`200`:
-
-```json
-{"items":[{"id":"veh_...","identifier":"...","type":"...","capacity":{"value":0,"unit":"..."},"status":"..."}],"page":{"nextCursor":null}}
-```
-
-Los valores `...` se reemplazan por campos/catálogos aprobados; `0` ilustra tipo numérico y no es valor válido de negocio.
+- Parámetros de consulta (`query`): `status` (`available`, `in_service`, `maintenance`, `out_of_service`), `vehicleStatus` (alias de `status`), `vehicleTypeId` (UUID), `plate` (búsqueda parcial insensible a mayúsculas, máx. 6 caracteres), `isActive` (booleano, `true` por defecto), `onlyAssignable` (booleano: activos y `available`), `page` (entero `>= 1`) y `limit` (entero `1..100`).
+- **Restricción por rol (`DRIVER`):** los conductores solo pueden consultar vehículos activos. Si un usuario con rol `DRIVER` envía `isActive=false`, la API responde `403 Forbidden`.
+- Respuestas: `200` (array de vehículos con `esAsignable`), `400` (parámetros inválidos), `401` (no autenticado), `403` (sin permiso o `DRIVER` solicitando inactivos).
 
 ### `POST /api/v1/vehicles`
 
@@ -80,7 +76,7 @@ Validar campos requeridos, identificador duplicado, formato, tipo permitido, uni
 
 ### `GET /api/v1/vehicles/{vehicleId}`
 
-Devuelve vehículo o `404`; no filtra información interna.
+Devuelve el detalle de un vehículo por UUID (`200`), `400` si el UUID es inválido, `403` si un usuario con rol `DRIVER` intenta consultar un vehículo inactivo (`activo = false`), o `404` si no existe.
 
 ### `PATCH /api/v1/vehicles/{vehicleId}`
 

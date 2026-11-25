@@ -1,11 +1,15 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
+
+import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
+import { roles } from '../common/enums/roles.enum';
 
 import {
   assertValidStatusTransition,
@@ -50,6 +54,11 @@ function parsePositiveInt(value: unknown): number | undefined {
     return undefined;
   }
   return parsed;
+}
+
+function isDriverOnly(actor?: Pick<AuthenticatedUser, 'roles'>): boolean {
+  if (!actor || !Array.isArray(actor.roles)) return false;
+  return actor.roles.includes(roles.DRIVER) && !actor.roles.includes(roles.ADMIN) && !actor.roles.includes(roles.OPERATOR);
 }
 
 @Injectable()
@@ -125,16 +134,31 @@ export class VehiculosService {
 
   async listar(
     query: ConsultarVehiculosDto = {},
+    actor?: Pick<AuthenticatedUser, 'roles'>,
   ): Promise<VehiculoConDisponibilidad[]> {
+    const driverOnly = isDriverOnly(actor);
+    const onlyAssignable = parseBooleanFilter(query.onlyAssignable);
+    const isActive = parseBooleanFilter(query.isActive);
+
+    if (driverOnly && isActive === false) {
+      throw new ForbiddenException(
+        'Los conductores no tienen permiso para consultar vehículos inactivos.',
+      );
+    }
+
     const qb = this.vehiculoRepository
       .createQueryBuilder('vehiculo')
       .leftJoinAndSelect('vehiculo.tipoVehiculo', 'tipoVehiculo')
       .orderBy('vehiculo.placa', 'ASC');
 
-    const onlyAssignable = parseBooleanFilter(query.onlyAssignable);
-    const isActive = parseBooleanFilter(query.isActive);
-
-    if (onlyAssignable === true) {
+    if (driverOnly) {
+      qb.andWhere('vehiculo.activo = :activo', { activo: true });
+      if (onlyAssignable === true) {
+        qb.andWhere('vehiculo.estado = :estadoDisponible', {
+          estadoDisponible: EstadoVehiculo.DISPONIBLE,
+        });
+      }
+    } else if (onlyAssignable === true) {
       qb.andWhere('vehiculo.activo = :activo', { activo: true });
       qb.andWhere('vehiculo.estado = :estadoDisponible', {
         estadoDisponible: EstadoVehiculo.DISPONIBLE,
@@ -174,13 +198,21 @@ export class VehiculosService {
     return items.map((vehicle) => this.withAvailability(vehicle));
   }
 
-  async obtener(id: string): Promise<VehiculoConDisponibilidad> {
+  async obtener(
+    id: string,
+    actor?: Pick<AuthenticatedUser, 'roles'>,
+  ): Promise<VehiculoConDisponibilidad> {
     const vehicle = await this.vehiculoRepository.findOne({
       where: { id },
       relations: { tipoVehiculo: true },
     });
     if (!vehicle) {
       throw new NotFoundException('El vehículo no existe.');
+    }
+    if (!vehicle.activo && isDriverOnly(actor)) {
+      throw new ForbiddenException(
+        'Los conductores no tienen permiso para consultar vehículos inactivos.',
+      );
     }
     return this.withAvailability(vehicle);
   }
