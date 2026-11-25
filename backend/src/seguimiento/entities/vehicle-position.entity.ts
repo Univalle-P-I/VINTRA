@@ -1,22 +1,24 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 /**
- * Posición geográfica de un vehículo. Tabla `vehicle_position`.
+ * Posición geográfica de un vehículo. Tabla `vehicle_position`
+ * (database/migrations/018_create_vehicle_position.sql).
  *
- * PROVISIONAL: alineada con la PR #115, que todavía no está aprobada.
- * Ajustar si el esquema cambia.
+ * Alineada con la migración 018, integrada en develop con la PR #115.
+ * El alcance del seguimiento sigue sujeto a las decisiones pendientes (#91).
  */
 @Entity({ name: 'vehicle_position' })
 export class VehiclePosition {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // PROVISIONAL (#115, #130): FK a assignment. Se declara como relación
-  // cuando exista la entidad de Asignaciones (#130) en develop.
+  // PROVISIONAL (#130): FK a assignment (fk_vehicle_position_assignment).
+  // Se declara como relación cuando exista la entidad de Asignaciones
+  // (#130) en develop.
   @Column({ name: 'assignment_id', type: 'uuid' })
   assignmentId!: string;
 
-  // PROVISIONAL (#115): geometry(Point, 4326), WGS 84.
+  // geometry(Point, 4326), WGS 84.
   @Column({
     name: 'geom',
     type: 'geometry',
@@ -25,7 +27,7 @@ export class VehiclePosition {
   })
   geom!: object;
 
-  // PROVISIONAL (#115): estado operativo. Por defecto TRUE en la base.
+  // Estado operativo. Por defecto TRUE en la base.
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive!: boolean;
 
