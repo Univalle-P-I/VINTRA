@@ -1,7 +1,11 @@
+import { ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import request from 'supertest';
 
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { roles } from '../common/enums/roles.enum';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { EstadoVehiculo } from './entidades/vehiculo.entity';
 import { VehiculosController } from './vehiculos.controller';
 import { VehiculosService } from './vehiculos.service';
@@ -84,5 +88,40 @@ describe('VehiculosController', () => {
     await expect(
       controller.actualizar('v1', { plate: 'XYZ999' }, actor, '127.0.0.1'),
     ).resolves.toEqual({ id: 'v1' });
+  });
+
+  it('rechaza por HTTP payloads con placa invalida o capacidad negativa mediante ValidationPipe', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [VehiculosController],
+      providers: [{ provide: VehiculosService, useValue: serviceMock }],
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          const req = context.switchToHttp().getRequest();
+          req.user = actor;
+          return true;
+        },
+      })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
+
+    const app = module.createNestApplication();
+    await app.init();
+
+    await request(app.getHttpServer())
+      .post('/api/v1/vehicles')
+      .send({
+        vehicleTypeId: '00000000-0000-4000-8000-000000000001',
+        vehicleStatus: 'available',
+        plate: 'INVALIDA-123',
+        capacityKg: '-50',
+        capacityYd3: '12',
+      })
+      .expect(400);
+
+    expect(serviceMock.crear).not.toHaveBeenCalled();
+    await app.close();
   });
 });

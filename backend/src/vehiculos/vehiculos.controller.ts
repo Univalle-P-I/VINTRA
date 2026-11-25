@@ -9,6 +9,8 @@ import {
   Post,
   Query,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -27,6 +29,13 @@ import { VehiculosService } from './vehiculos.service';
 
 @Controller('api/v1')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }),
+)
 export class VehiculosController {
   constructor(private readonly vehiculosService: VehiculosService) {}
 

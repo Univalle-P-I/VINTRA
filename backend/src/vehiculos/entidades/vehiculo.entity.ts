@@ -64,6 +64,14 @@ export class Vehiculo {
   estado!: EstadoVehiculo;
 
   @Column({
+    name: 'out_of_service_reason',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  motivoInhabilitacion!: string | null;
+
+  @Column({
     name: 'plate',
     type: 'char',
     length: 6,

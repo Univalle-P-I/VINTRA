@@ -190,8 +190,8 @@ export class VehiculosService {
     actorId: string,
     requestIp: string,
   ): Promise<VehiculoConDisponibilidad> {
+    const trimmedReason = dto.reason?.trim() ?? '';
     if (dto.vehicleStatus === EstadoVehiculo.FUERA_DE_SERVICIO) {
-      const trimmedReason = dto.reason?.trim() ?? '';
       if (trimmedReason.length < 5) {
         throw new BadRequestException({
           code: 'FAILURE_REASON_REQUIRED',
@@ -218,6 +218,10 @@ export class VehiculosService {
           repository.create({
             tipoVehiculo: type,
             estado: dto.vehicleStatus,
+            motivoInhabilitacion:
+              dto.vehicleStatus === EstadoVehiculo.FUERA_DE_SERVICIO
+                ? trimmedReason
+                : null,
             placa: dto.plate,
             capacidadKg: dto.capacityKg,
             capacidadYd3: dto.capacityYd3,
@@ -257,6 +261,10 @@ export class VehiculosService {
       });
 
       vehicle.estado = dto.vehicleStatus;
+      vehicle.motivoInhabilitacion =
+        dto.vehicleStatus === EstadoVehiculo.FUERA_DE_SERVICIO
+          ? dto.reason!.trim()
+          : null;
       vehicle.actualizadoEn = new Date();
 
       return repository.save(vehicle);
@@ -290,6 +298,10 @@ export class VehiculosService {
             reason: dto.reason,
           });
           vehicle.estado = dto.vehicleStatus;
+          vehicle.motivoInhabilitacion =
+            dto.vehicleStatus === EstadoVehiculo.FUERA_DE_SERVICIO
+              ? dto.reason!.trim()
+              : null;
         }
 
         if (dto.vehicleTypeId !== undefined) {

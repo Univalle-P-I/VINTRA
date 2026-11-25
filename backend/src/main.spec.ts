@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { bootstrap } from './main';
 
@@ -11,6 +12,7 @@ describe('inicio de la aplicación', () => {
   const originalPort = process.env.PORT;
 
   const mockApp = {
+    useGlobalPipes: jest.fn(),
     enableCors: jest.fn(),
     listen: jest.fn().mockResolvedValue(undefined),
   };
@@ -28,12 +30,15 @@ describe('inicio de la aplicación', () => {
     }
   });
 
-  it('configura CORS y usa el puerto 3002 de forma predeterminada', async () => {
+  it('configura ValidationPipe global, CORS y usa el puerto 3002 de forma predeterminada', async () => {
     delete process.env.PORT;
 
     await bootstrap();
 
     expect(NestFactory.create.mock.calls).toHaveLength(1);
+    expect(mockApp.useGlobalPipes).toHaveBeenCalledWith(
+      expect.any(ValidationPipe),
+    );
     expect(mockApp.enableCors).toHaveBeenCalledWith({
       origin: 'http://localhost:5173',
     });

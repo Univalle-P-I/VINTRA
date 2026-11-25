@@ -1,4 +1,4 @@
-﻿import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -16,7 +16,7 @@ describe('VehiculosService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    vehiculoMock = { id: '11111111-1111-4111-8111-111111111111', tipoVehiculo: tipoMock, estado: EstadoVehiculo.DISPONIBLE, placa: 'ABC123', capacidadKg: '8500', capacidadYd3: '16.5', activo: true, actualizadoEn: new Date('2026-11-21T00:00:00.000Z'), creadoEn: new Date('2026-11-21T00:00:00.000Z') };
+    vehiculoMock = { id: '11111111-1111-4111-8111-111111111111', tipoVehiculo: tipoMock, estado: EstadoVehiculo.DISPONIBLE, motivoInhabilitacion: null, placa: 'ABC123', capacidadKg: '8500', capacidadYd3: '16.5', activo: true, actualizadoEn: new Date('2026-11-21T00:00:00.000Z'), creadoEn: new Date('2026-11-21T00:00:00.000Z') };
     const mod = await Test.createTestingModule({ providers: [VehiculosService, { provide: getRepositoryToken(TipoVehiculo), useValue: tipoRepoMock }, { provide: getRepositoryToken(Vehiculo), useValue: vehiculoRepoMock }, { provide: DataSource, useValue: dataSourceMock }] }).compile();
     service = mod.get(VehiculosService);
   });
@@ -56,12 +56,17 @@ describe('VehiculosService', () => {
     await expect(service.obtener('none')).rejects.toThrow(NotFoundException);
   });
 
-  it('crea, actualiza y cambia estado de vehiculos', async () => {
+  it('crea, actualiza y persiste el motivo de inhabilitacion', async () => {
     await expect(service.crear({ vehicleTypeId: tipoMock.id, vehicleStatus: EstadoVehiculo.FUERA_DE_SERVICIO, plate: 'ABC123', capacityKg: '8000', capacityYd3: '15', reason: 'abc' }, 'u1', '')).rejects.toThrow(BadRequestException);
     tipoRepoMock.findOne.mockResolvedValueOnce(null);
     await expect(service.crear({ vehicleTypeId: tipoMock.id, vehicleStatus: EstadoVehiculo.DISPONIBLE, plate: 'ABC123', capacityKg: '8000', capacityYd3: '15' }, 'u1', '')).rejects.toThrow(NotFoundException);
     tipoRepoMock.findOne.mockResolvedValueOnce(tipoMock);
-    expect((await service.crear({ vehicleTypeId: tipoMock.id, vehicleStatus: EstadoVehiculo.DISPONIBLE, plate: 'ABC123', capacityKg: '8000', capacityYd3: '15' }, 'u1', '127.0.0.1')).esAsignable).toBe(true);
+    const creado = await service.crear({ vehicleTypeId: tipoMock.id, vehicleStatus: EstadoVehiculo.DISPONIBLE, plate: 'ABC123', capacityKg: '8000', capacityYd3: '15' }, 'u1', '127.0.0.1');
+    expect(creado.esAsignable).toBe(true);
+    expect(creado.motivoInhabilitacion).toBeNull();
+    tipoRepoMock.findOne.mockResolvedValueOnce(tipoMock);
+    const creadoInhabilitado = await service.crear({ vehicleTypeId: tipoMock.id, vehicleStatus: EstadoVehiculo.FUERA_DE_SERVICIO, plate: 'DEF456', capacityKg: '8000', capacityYd3: '15', reason: '  Falla hidraulica mayor  ' }, 'u1', '127.0.0.1');
+    expect(creadoInhabilitado.motivoInhabilitacion).toBe('Falla hidraulica mayor');
     tipoRepoMock.findOne.mockResolvedValueOnce(tipoMock);
     vehiculoRepoMock.save.mockRejectedValueOnce({ code: '23505' });
     await expect(service.crear({ vehicleTypeId: tipoMock.id, vehicleStatus: EstadoVehiculo.DISPONIBLE, plate: 'ABC123', capacityKg: '8000', capacityYd3: '15' }, 'u1', '')).rejects.toThrow(ConflictException);
@@ -79,9 +84,15 @@ describe('VehiculosService', () => {
     vehiculoRepoMock.findOne.mockResolvedValue({ ...vehiculoMock });
     expect((await service.actualizarEstado(vehiculoMock.id, { vehicleStatus: EstadoVehiculo.EN_SERVICIO }, 'u1', '127.0.0.1')).esAsignable).toBe(false);
     await expect(service.actualizarEstado(vehiculoMock.id, { vehicleStatus: EstadoVehiculo.FUERA_DE_SERVICIO }, 'u1', '')).rejects.toThrow(BadRequestException);
-    expect((await service.actualizarEstado(vehiculoMock.id, { vehicleStatus: EstadoVehiculo.FUERA_DE_SERVICIO, reason: 'Falla de frenos traseros' }, 'u1', '')).estado).toBe(EstadoVehiculo.FUERA_DE_SERVICIO);
-    vehiculoRepoMock.findOne.mockResolvedValueOnce({ ...vehiculoMock, estado: EstadoVehiculo.FUERA_DE_SERVICIO });
+    const inhabilitado = await service.actualizarEstado(vehiculoMock.id, { vehicleStatus: EstadoVehiculo.FUERA_DE_SERVICIO, reason: '  Falla de frenos traseros  ' }, 'u1', '');
+    expect(inhabilitado.estado).toBe(EstadoVehiculo.FUERA_DE_SERVICIO);
+    expect(inhabilitado.motivoInhabilitacion).toBe('Falla de frenos traseros');
+    vehiculoRepoMock.findOne.mockResolvedValueOnce({ ...vehiculoMock, estado: EstadoVehiculo.FUERA_DE_SERVICIO, motivoInhabilitacion: 'Falla de frenos traseros' });
     await expect(service.actualizarEstado(vehiculoMock.id, { vehicleStatus: EstadoVehiculo.DISPONIBLE }, 'u1', '')).rejects.toThrow(ConflictException);
+    vehiculoRepoMock.findOne.mockResolvedValueOnce({ ...vehiculoMock, estado: EstadoVehiculo.FUERA_DE_SERVICIO, motivoInhabilitacion: 'Falla de frenos traseros' });
+    const enMantenimiento = await service.actualizarEstado(vehiculoMock.id, { vehicleStatus: EstadoVehiculo.MANTENIMIENTO }, 'u1', '');
+    expect(enMantenimiento.estado).toBe(EstadoVehiculo.MANTENIMIENTO);
+    expect(enMantenimiento.motivoInhabilitacion).toBeNull();
     vehiculoRepoMock.findOne.mockResolvedValueOnce(null);
     await expect(service.actualizarEstado('missing', { vehicleStatus: EstadoVehiculo.MANTENIMIENTO }, 'u1', '')).rejects.toThrow(NotFoundException);
   });
