@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule } from '@nestjs/swagger';
 import { bootstrap } from './main';
 
 jest.mock('@nestjs/core', () => ({
@@ -13,11 +14,25 @@ describe('inicio de la aplicación', () => {
   const mockApp = {
     enableCors: jest.fn(),
     listen: jest.fn().mockResolvedValue(undefined),
+    setGlobalPrefix: jest.fn(),
+    useGlobalPipes: jest.fn(),
+    useGlobalFilters: jest.fn(),
   };
+  let swaggerSetup: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     (NestFactory.create as jest.Mock).mockResolvedValue(mockApp);
+    jest
+      .spyOn(SwaggerModule, 'createDocument')
+      .mockReturnValue({
+        openapi: '3.0.0',
+        info: { title: 'API VINTRA', version: '0.0.1' },
+        paths: {},
+      });
+    swaggerSetup = jest
+      .spyOn(SwaggerModule, 'setup')
+      .mockImplementation(() => undefined);
   });
 
   afterAll(() => {
@@ -37,6 +52,16 @@ describe('inicio de la aplicación', () => {
     expect(mockApp.enableCors).toHaveBeenCalledWith({
       origin: 'http://localhost:5173',
     });
+    expect(mockApp.setGlobalPrefix).toHaveBeenCalledWith('api/v1', {
+      exclude: ['health', 'health/db'],
+    });
+    expect(mockApp.useGlobalPipes).toHaveBeenCalledTimes(1);
+    expect(mockApp.useGlobalFilters).toHaveBeenCalledTimes(1);
+    expect(swaggerSetup).toHaveBeenCalledWith(
+      'api/docs',
+      mockApp,
+      expect.any(Object),
+    );
     expect(mockApp.listen.mock.calls).toEqual([[3002]]);
   });
 

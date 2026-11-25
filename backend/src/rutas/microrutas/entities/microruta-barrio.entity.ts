@@ -4,11 +4,12 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { Barrio } from '../../barrios/entities/barrios.entity';
 import { Microruta } from './microruta.entity';
 
-
+@Unique('uq_microroute_neighborhood', ['microruta', 'barrio'])
 @Entity({ name: 'microroute_neighborhood' })
 export class MicrorutaBarrio {
   @PrimaryGeneratedColumn('uuid')
