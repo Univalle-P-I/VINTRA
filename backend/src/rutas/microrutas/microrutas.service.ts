@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, QueryFailedError, Repository } from 'typeorm';
 import { Barrio } from '../barrios/entities/barrios.entity';
 import { Macroruta } from '../macrorutas/entities/macroruta.entity';
+import { lanzarErrorDeCreacionRuta } from '../errores-rutas';
 import { AsociarBarriosDto } from './dto/asociar-barrios.dto';
 import { CrearMicrorutaDto } from './dto/crear-microruta.dto';
 import { MicrorutaBarrio } from './entities/microruta-barrio.entity';
@@ -76,7 +77,10 @@ export class MicrorutasService {
       }
       id = idInsertado;
     } catch (error) {
-      this.lanzarErrorDeCreacion(error);
+      lanzarErrorDeCreacionRuta(
+        error,
+        'El código de la microruta ya existe.',
+      );
     }
 
     const { barrios: _barrios, ...creada } = await this.obtener(id);
@@ -228,21 +232,5 @@ export class MicrorutasService {
     }
 
     return this.obtener(id);
-  }
-
-  private lanzarErrorDeCreacion(error: unknown): never {
-    if (error instanceof QueryFailedError) {
-      const codigo = error.driverError.code;
-
-      if (codigo === '23505') {
-        throw new ConflictException('El código de la microruta ya existe.');
-      }
-
-      if (['22023', 'XX000', '22P02'].includes(codigo)) {
-        throw new BadRequestException('geom no es un GeoJSON válido.');
-      }
-    }
-
-    throw error;
   }
 }

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator';
+import { ApiMultiLineString } from '../../decorators/api-multilinestring.decorator';
 import { IsMultiLineString } from '../../validators/is-multilinestring';
 
 export class CrearMicrorutaDto {
@@ -19,18 +20,7 @@ export class CrearMicrorutaDto {
   @MaxLength(30)
   codigo: string;
 
-  @ApiProperty({
-    description: 'GeoJSON MultiLineString en SRID 4326.',
-    example: {
-      type: 'MultiLineString',
-      coordinates: [
-        [
-          [-76.53, 3.43],
-          [-76.52, 3.44],
-        ],
-      ],
-    },
-  })
+  @ApiMultiLineString()
   @IsMultiLineString()
   geom: unknown;
 }

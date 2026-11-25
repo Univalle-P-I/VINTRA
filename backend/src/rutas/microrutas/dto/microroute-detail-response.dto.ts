@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiMultiLineString } from '../../decorators/api-multilinestring.decorator';
 import { MacrorouteResponseDto } from '../../macrorutas/dto/macroroute-response.dto';
 import { MicrorouteNeighborhoodResponseDto } from './microroute-neighborhood-response.dto';
 import { MicrorouteResponseDto } from './microroute-response.dto';
@@ -7,18 +8,7 @@ export class MicrorouteDetailResponseDto extends MicrorouteResponseDto {
   @ApiProperty({ type: MacrorouteResponseDto })
   macroruta: MacrorouteResponseDto;
 
-  @ApiProperty({
-    description: 'GeoJSON MultiLineString en SRID 4326.',
-    example: {
-      type: 'MultiLineString',
-      coordinates: [
-        [
-          [-76.53, 3.43],
-          [-76.52, 3.44],
-        ],
-      ],
-    },
-  })
+  @ApiMultiLineString()
   geom: unknown;
 
   @ApiProperty({ type: MicrorouteNeighborhoodResponseDto, isArray: true })

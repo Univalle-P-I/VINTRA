@@ -1,13 +1,12 @@
 import {
-  BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CrearMacrorutaDto } from './dto/crear-macroruta.dto';
 import { Macroruta } from './entities/macroruta.entity';
+import { lanzarErrorDeCreacionRuta } from '../errores-rutas';
 
 @Injectable()
 export class MacrorutasService {
@@ -42,7 +41,10 @@ export class MacrorutasService {
 
       id = idInsertado;
     } catch (error) {
-      this.lanzarErrorDeCreacion(error);
+      lanzarErrorDeCreacionRuta(
+        error,
+        'El código de la macroruta ya existe.',
+      );
     }
 
     return this.obtener(id);
@@ -66,21 +68,5 @@ export class MacrorutasService {
 
     macroruta.geom = raw[0]?.geom_json;
     return macroruta;
-  }
-
-  private lanzarErrorDeCreacion(error: unknown): never {
-    if (error instanceof QueryFailedError) {
-      const codigo = error.driverError.code;
-
-      if (codigo === '23505') {
-        throw new ConflictException('El código de la macroruta ya existe.');
-      }
-
-      if (['22023', 'XX000', '22P02'].includes(codigo)) {
-        throw new BadRequestException('geom no es un GeoJSON válido.');
-      }
-    }
-
-    throw error;
   }
 }
