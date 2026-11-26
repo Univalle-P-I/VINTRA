@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
+          envs: JWT_SECRET
           script: |
             set -e
 

@@ -15,6 +15,7 @@ import { PersonalModule } from './personal/personal.module';
 import { RutasModule } from './rutas/rutas.module';
 import { UsersModule } from './users/users.module';
 import { SeguimientoModule } from './seguimiento/seguimiento.module';
+import { ThrottlerModule} from '@nestjs/throttler';
 
 export function createDatabaseOptions(
   config: ConfigService,
@@ -37,7 +38,9 @@ export function createDatabaseOptions(
       isGlobal: true,
       envFilePath: '../.env',
     }),
+    
     AuthModule,
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
     UsersModule,
     ProfileModule,
     TypeOrmModule.forRootAsync({
