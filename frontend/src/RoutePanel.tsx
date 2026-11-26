@@ -34,7 +34,6 @@ export default function RoutePanel({ canManage = true }: { canManage?: boolean }
   function saveMicro(e: FormEvent) {
     e.preventDefault()
     if (!name.trim()) return setErrors({ name: "Escribe el nombre de la microrruta." })
-    if (!parent) return setErrors({ parent: "Selecciona una macrorruta." })
     if (microroutes.some((m) => m.macrorouteId === parent && m.name.toLowerCase() === name.trim().toLowerCase())) return setErrors({ name: "Esa macrorruta ya tiene una microrruta con ese nombre." })
     add.microroute({ name: name.trim(), macrorouteId: parent }); show(`Microrruta ${name.trim()} creada.`); close()
   }
@@ -42,7 +41,6 @@ export default function RoutePanel({ canManage = true }: { canManage?: boolean }
     e.preventDefault()
     const next: Record<string, string> = {}
     if (!name.trim()) next.name = "Escribe un nombre para el horario."
-    if (!micro) next.micro = "Selecciona una microrruta."
     if (!start || !end || end <= start) next.time = "La hora de finalización debe ser posterior a la de inicio."
     if (!days.length) next.days = "Selecciona al menos un día."
     setErrors(next)
@@ -98,7 +96,7 @@ export default function RoutePanel({ canManage = true }: { canManage?: boolean }
     {modal === "macro" && (
       <Modal title="Nueva macrorruta" onClose={close}>
         <form noValidate onSubmit={saveMacro}>
-          <Field label="Nombre" value={name} onChange={setName} error={errors.name} required />
+          <Field label="Nombre" value={name} onChange={setName} error={errors.name} />
           <div className="actions" style={{ marginTop: 16 }}><Button primary type="submit">Crear macrorruta</Button><Button onClick={close}>Cancelar</Button></div>
         </form>
       </Modal>)}
@@ -106,8 +104,8 @@ export default function RoutePanel({ canManage = true }: { canManage?: boolean }
       <Modal title="Nueva microrruta" onClose={close}>
         <form noValidate onSubmit={saveMicro}>
           <div className="form-grid">
-            <Field label="Nombre" value={name} onChange={setName} error={errors.name} required />
-            <SelectField error={errors.parent} label="Macrorruta" required value={parent} onChange={setParent}><option value="">Seleccionar</option>{macroroutes.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</SelectField>
+            <Field label="Nombre" value={name} onChange={setName} error={errors.name} />
+            <SelectField label="Macrorruta" value={parent} onChange={setParent}>{macroroutes.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</SelectField>
           </div>
           <div className="actions" style={{ marginTop: 16 }}><Button primary type="submit">Crear microrruta</Button><Button onClick={close}>Cancelar</Button></div>
         </form>
@@ -116,10 +114,10 @@ export default function RoutePanel({ canManage = true }: { canManage?: boolean }
       <Modal title="Programar horario" onClose={close}>
         <form noValidate onSubmit={saveSchedule}>
           <div className="form-grid">
-            <Field label="Nombre del horario" value={name} onChange={setName} error={errors.name} placeholder="Ej.: Recolección de mañana" required />
-            <SelectField error={errors.micro} label="Microrruta" required value={micro} onChange={setMicro}><option value="">Seleccionar</option>{microroutes.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</SelectField>
-            <Field label="Hora de inicio" required type="time" value={start} onChange={setStart} />
-            <Field label="Hora de finalización" required type="time" value={end} onChange={setEnd} error={errors.time} />
+            <Field label="Nombre del horario" value={name} onChange={setName} error={errors.name} placeholder="Ej.: Recolección de mañana" />
+            <SelectField label="Microrruta" value={micro} onChange={setMicro}>{microroutes.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</SelectField>
+            <Field label="Hora de inicio" type="time" value={start} onChange={setStart} />
+            <Field label="Hora de finalización" type="time" value={end} onChange={setEnd} error={errors.time} />
           </div>
           <fieldset style={{ border: 0, margin: "16px 0 0", padding: 0 }}>
             <legend style={{ fontSize: "var(--text-sm)", fontWeight: 600 }}>Días de la semana</legend>

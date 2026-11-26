@@ -32,3 +32,4 @@ export const NO_MAP_DATA: MapData = {
   neighborhoods: emptyCollection,
   positions: [],
 }
+
