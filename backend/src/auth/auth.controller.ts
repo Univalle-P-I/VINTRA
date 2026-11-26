@@ -8,4 +8,5 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 
 export class AuthController {
     constructor(  private readonly AuthService: AuthService){}
+
 }
